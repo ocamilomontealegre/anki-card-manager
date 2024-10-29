@@ -1,0 +1,52 @@
+# Bytecode and other Python-related artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+
+# Virtual environments
+venv/
+.env/
+
+# Poetry-related
+# Poetry caches can be large and should be excluded.
+poetry.lock
+.poetry/
+
+# Git-related files
+.git/
+.gitignore
+.gitattributes
+
+# Docker-related files
+Dockerfile
+.dockerignore
+
+# Node.js related (if applicable)
+node_modules/
+npm-debug.log
+yarn.lock
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*~
+
+# OS generated files (macOS, Windows, etc.)
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment variables and sensitive files
+.env
+*.env
+
+# Test files
+tests/
+*.test.py
+pytest_cache/
+.coverage
+coverage.xml
+htmlcov/

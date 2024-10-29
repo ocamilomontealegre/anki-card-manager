@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "fast-api-project-template"
+version = "0.1.0"
+description = ""
+authors = ["ocamilomontealegre <ocamilomontealegre@gmail.com>"]
+readme = "README.md"
+packages = [{ include = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.0"
+uvicorn = "^0.31.0"
+pydantic = "^2.9.2"
+pydantic-settings = "^2.5.2"
+loguru = "^0.7.2"
+injector = "^0.22.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.10.0"
+flake8 = "^7.1.1"
+
+[tool.black]
+line-length = 79
+target-version = ["py310", "py311", "py312"]
+check = true
+
+
+[tool.poetry.scripts]
+start = "commands:start"
+lint = "commands:lint"
+format = "commands:format"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
