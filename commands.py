@@ -9,14 +9,14 @@ def get_poetry_python_path() -> str:
     )
     poetry_env_path = result.stdout.strip()
 
-    return path.join(poetry_env_path, "Scripts", "python.exe")
+    return path.join(poetry_env_path, "bin", "python")
 
 
 def start() -> None:
     """Start uvicorn server."""
     try:
         python_path = get_poetry_python_path()
-        print(python_path)
+        print(f"Using Python executable at: {python_path}")
         check_call([python_path, "src/main.py"])
     except KeyboardInterrupt:
         print("\nServer stopped manually.")
