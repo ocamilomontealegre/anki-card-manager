@@ -12,10 +12,13 @@ class FileService:
         with open(file_path, "wb") as file:
             file.write(await file_data.read())
         return file_path
+    
+    def __process_rows(rows: DataFrame): 
+        for _, row in rows.iterrows():
+            print(row)
 
     async def process_file(self, file: UploadFile):
         file_path = FileUtils.create_folder("uploads") / file.filename
         file_name = await self.__save_uploaded_file(file_path, file)
         df: DataFrame = read_csv(file_name, delimiter=";")
-        for _, row in df.iterrows():
-            print(row["word"])
+        result = self.__process_rows(df)
