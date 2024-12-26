@@ -18,5 +18,4 @@ class UploadService():
     async def process_file(self, file: UploadFile):
         file_path = FileUtils.create_folder("uploads") / file.filename
         file_name = await self.__save_file(file_path, file)
-        self.__event_emitter.emit("upload", "ok")
-        print("File: ", file_name)
+        self.__event_emitter.emit("upload", file_name)

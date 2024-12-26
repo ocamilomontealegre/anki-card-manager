@@ -1,5 +1,5 @@
 from injector import inject
-from fastapi import APIRouter, File, UploadFile
+from fastapi import APIRouter, File, HTTPException, UploadFile
 from ..services.upload_service import UploadService
 
 
@@ -13,6 +13,9 @@ class UploadController():
     def __register_routes(self):
         @self.__router.post("")
         async def upload(file: UploadFile = File(...)):
+            if not file:
+                raise HTTPException(status_code=400, detail="Not file provided")
+
             await self.__upload_service.process_file(file)
 
     def get_router(self) -> APIRouter:
