@@ -3,6 +3,7 @@ from injector import Injector
 from health.controllers.health_controller import HealthController
 from modules.file.controllers.file_controller import FileController
 from modules.upload.controllers.upload_controller import UploadController
+from modules.language.controllers.language_controller import LanguageController
 from app.enums.app_endpoints_enum import AppEndpoints
 
 
@@ -16,6 +17,7 @@ class AppRouter:
         health_controller = self.__injector.get(HealthController)
         file_controller = self.__injector.get(FileController)
         upload_controller = self.__injector.get(UploadController)
+        language_controller = self.__injector.get(LanguageController)
 
         self.__router.include_router(
             health_controller.get_router(),
@@ -30,6 +32,10 @@ class AppRouter:
         self.__router.include_router(
             upload_controller.get_router(),
             prefix=AppEndpoints.UPLOAD.value
+        )
+
+        self.__router.include_router(
+            language_controller.get_router(),
         )
 
     def get_router(self) -> APIRouter:
