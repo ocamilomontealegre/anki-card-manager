@@ -1,6 +1,7 @@
 from pydantic import ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from common.env.app_env_config import AppEnvVariables
+from common.env.open_ai_env_config import OpenAIEnvVariables
 from common.env.open_api_env_config import OpenAPIEnvVariables
 
 
@@ -10,6 +11,7 @@ class EnvVariables(BaseSettings):
     )
 
     app: AppEnvVariables
+    open_ai: OpenAIEnvVariables
     open_api: OpenAPIEnvVariables
 
 

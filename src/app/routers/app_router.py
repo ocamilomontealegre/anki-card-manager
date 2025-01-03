@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 from injector import Injector
 from health.controllers.health_controller import HealthController
-from modules.file.controllers.file_controller import FileController
 from modules.upload.controllers.upload_controller import UploadController
 from modules.language.controllers.language_controller import LanguageController
 from app.enums.app_endpoints_enum import AppEndpoints
@@ -15,18 +14,12 @@ class AppRouter:
 
     def __register_routes(self):
         health_controller = self.__injector.get(HealthController)
-        file_controller = self.__injector.get(FileController)
         upload_controller = self.__injector.get(UploadController)
         language_controller = self.__injector.get(LanguageController)
 
         self.__router.include_router(
             health_controller.get_router(),
             prefix=AppEndpoints.HEALTH.value
-        )
-
-        self.__router.include_router(
-            file_controller.get_router(),
-            prefix=AppEndpoints.FILE.value
         )
 
         self.__router.include_router(
