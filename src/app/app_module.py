@@ -1,5 +1,4 @@
 from pyee import EventEmitter
-from openai import OpenAI
 from injector import Binder, Module, singleton
 from health.health_module import HealthModule
 from modules.upload.upload_module import UploadModule
@@ -12,4 +11,3 @@ class AppModule(Module):
         binder.install(module=UploadModule)
         binder.install(module=LanguageModule)
         binder.bind(EventEmitter, to=EventEmitter, scope=singleton)
-        binder.bind(OpenAI, to=OpenAI, scope=singleton)
