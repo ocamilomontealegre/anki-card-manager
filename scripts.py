@@ -1,22 +1,12 @@
-from os import path
-from subprocess import CalledProcessError, check_call, run
-
-
-def get_poetry_python_path() -> str:
-    """Get the Python executable path from the Poetry virtual environment."""
-    result = run(
-        ["poetry", "env", "info", "--path"], capture_output=True, text=True, check=True
-    )
-    poetry_env_path = result.stdout.strip()
-
-    return path.join(poetry_env_path, "bin", "python")
+from sys import executable
+from subprocess import CalledProcessError, check_call
 
 
 def start() -> None:
     """Start uvicorn server."""
     try:
-        python_path = get_poetry_python_path()
-        print(f"Using Python executable at: {python_path}")
+        python_path = executable
+        print(python_path)
         check_call([python_path, "src/main.py"])
     except KeyboardInterrupt:
         print("\nServer stopped manually.")

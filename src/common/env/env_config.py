@@ -17,7 +17,9 @@ class EnvVariables(BaseSettings):
 
 def get_env_variables() -> EnvVariables:
     try:
-        return EnvVariables()
+        env = EnvVariables()
+        print(f"Loaded env vars: {env.dict()}")
+        return env
     except ValidationError as e:
         print(f"Error validating env variables {e}")
 

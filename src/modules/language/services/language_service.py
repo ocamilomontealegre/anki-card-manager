@@ -28,7 +28,7 @@ class LanguageService():
             model=self.__env.model,
             messages=[
                 {"role": "system", "content": "You are a polyglot expert with over 10 years of experience"},
-                {"role": "user", "content": f"please look for the definition of the word: {row.word}"}
+                {"role": "user", "content": f"please look for the definition of the word: {row["word"]}"}
             ],
             response_format=CardResponse
         )
@@ -36,6 +36,6 @@ class LanguageService():
         return completion.choices[0].message.parsed
 
     def process_csv(self, file_name: str):
-        df = read_csv(file_name, delimiter=";")
+        df = read_csv(file_name, delimiter=",")
         for _, row in df.iterrows():
             self.process_row(row.to_dict())

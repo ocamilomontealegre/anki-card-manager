@@ -20,6 +20,7 @@ pyee = "^12.1.1"
 openapi = "^2.0.0"
 openai = "^1.58.1"
 sqlalchemy = "^2.0.36"
+python-dotenv = "^1.0.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"
@@ -32,9 +33,9 @@ check = true
 
 
 [tool.poetry.scripts]
-start = "commands:start"
-lint = "commands:lint"
-format = "commands:format"
+start = "scripts:start"
+lint = "scripts:lint"
+format = "scripts:format"
 
 [build-system]
 requires = ["poetry-core"]
