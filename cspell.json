@@ -1,0 +1,11 @@
+{
+  "version": "0.2",
+  "language": "en_US,es",
+  "dictionaries": ["en_US", "es", "typescript"],
+  "allowCompoundWords": true,
+  "minWordLength": 3,
+  "ignoreRegExpList": ["http://[^s]*", "^[-\\w]+/[-\\w\\.]+$", "^foobar.*$", "I*"],
+  "ignoreWords": ["MMM"],
+  "words": ["openai"],
+  "flagWords": []
+}

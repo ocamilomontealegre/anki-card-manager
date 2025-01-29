@@ -1,7 +1,8 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
+from pydantic_settings import BaseSettings
 
 
-class OpenAPIEnvVariables(BaseModel):
+class OpenAPIEnvVariables(BaseSettings):
     title: str = Field(
         default="My Awesome API", description="Title for the app documentation"
     )

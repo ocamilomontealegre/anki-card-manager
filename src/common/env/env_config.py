@@ -1,6 +1,7 @@
 from pydantic import ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from common.env.app_env_config import AppEnvVariables
+from common.env.eleven_labs_env_config import ElevenLabsEnvVariables
 from common.env.open_ai_env_config import OpenAIEnvVariables
 from common.env.open_api_env_config import OpenAPIEnvVariables
 
@@ -11,14 +12,14 @@ class EnvVariables(BaseSettings):
     )
 
     app: AppEnvVariables
-    open_ai: OpenAIEnvVariables
-    open_api: OpenAPIEnvVariables
+    elevenlabs: ElevenLabsEnvVariables
+    openai: OpenAIEnvVariables
+    openapi: OpenAPIEnvVariables
 
 
 def get_env_variables() -> EnvVariables:
     try:
         env = EnvVariables()
-        print(f"Loaded env vars: {env.dict()}")
         return env
     except ValidationError as e:
         print(f"Error validating env variables {e}")

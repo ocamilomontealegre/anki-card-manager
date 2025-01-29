@@ -18,7 +18,7 @@ class AppBuilder:
         self.__env = get_env_variables()
 
     def set_open_api(self) -> "AppBuilder":
-        env_variables = self.__env.open_api
+        env_variables = self.__env.openapi
 
         self.__app.title = env_variables.title
         self.__app.description = env_variables.description
