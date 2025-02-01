@@ -2,6 +2,8 @@ from pydantic import ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from common.env.app_env_config import AppEnvVariables
 from common.env.eleven_labs_env_config import ElevenLabsEnvVariables
+from common.env.anki_env_config import AnkiEnvVariables
+from common.env.giphy_env_config import GiphyEnvVariables
 from common.env.open_ai_env_config import OpenAIEnvVariables
 from common.env.open_api_env_config import OpenAPIEnvVariables
 
@@ -11,8 +13,10 @@ class EnvVariables(BaseSettings):
         env_file=".env", env_nested_delimiter="_"
     )
 
+    anki: AnkiEnvVariables
     app: AppEnvVariables
     elevenlabs: ElevenLabsEnvVariables
+    giphy: GiphyEnvVariables
     openai: OpenAIEnvVariables
     openapi: OpenAPIEnvVariables
 
