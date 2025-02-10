@@ -6,6 +6,7 @@ from common.env.anki_env_config import AnkiEnvVariables
 from common.env.giphy_env_config import GiphyEnvVariables
 from common.env.open_ai_env_config import OpenAIEnvVariables
 from common.env.open_api_env_config import OpenAPIEnvVariables
+from common.env.unplash_env_config import UnplashEnvVariables
 
 
 class EnvVariables(BaseSettings):
@@ -19,6 +20,7 @@ class EnvVariables(BaseSettings):
     giphy: GiphyEnvVariables
     openai: OpenAIEnvVariables
     openapi: OpenAPIEnvVariables
+    unplash: UnplashEnvVariables
 
 
 def get_env_variables() -> EnvVariables:

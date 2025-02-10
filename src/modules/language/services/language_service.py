@@ -11,14 +11,11 @@ from ..models.interfaces import CardResponse, Row
 class LanguageService():
     @inject
     def __init__(self, event_emitter: EventEmitter) -> None:
-        self.__open_ai_env = get_env_variables().openai
-        self.__eleven_labs_env = get_env_variables().elevenlabs
-        self.__anki_env = get_env_variables().anki
-        self.__giphy_env = get_env_variables().giphy
+        self.__env = get_env_variables()
 
         self.__event_emitter = event_emitter
-        self.__open_ai_client = OpenAI(api_key=self.__open_ai_env.key)
-        self.__eleven_labs_client = ElevenLabs(api_key=self.__eleven_labs_env.key)
+        self.__open_ai_client = OpenAI(api_key=self.__env.openai.key)
+        self.__eleven_labs_client = ElevenLabs(api_key=self.__env.elevenlabs.key)
 
         self.__event_emitter.on("upload", self.process_csv)
 
@@ -30,11 +27,11 @@ class LanguageService():
         sentence = card_info["sentence"]
         partial_sentence = sentence.replace(word, "[...]")
 
-        url = f'https://api.giphy.com/v1/gifs/search?q={word}&api_key={self.__giphy_env.key}&limit=1'
+        url = f'https://api.giphy.com/v1/gifs/search?q={word}&api_key={self.__env.openai.key}&limit=1'
         response = requests.get(url)
         image = response.json()['data'][0]['url']
 
-        url2 = f"https://api.unsplash.com/search/photos?query={word}&client_id={}&per_page=1"
+        url2 = f"https://api.unsplash.com/search/photos?query={word}&client_id={self.__env.unplash.key}&per_page=1"
         response2 = requests.get(url2)
         image2 = response2.json()['results'][0]['urls']['regular']
 
@@ -91,7 +88,7 @@ class LanguageService():
 
     def process_row(self, row: Row) -> CardResponse:
         completion = self.__open_ai_client.beta.chat.completions.parse(
-            model=self.__open_ai_env.model,
+            model=self.__env.openai.model,
             messages=[
                 {"role": "system", "content": "You are a polyglot expert with over 10 years of experience"},
                 {"role": "user", "content": f"please look for the definition of the word: {row["word"]} in the {row["language"]} language"}
