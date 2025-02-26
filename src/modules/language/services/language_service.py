@@ -3,19 +3,26 @@ from injector import inject
 from pandas import read_csv
 from pyee import EventEmitter
 from openai import OpenAI
+from sqlalchemy.orm import Session
 from elevenlabs.client import ElevenLabs
+from common.database.strategies.database_strategy import DatabaseStrategy
 from common.env.env_config import get_env_variables
 from ..models.interfaces import CardResponse, Row
 
 
 class LanguageService():
     @inject
-    def __init__(self, event_emitter: EventEmitter) -> None:
+    def __init__(self, db: DatabaseStrategy, event_emitter: EventEmitter) -> None:
         self.__env = get_env_variables()
+
+        self.__session = db.create_session()
 
         self.__event_emitter = event_emitter
         self.__open_ai_client = OpenAI(api_key=self.__env.openai.key)
         self.__eleven_labs_client = ElevenLabs(api_key=self.__env.elevenlabs.key)
+
+        self.__giphy_base_url = "https://api.giphy.com/v1/gifs/"
+        self.__unplash_base_url = "https://api.unsplash.com/"
 
         self.__event_emitter.on("upload", self.process_csv)
 
@@ -27,13 +34,17 @@ class LanguageService():
         sentence = card_info["sentence"]
         partial_sentence = sentence.replace(word, "[...]")
 
-        url = f'https://api.giphy.com/v1/gifs/search?q={word}&api_key={self.__env.openai.key}&limit=1'
+        url = f'{self.__giphy_base_url}search?q={word}&api_key={self.__env.giphy.key}&limit=1'
         response = requests.get(url)
-        image = response.json()['data'][0]['url']
+        image: str = ''
+        if response.status_code == 200:
+            image = response.json()['data'][0]['url']
 
-        url2 = f"https://api.unsplash.com/search/photos?query={word}&client_id={self.__env.unplash.key}&per_page=1"
+        url2 = f"{self.__unplash_base_url}search/photos?query={word}&client_id={self.__env.unplash.key}&per_page=1"
         response2 = requests.get(url2)
-        image2 = response2.json()['results'][0]['urls']['regular']
+        image2: str = ''
+        if response2.status_code == 200:
+            image2 = response2.json()['results'][0]['urls']['regular']
 
         # audio = self.__eleven_labs_client.text_to_speech.convert(
         #     text=sentence,
@@ -84,6 +95,7 @@ class LanguageService():
             "image2": image2
             # "audio": audio_path
         }
+        
         print("🚀 Dict: ", new_dict)
 
     def process_row(self, row: Row) -> CardResponse:

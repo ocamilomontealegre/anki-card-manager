@@ -7,6 +7,7 @@ from common.env.giphy_env_config import GiphyEnvVariables
 from common.env.open_ai_env_config import OpenAIEnvVariables
 from common.env.open_api_env_config import OpenAPIEnvVariables
 from common.env.unplash_env_config import UnplashEnvVariables
+from common.env.pg_env_config import PgEnvVariables
 
 
 class EnvVariables(BaseSettings):
@@ -20,6 +21,7 @@ class EnvVariables(BaseSettings):
     giphy: GiphyEnvVariables
     openai: OpenAIEnvVariables
     openapi: OpenAPIEnvVariables
+    pg: PgEnvVariables
     unplash: UnplashEnvVariables
 
 
