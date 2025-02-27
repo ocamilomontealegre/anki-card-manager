@@ -83,6 +83,7 @@ class LanguageService():
         #     )
 
         new_dict = {
+            "definition": card_info["definition"],
             "plural": plural,
             "plural_audio": plural_audio_path,
             "singular": singular,
