@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from elevenlabs.client import ElevenLabs
 from common.database.strategies.database_strategy import DatabaseStrategy
 from common.env.env_config import get_env_variables
+from ..models.entities.word_entity import Word
 from ..models.interfaces import CardResponse, Row
 
 
@@ -82,22 +83,24 @@ class LanguageService():
         #         output_format="mp3_44100_128",
         #     )
 
-        new_dict = {
-            "definition": card_info["definition"],
-            "plural": plural,
-            "plural_audio": plural_audio_path,
-            "singular": singular,
-            "singular_audio": singular_audio_path,
-            "synonyms": synonyms,
-            "sentence": sentence,
-            "partial_sentence": partial_sentence,
-            "word": f"{', '.join(singular)}, {', '.join(plural)}",
-            "image": image,
-            "image2": image2
-            # "audio": audio_path
-        }
+        new_word = Word(
+            word=f"{', '.join(singular)}, {', '.join(plural)}",
+            definition=card_info["definition"],
+            sentence=sentence,
+            sentence_audio="", 
+            partial_sentence=partial_sentence,
+            singular=singular,
+            singular_audio=singular_audio_path,
+            plural=plural,
+            plural_audio=plural_audio_path,
+            synonyms=synonyms,
+            image=image,
+            image2=image2
+        )
+        self.__session.add(new_word)
+        self.__session.commit()
         
-        print("🚀 Dict: ", new_dict)
+        print("🚀 Dict: ", new_word)
 
     def process_row(self, row: Row) -> CardResponse:
         completion = self.__open_ai_client.beta.chat.completions.parse(
