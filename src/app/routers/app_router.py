@@ -29,6 +29,7 @@ class AppRouter:
 
         self.__router.include_router(
             language_controller.get_router(),
+            prefix=AppEndpoints.LANGUAGE.value
         )
 
     def get_router(self) -> APIRouter:

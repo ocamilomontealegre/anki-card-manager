@@ -5,3 +5,4 @@ class AppEndpoints(Enum):
     HEALTH = "/health"
     FILE = "/files"
     UPLOAD = "/uploads"
+    LANGUAGE = "/words"

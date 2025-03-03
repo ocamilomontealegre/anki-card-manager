@@ -16,7 +16,7 @@ class LanguageService():
     def __init__(self, db: DatabaseStrategy, event_emitter: EventEmitter) -> None:
         self.__env = get_env_variables()
 
-        self.__session = db.create_session()
+        self.__session: Session = db.create_session()
 
         self.__event_emitter = event_emitter
         self.__open_ai_client = OpenAI(api_key=self.__env.openai.key)
@@ -95,7 +95,7 @@ class LanguageService():
             plural_audio=plural_audio_path,
             synonyms=synonyms,
             image=image,
-            image2=image2
+            image_2=image2
         )
         self.__session.add(new_word)
         self.__session.commit()
@@ -149,3 +149,7 @@ class LanguageService():
 
         # for _, row in df.iterrows():
         #     self.process_row(row.to_dict())
+
+    def find_all(self):
+        words = self.__session.query(Word).all()
+        return words

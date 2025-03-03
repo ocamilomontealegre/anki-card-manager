@@ -3,6 +3,7 @@ from injector import Injector
 from app.app_module import AppModule
 from app.routers.app_router import AppRouter
 from common.interceptors import HTTPInterceptor
+from common.database.strategies.database_strategy import DatabaseStrategy
 from common.exception_handlers import (
     GeneralExceptionHandler,
     HTTPExceptionHandler,
@@ -45,6 +46,13 @@ class AppBuilder:
             self.__router,
             prefix=f"/{env_variables.global_prefix}/{env_variables.version}",
         )
+        return self
+
+    def set_database(self) -> "AppBuilder":
+        db = self.__injector.get(DatabaseStrategy)
+        db.create_session()
+        db.create_tables()
+
         return self
 
     def build(self):

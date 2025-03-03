@@ -14,7 +14,7 @@ class Word(Base):
     sentence_audio = Column(String(256), unique=False, nullable=False)
     partial_sentence = Column(String(256), unique=False, nullable=False)
     singular = Column(String(256), unique=False, nullable=False)
-    singular_audiot = Column(String(256), unique=False, nullable=False)
+    singular_audio = Column(String(256), unique=False, nullable=False)
     plural = Column(String(256), unique=False, nullable=True)
     plural_audio = Column(String(256), unique=False, nullable=True)
     synonyms = Column(String(256), unique=False, nullable=True)

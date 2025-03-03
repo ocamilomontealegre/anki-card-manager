@@ -9,6 +9,7 @@ app = (
     .set_http_logging_middleware()
     .set_exception_handlers()
     .set_router()
+    .set_database()
     .build()
 )
 
