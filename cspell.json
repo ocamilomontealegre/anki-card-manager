@@ -5,7 +5,7 @@
   "allowCompoundWords": true,
   "minWordLength": 3,
   "ignoreRegExpList": ["http://[^s]*", "^[-\\w]+/[-\\w\\.]+$", "^foobar.*$", "I*"],
-  "ignoreWords": ["MMM"],
+  "ignoreWords": [""],
   "words": ["openai"],
   "flagWords": []
 }

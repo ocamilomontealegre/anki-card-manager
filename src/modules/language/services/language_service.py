@@ -20,6 +20,7 @@ class LanguageService():
 
         self.__event_emitter = event_emitter
         self.__open_ai_client = OpenAI(api_key=self.__env.openai.key)
+
         self.__eleven_labs_client = ElevenLabs(api_key=self.__env.elevenlabs.key)
 
         self.__giphy_base_url = "https://api.giphy.com/v1/gifs/"
@@ -29,9 +30,9 @@ class LanguageService():
 
     def process_card(self, card_info: CardResponse):
         word = card_info["word"]
-        plural = list(map(lambda x: x.capitalize(), card_info["plural"]))
-        singular = list(map(lambda x: x.capitalize(), card_info["singular"]))
-        synonyms = list(map(lambda x: x.capitalize(), card_info["synonyms"]))
+        plural = ", ".join(list(map(lambda x: x.capitalize(), card_info["plural"])))
+        singular = ", ".join(list(map(lambda x: x.capitalize(), card_info["singular"])))
+        synonyms = ", ".join(list(map(lambda x: x.capitalize(), card_info["synonyms"])))
         sentence = card_info["sentence"]
         partial_sentence = sentence.replace(word, "[...]")
 
@@ -84,9 +85,10 @@ class LanguageService():
         #     )
 
         new_word = Word(
-            word=f"{', '.join(singular)}, {', '.join(plural)}",
+            word=lambda(),
             definition=card_info["definition"],
             sentence=sentence,
+            phonetics=card_info["phonetics"],
             sentence_audio="", 
             partial_sentence=partial_sentence,
             singular=singular,
@@ -97,10 +99,9 @@ class LanguageService():
             image=image,
             image_2=image2
         )
+        print("WORD: ", new_word)
         self.__session.add(new_word)
         self.__session.commit()
-        
-        print("🚀 Dict: ", new_word)
 
     def process_row(self, row: Row) -> CardResponse:
         completion = self.__open_ai_client.beta.chat.completions.parse(
@@ -124,7 +125,8 @@ class LanguageService():
                 'plural': [],
                 'singular': ['hello'],
                 'synonyms': ['hi', 'greetings', 'salutation'],
-                'sentence': "When answering the phone, she always starts with a cheerful 'hello'."
+                'sentence': "When answering the phone, she always starts with a cheerful 'hello'.",
+                "phonetics": ""
             },
             {
                 'word': 'salut',
@@ -132,7 +134,8 @@ class LanguageService():
                 'plural': ['saluts'],
                 'singular': ['salut'],
                 'synonyms': ['bonjour', 'salutation'],
-                'sentence': 'Je lui ai dit salut en entrant dans la pièce.'
+                'sentence': 'Je lui ai dit salut en entrant dans la pièce.',
+                "phonetics": ""
             },
             {
                 'word': 'calcio',
@@ -140,7 +143,8 @@ class LanguageService():
                 'plural': ['calci', 'calcio'],
                 'singular': ['calcio'],
                 'synonyms': ['calcio a 11', 'calcio moderno'],
-                'sentence': 'Il calcio è lo sport più popolare in Italia e in molti altri paesi.'
+                'sentence': 'Il calcio è lo sport più popolare in Italia e in molti altri paesi.',
+                "phonetics": ""
             }
         ]
 

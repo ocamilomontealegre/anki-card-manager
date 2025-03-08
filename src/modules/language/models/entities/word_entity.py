@@ -11,6 +11,7 @@ class Word(Base):
     word = Column(String(256), unique=False, nullable=False)
     definition = Column(String(256), unique=False, nullable=False)
     sentence = Column(String(256), unique=False, nullable=False)
+    phonetics = Column(String(256), unique=False, nullable=False)
     sentence_audio = Column(String(256), unique=False, nullable=False)
     partial_sentence = Column(String(256), unique=False, nullable=False)
     singular = Column(String(256), unique=False, nullable=False)
