@@ -83,9 +83,10 @@ class LanguageService():
         #         model_id="eleven_multilingual_v2",
         #         output_format="mp3_44100_128",
         #     )
+        print("WORD: ", card_info["word"][:-1])
 
         new_word = Word(
-            word=lambda(),
+            word=word,
             definition=card_info["definition"],
             sentence=sentence,
             phonetics=card_info["phonetics"],
