@@ -28,6 +28,9 @@ class LanguageService():
 
         self.__event_emitter.on("upload", self.process_csv)
 
+    def __calculate_language_id(self):
+        pass
+
     def process_card(self, card_info: CardResponse):
         word = card_info["word"]
         plural = ", ".join(list(map(lambda x: x.capitalize(), card_info["plural"])))
@@ -83,10 +86,10 @@ class LanguageService():
         #         model_id="eleven_multilingual_v2",
         #         output_format="mp3_44100_128",
         #     )
-        print("WORD: ", card_info["word"][:-1])
+        word_forms = f"{singular}, {plural}"
 
         new_word = Word(
-            word=word,
+            word=word_forms[:-1] if word_forms[-1] == "," else word_forms,
             definition=card_info["definition"],
             sentence=sentence,
             phonetics=card_info["phonetics"],
