@@ -161,3 +161,6 @@ class LanguageService():
     def find_all(self):
         words = self.__session.query(Word).all()
         return words
+
+    def delete_all(self):
+        self.__session.query(Word).delete()
