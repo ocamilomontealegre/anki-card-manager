@@ -28,9 +28,6 @@ class LanguageService():
 
         self.__event_emitter.on("upload", self.process_csv)
 
-    def __calculate_language_id(self):
-        pass
-
     def process_card(self, card_info: CardResponse):
         word = card_info["word"]
         plural = ", ".join(list(map(lambda x: x.capitalize(), card_info["plural"])))
@@ -90,10 +87,11 @@ class LanguageService():
 
         new_word = Word(
             word=word_forms[:-1] if word_forms[-1] == "," else word_forms,
+            category=card_info["category"],
             definition=card_info["definition"],
             sentence=sentence,
             phonetics=card_info["phonetics"],
-            sentence_audio="", 
+            sentence_audio="",
             partial_sentence=partial_sentence,
             singular=singular,
             singular_audio=singular_audio_path,
@@ -104,8 +102,7 @@ class LanguageService():
             image_2=image2
         )
         print("WORD: ", new_word)
-        self.__session.add(new_word)
-        self.__session.commit()
+        self.create(new_word)
 
     def process_row(self, row: Row) -> CardResponse:
         completion = self.__open_ai_client.beta.chat.completions.parse(
@@ -125,6 +122,7 @@ class LanguageService():
         words_data = [
             {
                 'word': 'hello',
+                'category': "noun",
                 'definition': 'A greeting or expression of goodwill used when meeting someone, answering the phone, or initiating a conversation.',
                 'plural': [],
                 'singular': ['hello'],
@@ -134,6 +132,7 @@ class LanguageService():
             },
             {
                 'word': 'salut',
+                'category': 'noun',
                 'definition': "Salut est une interjection française utilisée pour saluer quelqu'un. Elle peut également être employée comme un toast lors de la consommation de boissons.",
                 'plural': ['saluts'],
                 'singular': ['salut'],
@@ -143,6 +142,7 @@ class LanguageService():
             },
             {
                 'word': 'calcio',
+                'category': 'noun',
                 'definition': 'Sport di squadra giocato tra due squadre di undici giocatori su un campo di gioco rettangolare, in cui i giocatori tentano di segnare gol calciando una palla in rete.',
                 'plural': ['calci', 'calcio'],
                 'singular': ['calcio'],
@@ -157,6 +157,11 @@ class LanguageService():
 
         # for _, row in df.iterrows():
         #     self.process_row(row.to_dict())
+
+    def create(self, word: Word):
+        new_word = self.__session.add(word)
+        self.__session.commit()
+        return new_word
 
     def find_all(self):
         words = self.__session.query(Word).all()
