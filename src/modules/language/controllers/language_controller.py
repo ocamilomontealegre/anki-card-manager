@@ -11,9 +11,7 @@ class LanguageController:
         self.__register_routes()
 
     def __register_routes(self):
-        @self.__router.get("")
-        async def find_all():
-            return self.language_service.find_all()
+        pass
 
     def get_router(self) -> APIRouter:
         return self.__router

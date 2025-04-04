@@ -3,20 +3,23 @@ from injector import inject
 from pandas import read_csv
 from pyee import EventEmitter
 from openai import OpenAI
-from sqlalchemy.orm import Session
 from elevenlabs.client import ElevenLabs
-from common.database.strategies.database_strategy import DatabaseStrategy
 from common.env.env_config import get_env_variables
-from ..models.entities.word_entity import Word
+from modules.word.services.word_service import WordService
+from modules.word.models.entities.word_entity import Word
 from ..models.interfaces import CardResponse, Row
 
 
 class LanguageService():
     @inject
-    def __init__(self, db: DatabaseStrategy, event_emitter: EventEmitter) -> None:
+    def __init__(
+        self,
+        word_service: WordService,
+        event_emitter: EventEmitter
+    ) -> None:
         self.__env = get_env_variables()
 
-        self.__session: Session = db.create_session()
+        self.__word_service = word_service
 
         self.__event_emitter = event_emitter
         self.__open_ai_client = OpenAI(api_key=self.__env.openai.key)
@@ -28,62 +31,49 @@ class LanguageService():
 
         self.__event_emitter.on("upload", self.process_csv)
 
-    def process_card(self, card_info: CardResponse):
+    def __get_image_from_api(self, url: str):
+        response = requests.get(url)
+        if response.status_code == 200:
+            return response.json()
+
+    def __transform_text_to_audio(self, text: str, word: str, prefix: str = "") -> str:
+        audio = self.__eleven_labs_client.text_to_speech.convert(
+            text=text,
+            voice_id="JBFqnCBsd6RMkjVDRZzb",
+            model_id="eleven_multilingual_v2",
+            output_format="mp3_44100_128",
+        )
+
+        audio_bytes = b''.join(audio)
+        audio_path = f"{self.__env.anki.audios}/{prefix}{word}.mp3"
+        with open(audio_path, "wb") as audio_file:
+            audio_file.write(audio_bytes)
+        return audio_path
+
+    def __transform_card(self, card_info: CardResponse) -> Word:
         word = card_info["word"]
         plural = ", ".join(list(map(lambda x: x.capitalize(), card_info["plural"])))
         singular = ", ".join(list(map(lambda x: x.capitalize(), card_info["singular"])))
         synonyms = ", ".join(list(map(lambda x: x.capitalize(), card_info["synonyms"])))
         sentence = card_info["sentence"]
         partial_sentence = sentence.replace(word, "[...]")
+        word_forms = f"{singular}, {plural}"
 
-        url = f'{self.__giphy_base_url}search?q={word}&api_key={self.__env.giphy.key}&limit=1'
-        response = requests.get(url)
-        image: str = ''
-        if response.status_code == 200:
-            image = response.json()['data'][0]['url']
+        giphy_url = f'{self.__giphy_base_url}search?q={word}&api_key={self.__env.giphy.key}&limit=1'
+        giphy_image = self.__get_image_from_api(giphy_url)['data'][0]['url']
 
-        url2 = f"{self.__unplash_base_url}search/photos?query={word}&client_id={self.__env.unplash.key}&per_page=1"
-        response2 = requests.get(url2)
-        image2: str = ''
-        if response2.status_code == 200:
-            image2 = response2.json()['results'][0]['urls']['regular']
+        unplash_url = f"{self.__unplash_base_url}search/photos?query={word}&client_id={self.__env.unplash.key}&per_page=1"
+        unplash_image = self.__get_image_from_api(unplash_url)['results'][0]['urls']['regular']
 
-        # audio = self.__eleven_labs_client.text_to_speech.convert(
-        #     text=sentence,
-        #     voice_id="JBFqnCBsd6RMkjVDRZzb",
-        #     model_id="eleven_multilingual_v2",
-        #     output_format="mp3_44100_128",
-        # )
-        # # Assuming `audio` is a generator:
-        # audio_bytes = b''.join(audio)
-        # audio_path = f"{self.__anki_env.audios}/{word}.mp3"
-
-        # # Now you can write the bytes to a file
-        # with open(audio_path, "wb") as audio_file:
-        #     audio_file.write(audio_bytes)
+        sentence_path = self.__transform_text_to_audio(sentence, word)
 
         plural_audio_path = ''
-        # if len(plural) > 0:
-        #     plural_audio = self.__eleven_labs_client.text_to_speech.convert(
-        #         text=', '.join(plural),
-        #         voice_id="JBFqnCBsd6RMkjVDRZzb",
-        #         model_id="eleven_multilingual_v2",
-        #         output_format="mp3_44100_128",
-        #     )
-        #     plural_audio_bytes = b''.join(plural_audio)
-        #     plural_audio_path = f"{self.__anki_env.audios}/plural_{word}.mp3"
-        #     with open(plural_audio_path, "wb") as audio_file:
-        #         audio_file.write(plural_audio_bytes)
-            
+        if len(plural) > 0:
+            plural_audio_path = self.__transform_text_to_audio(plural, word, "plural")
+
         singular_audio_path = ''
-        # if len(singular) > 0:
-        #     singular_audio = self.__eleven_labs_client.text_to_speech.conver(
-        #         text=plural,
-        #         voice_id="JBFqnCBsd6RMkjVDRZzb",
-        #         model_id="eleven_multilingual_v2",
-        #         output_format="mp3_44100_128",
-        #     )
-        word_forms = f"{singular}, {plural}"
+        if len(singular) > 0:
+            singular_audio_path = self.__transform_text_to_audio(singular, word, "singular")
 
         new_word = Word(
             word=word_forms[:-1] if word_forms[-1] == "," else word_forms,
@@ -91,18 +81,21 @@ class LanguageService():
             definition=card_info["definition"],
             sentence=sentence,
             phonetics=card_info["phonetics"],
-            sentence_audio="",
+            sentence_audio=sentence_path,
             partial_sentence=partial_sentence,
             singular=singular,
             singular_audio=singular_audio_path,
             plural=plural,
             plural_audio=plural_audio_path,
             synonyms=synonyms,
-            image=image,
-            image_2=image2
+            image=giphy_image,
+            image_2=unplash_image
         )
-        print("WORD: ", new_word)
-        self.create(new_word)
+        return new_word
+
+    def process_card(self, card_info: CardResponse):
+        word = self.__transform_card(card_info)
+        self.__word_service.create(word)
 
     def process_row(self, row: Row) -> CardResponse:
         completion = self.__open_ai_client.beta.chat.completions.parse(
@@ -157,15 +150,3 @@ class LanguageService():
 
         # for _, row in df.iterrows():
         #     self.process_row(row.to_dict())
-
-    def create(self, word: Word):
-        new_word = self.__session.add(word)
-        self.__session.commit()
-        return new_word
-
-    def find_all(self):
-        words = self.__session.query(Word).all()
-        return words
-
-    def delete_all(self):
-        self.__session.query(Word).delete()
