@@ -1,5 +1,6 @@
+from typing import Dict
 from injector import inject
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from ..services.word_service import WordService
 
 
@@ -12,8 +13,9 @@ class WordController:
 
     def __register_routes(self):
         @self.__router.get("")
-        async def find_all():
-            return self.__word_service.find_all()
+        async def find_all(request: Request):
+            filters: Dict[str, str] = {k: v for k, v in request.query_params.items() if v}
+            return self.__word_service.find_all(filters)
 
         @self.__router.delete("")
         async def delete_all():

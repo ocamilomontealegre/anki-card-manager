@@ -15,9 +15,16 @@ class WordService():
         self.__session.refresh(word)
         return new_word
 
-    def find_all(self):
-        words = self.__session.query(Word).all()
-        return words
+    def find_all(self, filters: dict):
+        query = self.__session.query(Word)
+
+        if "category" in filters:
+            query = query.filter(Word.category == filters["category"])
+
+        if "word" in filters:
+            query = query.filter(Word.word.contains(filters["word"]))
+
+        return query.all()
 
     def delete_all(self):
         self.__session.query(Word).delete()
