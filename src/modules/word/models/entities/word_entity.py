@@ -26,4 +26,4 @@ class Word(Base):
     updated_at = Column(DateTime, default=func.now())
 
     def __repr__(self):
-        return f"<Word(id={self.id}, word={self.word})>"
+        return f"<Word(id={self.id}, word={self.word}), category={self.category}>"
