@@ -4,7 +4,9 @@ import pandas as pd
 from injector import inject
 from sqlalchemy.orm import Session
 from common.database.strategies.database_strategy import DatabaseStrategy
+from common.env.env_config import get_env_variables
 from ..models.entities.word_entity import Word
+from ..models.inferfaces.find_all_params import FindAllParams
 
 
 class WordService():
@@ -12,22 +14,7 @@ class WordService():
     def __init__(self, db: DatabaseStrategy) -> None:
         self.__session: Session = db.create_session()
 
-    def create(self, word: Word) -> Word:
-        new_word = self.__session.add(word)
-        self.__session.commit()
-        self.__session.refresh(word)
-        return new_word
-
-    def find_all(self, filters: dict):
-        query = self.__session.query(Word)
-
-        if "category" in filters:
-            query = query.filter(Word.category == filters["category"])
-
-        if "word" in filters:
-            query = query.filter(Word.word.contains(filters["word"]))
-
-        return query.all()
+        self.__anki_env = get_env_variables().anki
 
     def __transform_word(self, word: Word):
         return {
@@ -48,7 +35,13 @@ class WordService():
             "image_2": word.image_2,
         }
 
-    def get_as_csv(self, filters: dict):
+    def create(self, word: Word) -> Word:
+        new_word = self.__session.add(word)
+        self.__session.commit()
+        self.__session.refresh(word)
+        return new_word
+
+    def find_all(self, filters: FindAllParams):
         query = self.__session.query(Word)
 
         if "category" in filters:
@@ -57,11 +50,28 @@ class WordService():
         if "word" in filters:
             query = query.filter(Word.word.contains(filters["word"]))
 
+        if "language" in filters:
+            query = query.filter(Word.language == filters["language"].value)
+
+        return query.all()
+
+    def get_as_csv(self, filters: FindAllParams):
+        query = self.__session.query(Word)
+
+        if "category" in filters:
+            query = query.filter(Word.category == filters["category"])
+
+        if "word" in filters:
+            query = query.filter(Word.word.contains(filters["word"]))
+
+        if "language" in filters:
+            query = query.filter(Word.language == filters["language"].value)
+
         result = query.all()
         words = [self.__transform_word(word) for word in result]
         df = pd.DataFrame(words)
 
-        output_path = Path("output") / f"{uuid4()}.csv"
+        output_path = Path(self.__anki_env.output) / f"{uuid4()}.csv"
 
         df.to_csv(output_path, index=False)
         return {"status": "OK"}

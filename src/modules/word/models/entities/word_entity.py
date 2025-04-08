@@ -8,6 +8,7 @@ class Word(Base):
     __tablename__ = "words"
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    language = Column(String(36), unique=False, nullable=False)
     word = Column(String(256), unique=False, nullable=False)
     category = Column(String(56), unique=False, nullable=False)
     definition = Column(String(256), unique=False, nullable=False)
