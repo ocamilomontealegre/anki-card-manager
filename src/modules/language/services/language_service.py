@@ -77,6 +77,7 @@ class LanguageService():
 
         new_word = Word(
             word=word_forms[:-1] if word_forms[-1] == "," else word_forms,
+            language=card_info["language"],
             category=card_info["category"],
             definition=card_info["definition"],
             sentence=sentence,
@@ -115,6 +116,7 @@ class LanguageService():
         words_data = [
             {
                 'word': 'hello',
+                "language": "en",
                 'category': "noun",
                 'definition': 'A greeting or expression of goodwill used when meeting someone, answering the phone, or initiating a conversation.',
                 'plural': [],
@@ -125,6 +127,7 @@ class LanguageService():
             },
             {
                 'word': 'salut',
+                "language": "fr",
                 'category': 'noun',
                 'definition': "Salut est une interjection française utilisée pour saluer quelqu'un. Elle peut également être employée comme un toast lors de la consommation de boissons.",
                 'plural': ['saluts'],
@@ -135,6 +138,7 @@ class LanguageService():
             },
             {
                 'word': 'calcio',
+                "language": "it",
                 'category': 'noun',
                 'definition': 'Sport di squadra giocato tra due squadre di undici giocatori su un campo di gioco rettangolare, in cui i giocatori tentano di segnare gol calciando una palla in rete.',
                 'plural': ['calci', 'calcio'],

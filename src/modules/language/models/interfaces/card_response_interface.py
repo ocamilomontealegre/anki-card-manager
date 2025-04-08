@@ -5,6 +5,7 @@ from ..enums.word_category_enum import WordCategory
 
 class CardResponse(BaseModel):
     word: str
+    language: str
     definition: str
     category: WordCategory
     plural: List[str]
