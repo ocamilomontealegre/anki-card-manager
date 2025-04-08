@@ -1,5 +1,8 @@
+from os import path
 from sys import executable
 from subprocess import CalledProcessError, check_call
+from alembic import command
+from alembic.config import Config
 
 
 def start() -> None:
@@ -31,5 +34,19 @@ def format() -> None:
     except CalledProcessError as e:
         error_message = e.output.decode().strip() if e.output else "No output provided."
         print(f"Formatting failed with error code {e.returncode}: {error_message}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
+
+def migrate(message: str) -> None:
+    """Make migration with alembic"""
+    try:
+        alembic_init_path = path.join(path.dirname(__file__), "alembic.ini")
+        alembic_cfg = Config(alembic_init_path)
+
+        command.revision(alembic_cfg, message=message, autogenerate=True)
+        print("Migration revision executed")
+        command.upgrade(alembic_cfg, "head")
+        print("Migration applied")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")

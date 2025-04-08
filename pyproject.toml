@@ -39,6 +39,7 @@ check = true
 start = "scripts:start"
 lint = "scripts:lint"
 format = "scripts:format"
+migrate = "scripts:migrate"
 
 [build-system]
 requires = ["poetry-core"]
