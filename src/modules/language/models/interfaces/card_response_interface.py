@@ -1,11 +1,11 @@
 from typing import List
 from pydantic import BaseModel
-from ..enums.word_category_enum import WordCategory
+from ..enums import Language, WordCategory
 
 
 class CardResponse(BaseModel):
     word: str
-    language: str
+    language: Language
     definition: str
     category: WordCategory
     plural: List[str]
