@@ -3,6 +3,7 @@ from injector import Injector
 from app.app_module import AppModule
 from app.routers.app_router import AppRouter
 from common.interceptors import HTTPInterceptor
+from common.loggers.logger import AppLogger
 from common.database.strategies.database_strategy import DatabaseStrategy
 from common.exception_handlers import (
     GeneralExceptionHandler,
@@ -16,6 +17,7 @@ class AppBuilder:
         self.__app = FastAPI()
         self.__injector = Injector([AppModule])
         self.__router = AppRouter(self.__injector).get_router()
+        self.__loger = AppLogger(label="AppBuilder")
         self.__env = get_env_variables()
 
     def set_open_api(self) -> "AppBuilder":
@@ -50,9 +52,12 @@ class AppBuilder:
 
     def set_database(self) -> "AppBuilder":
         db = self.__injector.get(DatabaseStrategy)
-        db.create_session()
-        db.create_tables()
 
+        try:
+            db.create_session()
+            db.create_tables()
+        except Exception as e:
+            self.__loger.error(f"DB setup failed: {e}")
         return self
 
     def build(self):
