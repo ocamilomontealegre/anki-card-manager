@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import datetime
 from uuid import uuid4
 import pandas as pd
 from injector import inject
@@ -71,7 +72,7 @@ class WordService():
         words = [self.__transform_word(word) for word in result]
         df = pd.DataFrame(words)
 
-        output_path = Path(self.__anki_env.output) / f"{uuid4()}.csv"
+        output_path = Path(self.__anki_env.output) / f"{datetime.today().strftime("%Y-%m-%d")}-{uuid4()}.csv"
 
         df.to_csv(output_path, index=False)
         return {"status": "OK"}
