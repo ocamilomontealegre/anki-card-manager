@@ -3,5 +3,5 @@ from pydantic_settings import BaseSettings
 
 
 class AnkiEnvVariables(BaseSettings):
-    audios: str = Field(description="Path for storing the audios")
+    media: str = Field(description="Path for storing the media like images an audio")
     output: str = Field(description="Path for storing csv output files")

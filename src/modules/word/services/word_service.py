@@ -1,3 +1,4 @@
+from os import path as os_path
 from pathlib import Path
 from datetime import datetime
 from uuid import uuid4
@@ -17,6 +18,12 @@ class WordService():
 
         self.__anki_env = get_env_variables().anki
 
+    def __format_audio_path(self, audio_path) -> str:
+        if audio_path:
+            return f"[sound:{os_path.basename(audio_path)}]"
+        else:
+            return ""
+
     def __transform_word(self, word: Word):
         return {
             "id": word.id,
@@ -24,16 +31,16 @@ class WordService():
             "category": word.category,
             "definition": word.definition,
             "sentence": word.sentence,
-            "sentence_audio": word.sentence_audio,
+            "sentence_audio": self.__format_audio_path(word.sentence_audio),
             "phonetics": word.phonetics,
             "partial_sentence": word.partial_sentence,
             "singular": word.singular,
-            "singular_audio": word.singular_audio,
+            "singular_audio": self.__format_audio_path(word.singular_audio),
             "plural": word.plural,
-            "plural_audio": word.plural_audio,
+            "plural_audio": self.__format_audio_path(word.plural_audio),
             "synonyms": word.synonyms,
-            "image": word.image,
-            "image_2": word.image_2,
+            "image": os_path.basename(word.image),
+            "image_2": os_path.basename(word.image_2),
         }
 
     def create(self, word: Word) -> Word:
@@ -74,7 +81,7 @@ class WordService():
 
         output_path = Path(self.__anki_env.output) / f"{datetime.today().strftime("%Y-%m-%d")}-{uuid4()}.csv"
 
-        df.to_csv(output_path, index=False)
+        df.to_csv(output_path, index=False, header=False)
         return {"status": "OK"}
 
     def delete_all(self):

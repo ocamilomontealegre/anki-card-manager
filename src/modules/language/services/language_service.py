@@ -1,4 +1,5 @@
 import requests
+from uuid import uuid4
 from injector import inject
 from pandas import read_csv
 from pyee import EventEmitter
@@ -31,10 +32,24 @@ class LanguageService():
 
         self.__event_emitter.on("upload", self.process_csv)
 
-    def __get_image_from_api(self, url: str):
+    def __get_image_url(self, url: str):
         response = requests.get(url)
         if response.status_code == 200:
             return response.json()
+
+    def __download_image(self, url: str, word: str):
+        response = requests.get(url)
+
+        extension = ""
+        if "giphy" in url:
+            extension = "gif"
+        else:
+            extension = "jpg"
+        
+        path = f"{self.__env.anki.media}\{word}_{uuid4().hex[:8]}.{extension}"
+        with open(path, "wb") as f:
+            f.write(response.content)
+        return path
 
     def __transform_text_to_audio(self, text: str, word: str, prefix: str = "") -> str:
         audio = self.__eleven_labs_client.text_to_speech.convert(
@@ -45,7 +60,7 @@ class LanguageService():
         )
 
         audio_bytes = b''.join(audio)
-        audio_path = f"{self.__env.anki.audios}/{prefix}{word}.mp3"
+        audio_path = f"{self.__env.anki.media}/{prefix}_{word}.mp3"
         with open(audio_path, "wb") as audio_file:
             audio_file.write(audio_bytes)
         return audio_path
@@ -60,10 +75,10 @@ class LanguageService():
         word_forms = f"{singular}, {plural}"
 
         giphy_url = f'{self.__giphy_base_url}search?q={word}&api_key={self.__env.giphy.key}&limit=1'
-        giphy_image = self.__get_image_from_api(giphy_url)['data'][0]['url']
+        giphy_image = self.__get_image_url(giphy_url)['data'][0]["images"]["original"]["url"]
 
         unplash_url = f"{self.__unplash_base_url}search/photos?query={word}&client_id={self.__env.unplash.key}&per_page=1"
-        unplash_image = self.__get_image_from_api(unplash_url)['results'][0]['urls']['regular']
+        unplash_image = self.__get_image_url(unplash_url)['results'][0]['urls']['regular']
 
         sentence_path = self.__transform_text_to_audio(sentence, word)
 
@@ -89,8 +104,8 @@ class LanguageService():
             plural=plural,
             plural_audio=plural_audio_path,
             synonyms=synonyms,
-            image=giphy_image,
-            image_2=unplash_image
+            image=self.__download_image(giphy_image, word),
+            image_2=self.__download_image(unplash_image, word)
         )
         return new_word
 
