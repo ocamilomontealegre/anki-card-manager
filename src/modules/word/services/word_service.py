@@ -32,7 +32,7 @@ class WordService():
             "definition": word.definition,
             "sentence": word.sentence,
             "sentence_audio": self.__format_audio_path(word.sentence_audio),
-            "phonetics": word.phonetics,
+            "phonetics": f"/{word.phonetics}/",
             "partial_sentence": word.partial_sentence,
             "singular": word.singular,
             "singular_audio": self.__format_audio_path(word.singular_audio),

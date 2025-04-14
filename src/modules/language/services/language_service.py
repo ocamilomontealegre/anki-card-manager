@@ -1,4 +1,5 @@
 import requests
+from typing import List
 from uuid import uuid4
 from injector import inject
 from pandas import read_csv
@@ -45,8 +46,8 @@ class LanguageService():
             extension = "gif"
         else:
             extension = "jpg"
-        
-        path = f"{self.__env.anki.media}\{word}_{uuid4().hex[:8]}.{extension}"
+
+        path = f"{self.__env.anki.media}\\{word}_{uuid4().hex[:8]}.{extension}"
         with open(path, "wb") as f:
             f.write(response.content)
         return path
@@ -66,106 +67,79 @@ class LanguageService():
         return audio_path
 
     def __transform_card(self, card_info: CardResponse) -> Word:
-        word = card_info["word"]
-        plural = ", ".join(list(map(lambda x: x.capitalize(), card_info["plural"])))
-        singular = ", ".join(list(map(lambda x: x.capitalize(), card_info["singular"])))
-        synonyms = ", ".join(list(map(lambda x: x.capitalize(), card_info["synonyms"])))
-        sentence = card_info["sentence"]
-        partial_sentence = sentence.replace(word, "[...]")
-        word_forms = f"{singular}, {plural}"
+        try:
+            card_info = card_info.dict()
+            word = card_info["word"]
+            plural = ", ".join(list(map(lambda x: x.capitalize(), card_info["plural"])))
+            singular = ", ".join(list(map(lambda x: x.capitalize(), card_info["singular"])))
+            synonyms = ", ".join(list(map(lambda x: x.capitalize(), card_info["synonyms"])))
+            sentence = card_info["sentence"]
+            partial_sentence = sentence.replace(word, "[...]")
+            word_forms = f"{singular}, {plural}"
 
-        giphy_url = f'{self.__giphy_base_url}search?q={word}&api_key={self.__env.giphy.key}&limit=1'
-        giphy_image = self.__get_image_url(giphy_url)['data'][0]["images"]["original"]["url"]
+            giphy_url = f'{self.__giphy_base_url}search?q={word}&api_key={self.__env.giphy.key}&limit=1'
+            giphy_image = self.__get_image_url(giphy_url)['data'][0]["images"]["original"]["url"]
 
-        unplash_url = f"{self.__unplash_base_url}search/photos?query={word}&client_id={self.__env.unplash.key}&per_page=1"
-        unplash_image = self.__get_image_url(unplash_url)['results'][0]['urls']['regular']
+            unplash_url = f"{self.__unplash_base_url}search/photos?query={word}&client_id={self.__env.unplash.key}&per_page=1"
+            unplash_image = self.__get_image_url(unplash_url)['results'][0]['urls']['regular']
 
-        sentence_path = self.__transform_text_to_audio(sentence, word)
+            sentence_path = self.__transform_text_to_audio(sentence, word)
 
-        plural_audio_path = ''
-        if len(plural) > 0:
-            plural_audio_path = self.__transform_text_to_audio(plural, word, "plural")
+            plural_audio_path = ''
+            if len(plural) > 0:
+                plural_audio_path = self.__transform_text_to_audio(plural, word, "plural")
 
-        singular_audio_path = ''
-        if len(singular) > 0:
-            singular_audio_path = self.__transform_text_to_audio(singular, word, "singular")
+            singular_audio_path = ''
+            if len(singular) > 0:
+                singular_audio_path = self.__transform_text_to_audio(singular, word, "singular")
 
-        new_word = Word(
-            word=word_forms[:-1] if word_forms[-1] == "," else word_forms,
-            language=card_info["language"],
-            category=card_info["category"],
-            definition=card_info["definition"],
-            sentence=sentence,
-            phonetics=card_info["phonetics"],
-            sentence_audio=sentence_path,
-            partial_sentence=partial_sentence,
-            singular=singular,
-            singular_audio=singular_audio_path,
-            plural=plural,
-            plural_audio=plural_audio_path,
-            synonyms=synonyms,
-            image=self.__download_image(giphy_image, word),
-            image_2=self.__download_image(unplash_image, word)
-        )
-        return new_word
+            new_word = Word(
+                word=word_forms[:-1] if word_forms[-1] == "," else word_forms,
+                language=card_info["language"].value,
+                category=card_info["category"].value.capitalize(),
+                definition=card_info["definition"].capitalize(),
+                sentence=sentence,
+                phonetics=card_info["sentence_phonetics"],
+                sentence_audio=sentence_path,
+                partial_sentence=partial_sentence,
+                singular=singular,
+                singular_audio=singular_audio_path,
+                plural=plural,
+                plural_audio=plural_audio_path,
+                synonyms=synonyms,
+                image=self.__download_image(giphy_image, word),
+                image_2=self.__download_image(unplash_image, word)
+            )
+            return new_word
+        except Exception as e:
+            print(f"Error transforming card: {e}")
 
     def process_card(self, card_info: CardResponse):
         word = self.__transform_card(card_info)
         self.__word_service.create(word)
 
     def process_row(self, row: Row) -> CardResponse:
-        completion = self.__open_ai_client.beta.chat.completions.parse(
-            model=self.__env.openai.model,
-            messages=[
-                {"role": "system", "content": "You are a polyglot expert with over 10 years of experience"},
-                {"role": "user", "content": f"please look for the definition of the word: {row["word"]} in the {row["language"]} language"}
-            ],
-            response_format=CardResponse
-        )
-        print(completion.choices[0].message.parsed)
-        return completion.choices[0].message.parsed
+        try:
+            completion = self.__open_ai_client.beta.chat.completions.parse(
+                model=self.__env.openai.model,
+                messages=[
+                    {"role": "system", "content": "You are a polyglot expert with over 10 years of experience"},
+                    {"role": "user", "content": f"please look for the definition of the word: {row["word"]} in the {row["language"]} language"}
+                ],
+                response_format=CardResponse
+            )
+            print(completion.choices[0].message.parsed)
+            return completion.choices[0].message.parsed
+        except Exception as e:
+            print(f"Error processing row: {row}, Error: {e}")
 
     def process_csv(self, file_name: str):
-        # df = read_csv(file_name, delimiter=",")
+        df = read_csv(file_name, delimiter=",")
 
-        words_data = [
-            {
-                'word': 'hello',
-                "language": "en",
-                'category': "noun",
-                'definition': 'A greeting or expression of goodwill used when meeting someone, answering the phone, or initiating a conversation.',
-                'plural': [],
-                'singular': ['hello'],
-                'synonyms': ['hi', 'greetings', 'salutation'],
-                'sentence': "When answering the phone, she always starts with a cheerful 'hello'.",
-                "phonetics": ""
-            },
-            {
-                'word': 'salut',
-                "language": "fr",
-                'category': 'noun',
-                'definition': "Salut est une interjection française utilisée pour saluer quelqu'un. Elle peut également être employée comme un toast lors de la consommation de boissons.",
-                'plural': ['saluts'],
-                'singular': ['salut'],
-                'synonyms': ['bonjour', 'salutation'],
-                'sentence': 'Je lui ai dit salut en entrant dans la pièce.',
-                "phonetics": ""
-            },
-            {
-                'word': 'calcio',
-                "language": "it",
-                'category': 'noun',
-                'definition': 'Sport di squadra giocato tra due squadre di undici giocatori su un campo di gioco rettangolare, in cui i giocatori tentano di segnare gol calciando una palla in rete.',
-                'plural': ['calci', 'calcio'],
-                'singular': ['calcio'],
-                'synonyms': ['calcio a 11', 'calcio moderno'],
-                'sentence': 'Il calcio è lo sport più popolare in Italia e in molti altri paesi.',
-                "phonetics": ""
-            }
-        ]
+        words_data: List[CardResponse] = []
+        for _, row in df.iterrows():
+            card_responses = self.process_row(row.to_dict())
+            words_data.append(card_responses)
 
-        for data in words_data:
-            self.process_card(card_info=data)
-
-        # for _, row in df.iterrows():
-        #     self.process_row(row.to_dict())
+        for card_response in words_data:
+            self.process_card(card_response)
