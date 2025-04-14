@@ -12,4 +12,4 @@ class CardResponse(BaseModel):
     singular: List[str]
     synonyms: List[str]
     sentence: str
-    phonetics: str
+    sentence_phonetics: str
