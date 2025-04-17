@@ -1,11 +1,13 @@
 import requests
-from typing import List
 from uuid import uuid4
+from pathlib import Path
+from typing import List, Optional
 from injector import inject
 from pandas import read_csv
 from pyee import EventEmitter
 from openai import OpenAI
 from elevenlabs.client import ElevenLabs
+from common.loggers.logger import AppLogger
 from common.env.env_config import get_env_variables
 from modules.word.services.word_service import WordService
 from modules.word.models.entities.word_entity import Word
@@ -21,6 +23,8 @@ class LanguageService():
     ) -> None:
         self.__env = get_env_variables()
 
+        self.__logger = AppLogger(label=LanguageService.__name__)
+
         self.__word_service = word_service
 
         self.__event_emitter = event_emitter
@@ -33,13 +37,13 @@ class LanguageService():
 
         self.__event_emitter.on("upload", self.process_csv)
 
-    def __get_image_url(self, url: str):
+    def __get_image_url(self, url: str) -> Optional[dict]:
         response = requests.get(url)
         if response.status_code == 200:
             return response.json()
 
-    def __download_image(self, url: str, word: str):
-        response = requests.get(url)
+    def __download_image(self, url: str, word: str) -> str:
+        response = requests.get(url, stream=True)
 
         extension = ""
         if "giphy" in url:
@@ -47,10 +51,12 @@ class LanguageService():
         else:
             extension = "jpg"
 
-        path = f"{self.__env.anki.media}\\{word}_{uuid4().hex[:8]}.{extension}"
+        path = Path(self.__env.anki.media) / f"{word}_{uuid4().hex[:8]}.{extension}"
         with open(path, "wb") as f:
-            f.write(response.content)
-        return path
+            for chunk in response.iter_content(8192):
+                f.write(chunk)
+
+        return str(path)
 
     def __transform_text_to_audio(self, text: str, word: str, prefix: str = "") -> str:
         audio = self.__eleven_labs_client.text_to_speech.convert(
@@ -65,6 +71,12 @@ class LanguageService():
         with open(audio_path, "wb") as audio_file:
             audio_file.write(audio_bytes)
         return audio_path
+
+    def __check_word_forms(self, base_word: str, word_forms: Optional[str]) -> str:
+        if word_forms and word_forms != ", ":
+            return word_forms[:-1] if word_forms[-1] == "," else word_forms
+        else:
+            return f"{base_word[0].upper()}{base_word[1:]}"
 
     def __transform_card(self, card_info: CardResponse) -> Word:
         try:
@@ -94,7 +106,7 @@ class LanguageService():
                 singular_audio_path = self.__transform_text_to_audio(singular, word, "singular")
 
             new_word = Word(
-                word=word_forms[:-1] if word_forms[-1] == "," else word_forms,
+                word=self.__check_word_forms(word, word_forms),
                 language=card_info["language"].value,
                 category=card_info["category"].value.capitalize(),
                 definition=card_info["definition"].capitalize(),
@@ -112,11 +124,10 @@ class LanguageService():
             )
             return new_word
         except Exception as e:
-            print(f"Error transforming card: {e}")
+            self.__logger.error(f"Error transforming card: {e}")
 
-    def process_card(self, card_info: CardResponse):
-        word = self.__transform_card(card_info)
-        self.__word_service.create(word)
+    def process_cards(self, cards_info: List[CardResponse]) -> None:
+        self.__word_service.create_many(cards_info)
 
     def process_row(self, row: Row) -> CardResponse:
         try:
@@ -128,12 +139,11 @@ class LanguageService():
                 ],
                 response_format=CardResponse
             )
-            print(completion.choices[0].message.parsed)
             return completion.choices[0].message.parsed
         except Exception as e:
-            print(f"Error processing row: {row}, Error: {e}")
+            self.__logger.error(f"Error processing row: {row}, Error: {e}")
 
-    def process_csv(self, file_name: str):
+    def process_csv(self, file_name: str) -> None:
         df = read_csv(file_name, delimiter=",")
 
         words_data: List[CardResponse] = []
@@ -141,5 +151,9 @@ class LanguageService():
             card_responses = self.process_row(row.to_dict())
             words_data.append(card_responses)
 
+        transformed_words: List[Word] = []
         for card_response in words_data:
-            self.process_card(card_response)
+            self.__logger.debug(f"WORD: {card_response.word}")
+            transformed_word = self.__transform_card(card_response)
+            transformed_words.append(transformed_word)
+            self.process_cards(transformed_words)
