@@ -42,20 +42,25 @@ class AppLogger:
             ),
         )
 
-    def debug(self, message):
-        self.logger.debug(f"🐛 {message}")
+    def debug(self, message: str, context: str | None = None) -> None:
+        prefix = f"📜 [{context}]:" if context else "🐛 "
+        self.logger.debug(f"{prefix} {message}")
 
-    def info(self, message):
-        self.logger.info(f"📄 {message}")
+    def info(self, message: str, context: str | None = None) -> None:
+        prefix = f"📜 [{context}]:" if context else "📄 "
+        self.logger.info(f"{prefix} {message}")
 
-    def warning(self, message):
-        self.logger.warning(f"⚠️ {message}")
+    def warning(self, message: str, context: str | None = None) -> None:
+        prefix = f"📜 [{context}]:" if context else "⚠️ "
+        self.logger.warning(f"{prefix} {message}")
 
-    def error(self, message):
-        self.logger.error(f"❌ {message}")
+    def error(self, message: str, context: str | None = None) -> None:
+        prefix = f"📜 [{context}]:" if context else "❌ "
+        self.logger.error(f"{prefix} {message}")
 
-    def critical(self, message):
-        self.logger.critical(f"💥 {message}")
+    def critical(self, message: str, context: str | None = None) -> None:
+        prefix = f"📜 [{context}]:" if context else "💥 "
+        self.logger.critical(f"{prefix} {message}")
 
-    def set_level(self, level):
+    def set_level(self, level) -> None:
         self._configure_logger(level)
