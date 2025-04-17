@@ -6,6 +6,6 @@
   "minWordLength": 3,
   "ignoreRegExpList": ["http://[^s]*", "^[-\\w]+/[-\\w\\.]+$", "^foobar.*$", "I*"],
   "ignoreWords": [""],
-  "words": ["openai"],
+  "words": ["openai", "iterrows"],
   "flagWords": []
 }
