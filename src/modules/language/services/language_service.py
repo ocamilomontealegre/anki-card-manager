@@ -38,9 +38,12 @@ class LanguageService():
         self.__event_emitter.on("upload", self.process_csv)
 
     def __get_image_url(self, url: str) -> Optional[dict]:
-        response = requests.get(url)
-        if response.status_code == 200:
-            return response.json()
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                return response.json()
+        except Exception as e:
+            self.__logger.error(f"Error getting image url {e}")
 
     def __download_image(self, url: str, word: str) -> str:
         response = requests.get(url, stream=True)
@@ -59,18 +62,21 @@ class LanguageService():
         return str(path)
 
     def __transform_text_to_audio(self, text: str, word: str, prefix: str = "") -> str:
-        audio = self.__eleven_labs_client.text_to_speech.convert(
-            text=text,
-            voice_id="JBFqnCBsd6RMkjVDRZzb",
-            model_id="eleven_multilingual_v2",
-            output_format="mp3_44100_128",
-        )
+        try:
+            audio = self.__eleven_labs_client.text_to_speech.convert(
+                text=text,
+                voice_id="JBFqnCBsd6RMkjVDRZzb",
+                model_id="eleven_multilingual_v2",
+                output_format="mp3_44100_128",
+            )
 
-        audio_bytes = b''.join(audio)
-        audio_path = f"{self.__env.anki.media}/{prefix}_{word}.mp3"
-        with open(audio_path, "wb") as audio_file:
-            audio_file.write(audio_bytes)
-        return audio_path
+            audio_bytes = b''.join(audio)
+            audio_path = f"{self.__env.anki.media}/{prefix}_{word}.mp3"
+            with open(audio_path, "wb") as audio_file:
+                audio_file.write(audio_bytes)
+            return audio_path
+        except Exception as e:
+            self.__logger.error(f"Error transforming text to audio {e}")
 
     def __check_word_forms(self, base_word: str, word_forms: Optional[str]) -> str:
         if word_forms and word_forms != ", ":
@@ -124,7 +130,7 @@ class LanguageService():
             )
             return new_word
         except Exception as e:
-            self.__logger.error(f"Error transforming card: {e}")
+            self.__logger.error(f"Error transforming card: {e}", self.__transform_card.__name__)
 
     def process_cards(self, cards_info: List[CardResponse]) -> None:
         self.__word_service.create_many(cards_info)
@@ -141,7 +147,7 @@ class LanguageService():
             )
             return completion.choices[0].message.parsed
         except Exception as e:
-            self.__logger.error(f"Error processing row: {row}, Error: {e}")
+            self.__logger.error(f"Error processing row: {row}, Error: {e}", self.process_row.__name__)
 
     def process_csv(self, file_name: str) -> None:
         df = read_csv(file_name, delimiter=",")
