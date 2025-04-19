@@ -7,3 +7,4 @@ class AppEndpoints(Enum):
     UPLOAD = "/uploads"
     LANGUAGE = "/language"
     WORD = "/words"
+    SCRAPER = "/scrapers"

@@ -10,6 +10,7 @@ from elevenlabs.client import ElevenLabs
 from common.loggers.logger import AppLogger
 from common.env.env_config import get_env_variables
 from modules.word.services.word_service import WordService
+from modules.scraper.services.scraper_service import ScraperService
 from modules.word.models.entities.word_entity import Word
 from ..models.interfaces import CardResponse, Row
 
@@ -19,6 +20,7 @@ class LanguageService():
     def __init__(
         self,
         word_service: WordService,
+        scraper_service: ScraperService,
         event_emitter: EventEmitter
     ) -> None:
         self.__env = get_env_variables()
@@ -26,24 +28,14 @@ class LanguageService():
         self.__logger = AppLogger(label=LanguageService.__name__)
 
         self.__word_service = word_service
+        self.__scraper_service = scraper_service
 
         self.__event_emitter = event_emitter
         self.__open_ai_client = OpenAI(api_key=self.__env.openai.key)
 
         self.__eleven_labs_client = ElevenLabs(api_key=self.__env.elevenlabs.key)
 
-        self.__giphy_base_url = "https://api.giphy.com/v1/gifs/"
-        self.__unplash_base_url = "https://api.unsplash.com/"
-
         self.__event_emitter.on("upload", self.process_csv)
-
-    def __get_image_url(self, url: str) -> Optional[dict]:
-        try:
-            response = requests.get(url)
-            if response.status_code == 200:
-                return response.json()
-        except Exception as e:
-            self.__logger.error(f"Error getting image url {e}")
 
     def __download_image(self, url: str, word: str) -> str:
         response = requests.get(url, stream=True)
@@ -95,11 +87,11 @@ class LanguageService():
             partial_sentence = sentence.replace(word, "[...]")
             word_forms = f"{singular}, {plural}"
 
-            giphy_url = f'{self.__giphy_base_url}search?q={word}&api_key={self.__env.giphy.key}&limit=1'
-            giphy_image = self.__get_image_url(giphy_url)['data'][0]["images"]["original"]["url"]
+            giphy_image_url = self.__scraper_service.get_image_url(query=word)
+            giphy_image = self.__download_image(url=giphy_image_url, word=word)
 
-            unplash_url = f"{self.__unplash_base_url}search/photos?query={word}&client_id={self.__env.unplash.key}&per_page=1"
-            unplash_image = self.__get_image_url(unplash_url)['results'][0]['urls']['regular']
+            unplash_url = self.__scraper_service.get_image_url(query=word)
+            unplash_image = self.__download_image(url=unplash_url, word=word)
 
             sentence_path = self.__transform_text_to_audio(sentence, word)
 

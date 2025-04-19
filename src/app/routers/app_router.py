@@ -4,6 +4,7 @@ from health.controllers.health_controller import HealthController
 from modules.upload.controllers.upload_controller import UploadController
 from modules.language.controllers.language_controller import LanguageController
 from modules.word.controllers.word_controller import WordController
+from modules.scraper.controllers.scraper_controller import ScraperController
 from app.enums.app_endpoints_enum import AppEndpoints
 
 
@@ -18,6 +19,7 @@ class AppRouter:
         upload_controller = self.__injector.get(UploadController)
         language_controller = self.__injector.get(LanguageController)
         word_controller = self.__injector.get(WordController)
+        scraper_controller = self.__injector.get(ScraperController)
 
         self.__router.include_router(
             health_controller.get_router(),
@@ -37,6 +39,11 @@ class AppRouter:
         self.__router.include_router(
             word_controller.get_router(),
             prefix=AppEndpoints.WORD.value
+        )
+
+        self.__router.include_router(
+            scraper_controller.get_router(),
+            prefix=AppEndpoints.SCRAPER.value
         )
 
     def get_router(self) -> APIRouter:

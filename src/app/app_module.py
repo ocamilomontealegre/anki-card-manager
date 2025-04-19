@@ -5,6 +5,7 @@ from common.database.database_module import DatabaseModule
 from modules.upload.upload_module import UploadModule
 from modules.language.language_module import LanguageModule
 from modules.word.word_module import WordModule
+from modules.scraper.scraper_module import ScraperModule
 
 
 class AppModule(Module):
@@ -14,4 +15,5 @@ class AppModule(Module):
         binder.install(module=UploadModule)
         binder.install(module=LanguageModule)
         binder.install(module=WordModule)
+        binder.install(module=ScraperModule)
         binder.bind(EventEmitter, to=EventEmitter, scope=singleton)
