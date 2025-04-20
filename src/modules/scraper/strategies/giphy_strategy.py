@@ -6,23 +6,23 @@ from common.env.env_config import get_env_variables
 from .base_strategy import BaseStrategy
 
 
-class UnplashStrategy(BaseStrategy):
+class GiphyStrategy(BaseStrategy):
     def __init__(self):
-        self.__logger = AppLogger(label=UnplashStrategy.__name__)
+        self.__logger = AppLogger(label=GiphyStrategy.__name__)
 
-        self.__unplash_env = get_env_variables().unplash
+        self.__giphy_env = get_env_variables().giphy
 
-    async def get_image_url(self, query: str) -> str:
-        image_selector = "div[data-testid='masonry-grid-count-three'] img"
+    def get_image_url(self, query: str) -> str:
+        first_image_selector = ".giphy-grid img"
 
         try:
             driver = webdriver.Chrome()
-            driver.get(f"{self.__unplash_env.url}/{query}")
+            driver.get(f"{self.__giphy_env.url}/{query}")
             sleep(5)
 
             soup = BeautifulSoup(driver.page_source, "html.parser")
             print("SOUP: ", soup)
-            img = soup.select_one(image_selector)
+            img = soup.select_one(first_image_selector)
 
             if not img:
                 raise Exception("Could not get image url") 

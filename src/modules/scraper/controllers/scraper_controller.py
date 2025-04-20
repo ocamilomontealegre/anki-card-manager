@@ -15,7 +15,7 @@ class ScraperController:
         async def get_url_image(req: Request):
             body = await req.json()
             query = body.get('query')
-            result = await self.__scraper_service.get_image_url(query)
+            result = self.__scraper_service.get_image_url(query)
             return {"url": result}
 
     def get_router(self) -> APIRouter:
