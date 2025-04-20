@@ -18,6 +18,6 @@ if __name__ == "__main__":
         "main:app",
         host=env_variables.host,
         port=env_variables.port,
-        reload=False,
+        reload=True,
         log_level="debug",
     )

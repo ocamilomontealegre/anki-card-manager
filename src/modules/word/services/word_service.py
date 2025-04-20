@@ -1,4 +1,3 @@
-from os import path as os_path
 from typing import List
 from pathlib import Path
 from datetime import datetime
@@ -20,31 +19,6 @@ class WordService():
 
         self.__logger: AppLogger = AppLogger(label=WordService.__name__)
         self.__anki_env = get_env_variables().anki
-
-    def __format_audio_path(self, audio_path) -> str:
-        if audio_path:
-            return f"[sound:{os_path.basename(audio_path)}]"
-        else:
-            return ""
-
-    def __transform_word(self, word: Word) -> dict:
-        return {
-            "id": word.id,
-            "word": word.word,
-            "category": word.category,
-            "definition": word.definition,
-            "sentence": word.sentence,
-            "sentence_audio": self.__format_audio_path(word.sentence_audio),
-            "phonetics": f"/{word.phonetics}/",
-            "partial_sentence": word.partial_sentence,
-            "singular": word.singular,
-            "singular_audio": self.__format_audio_path(word.singular_audio),
-            "plural": word.plural,
-            "plural_audio": self.__format_audio_path(word.plural_audio),
-            "synonyms": word.synonyms,
-            "image": os_path.basename(word.image),
-            "image_2": os_path.basename(word.image_2),
-        }
 
     def create(self, word: Word) -> Word:
         new_word = self.__session.add(word)

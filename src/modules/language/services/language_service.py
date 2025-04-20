@@ -87,10 +87,10 @@ class LanguageService():
             partial_sentence = sentence.replace(word, "[...]")
             word_forms = f"{singular}, {plural}"
 
-            giphy_image_url = self.__scraper_service.get_image_url(query=word)
+            giphy_image_url = self.__scraper_service.get_giphy_image_url(query=word)
             giphy_image = self.__download_image(url=giphy_image_url, word=word)
 
-            unplash_url = self.__scraper_service.get_image_url(query=word)
+            unplash_url = self.__scraper_service.get_unplash_image_url(query=word)
             unplash_image = self.__download_image(url=unplash_url, word=word)
 
             sentence_path = self.__transform_text_to_audio(sentence, word)
