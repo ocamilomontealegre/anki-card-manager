@@ -78,7 +78,7 @@ class LanguageService():
 
     def __transform_card(self, card_info: CardResponse) -> Word:
         try:
-            card_info = card_info.dict()
+            card_info = card_info.model_dump()
             word = card_info["word"]
             plural = ", ".join(list(map(lambda x: x.capitalize(), card_info["plural"])))
             singular = ", ".join(list(map(lambda x: x.capitalize(), card_info["singular"])))
@@ -145,13 +145,22 @@ class LanguageService():
         df = read_csv(file_name, delimiter=",")
 
         words_data: List[CardResponse] = []
-        for _, row in df.iterrows():
-            card_responses = self.process_row(row.to_dict())
-            words_data.append(card_responses)
+        for index, row in df.iterrows():
+            try:
+                card_responses = self.process_row(row.to_dict())
+                words_data.append(card_responses)
+            except Exception as e:
+                self.__logger.error(f"Skipping row {index} due to error: {e}")
+                continue
 
         transformed_words: List[Word] = []
-        for card_response in words_data:
-            self.__logger.debug(f"WORD: {card_response.word}")
-            transformed_word = self.__transform_card(card_response)
-            transformed_words.append(transformed_word)
-            self.process_cards(transformed_words)
+        for index, card_response in words_data:
+            try:
+                self.__logger.debug(f"WORD: {card_response.word}")
+                transformed_word = self.__transform_card(card_response)
+                transformed_words.append(transformed_word)
+            except Exception as e:
+                self.__logger(f"Failed to transform card response at index {index}: {e}")
+                continue
+
+        self.process_cards(transformed_words)
