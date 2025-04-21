@@ -1,6 +1,7 @@
 from time import sleep
-from selenium import webdriver
 from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from common.loggers.logger import AppLogger
 from common.env.env_config import get_env_variables
 from .base_strategy import BaseStrategy
@@ -16,7 +17,9 @@ class UnplashStrategy(BaseStrategy):
         image_selector = "div[data-testid='masonry-grid-count-three'] img"
 
         try:
-            driver = webdriver.Chrome()
+            options = Options()
+            options.add_argument("--headless")
+            driver = webdriver.Chrome(options=options)
             driver.get(f"{self.__unplash_env.url}/{query}")
             sleep(5)
 
