@@ -6,6 +6,7 @@ from modules.upload.upload_module import UploadModule
 from modules.language.language_module import LanguageModule
 from modules.word.word_module import WordModule
 from modules.scraper.scraper_module import ScraperModule
+from modules.anki.anki_module import AnkiModule
 
 
 class AppModule(Module):
@@ -16,4 +17,5 @@ class AppModule(Module):
         binder.install(module=LanguageModule)
         binder.install(module=WordModule)
         binder.install(module=ScraperModule)
+        binder.install(module=AnkiModule)
         binder.bind(EventEmitter, to=EventEmitter, scope=singleton)
