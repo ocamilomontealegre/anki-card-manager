@@ -1,6 +1,7 @@
 from os import path
 from injector import inject
-from models.entities.word_entity import Word
+from ..models.entities.word_entity import Word
+from ..models.inferfaces.transformed_card_interface import TransformedCard
 
 
 class WordTransformer():
@@ -9,12 +10,9 @@ class WordTransformer():
         pass
 
     def __format_audio_path(self, audio_path) -> str:
-        if audio_path:
-            return f"[sound:{path.basename(audio_path)}]"
-        else:
-            return ""
+        return f"[sound:{path.basename(audio_path)}]" if audio_path else ""
 
-    def transform(self, word: Word) -> dict:
+    def transform(self, word: Word) -> TransformedCard:
         return {
             "id": word.id,
             "word": word.word,
