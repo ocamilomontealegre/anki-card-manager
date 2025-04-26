@@ -1,14 +1,23 @@
 import asyncio
+from os import startfile
 from pathlib import Path
 from google.cloud import texttospeech
 from google.oauth2 import service_account
 
+from modules.language.models.enums import Language
+from ..env.env_config import get_env_variables
+from ..maps import language_voice_map
+
 
 class GoogleUtils:
     @staticmethod
-    async def synthetize_text(text: str, output_file: Path):
+    async def synthetize_text(
+        text: str, language: Language, output_file: Path
+    ):
+        google_env = get_env_variables().google
+
         credentials = service_account.Credentials.from_service_account_file(
-            r"C:\Users\CAMILO\Documents\01_Software_Development\06_Projects\03_Python\anki-card-manager\protected\gothic-sled-457121-r0-07a2d7ada2ed.json"
+            google_env.credentials
         )
 
         client = texttospeech.TextToSpeechAsyncClient(credentials=credentials)
@@ -16,8 +25,8 @@ class GoogleUtils:
         synthesis_input = texttospeech.SynthesisInput(text=text)
 
         voice = texttospeech.VoiceSelectionParams(
-            language_code="en-US",
-            name="en-US-Wavenet-D",
+            language_code=language_voice_map[language]["language_code"],
+            name=language_voice_map[language]["voice_model"],
             ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL,
         )
 
@@ -35,17 +44,12 @@ class GoogleUtils:
 
 
 async def main():
-    output_path = Path(
-        "../../../uploads/random.mp3"
-    )  # Full file path (with filename)
-    output_path.parent.mkdir(
-        parents=True, exist_ok=True
-    )  # Make sure the directory exists
+    output_path = Path("../../../uploads/random.mp3")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     await GoogleUtils.synthetize_text(
-        "Hello my name is Camilo", output_file=output_path
+        "Ich spreche kein Deutsch", output_file=output_path
     )
+    startfile(output_path)
 
-
-# Run the async function
 if __name__ == "__main__":
     asyncio.run(main())
