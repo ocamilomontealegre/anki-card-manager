@@ -15,7 +15,9 @@ from common.exception_handlers import (
 class HTTPInterceptor(BaseHTTPMiddleware):
     def __init__(self, app: FastAPI):
         super().__init__(app)
-        self.__logger = AppLogger(log_level="INFO", label=self.__class__.__name__)
+        self.__logger = AppLogger(
+            log_level="INFO", label=self.__class__.__name__
+        )
 
     async def __format_response(
         self, body_iterator: bytes, status_code: int

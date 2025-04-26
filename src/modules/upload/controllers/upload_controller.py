@@ -3,7 +3,7 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 from ..services.upload_service import UploadService
 
 
-class UploadController():
+class UploadController:
     @inject
     def __init__(self, upload_service: UploadService) -> None:
         self.__upload_service = upload_service
@@ -14,7 +14,9 @@ class UploadController():
         @self.__router.post("")
         async def upload(file: UploadFile = File(...)):
             if not file:
-                raise HTTPException(status_code=400, detail="Not file provided")
+                raise HTTPException(
+                    status_code=400, detail="Not file provided"
+                )
 
             await self.__upload_service.process_file(file)
 

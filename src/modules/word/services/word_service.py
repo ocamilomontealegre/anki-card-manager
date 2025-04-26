@@ -12,7 +12,7 @@ from ..models.entities.word_entity import Word
 from ..models.inferfaces.find_all_params import FindAllParams
 
 
-class WordService():
+class WordService:
     @inject
     def __init__(self, db: DatabaseStrategy) -> None:
         self.__session: Session = db.create_session()
@@ -24,7 +24,10 @@ class WordService():
         new_word = self.__session.add(word)
         self.__session.commit()
         self.__session.refresh(word)
-        self.__logger.info(f"{Word.__name__}[{word.word}] created successfully.", context=self.create.__name__)
+        self.__logger.info(
+            f"{Word.__name__}[{word.word}] created successfully.",
+            context=self.create.__name__,
+        )
         return new_word
 
     def create_many(self, words: List[Word]):
@@ -54,7 +57,9 @@ class WordService():
             query = query.filter(Word.language == filters["language"].value)
 
         words = query.all()
-        self.__logger.info(f"{Word.__name__}[{len(words)}] found", self.find_all.__name__)
+        self.__logger.info(
+            f"{Word.__name__}[{len(words)}] found", self.find_all.__name__
+        )
         return {
             "items": words,
             "total": len(words),
@@ -85,14 +90,22 @@ class WordService():
         words = [self.__transform_word(word) for word in result]
         df = DataFrame(words)
 
-        output_path = Path(self.__anki_env.output) / f"{datetime.today().strftime("%Y-%m-%d")}-{uuid4()}.csv"
+        output_path = (
+            Path(self.__anki_env.output)
+            / f"{datetime.today().strftime("%Y-%m-%d")}-{uuid4()}.csv"
+        )
 
         df.to_csv(output_path, index=False, header=False)
-        self.__logger.info(f"{Word.__name__}[{len(words)}] found", self.get_as_csv.__name__)
+        self.__logger.info(
+            f"{Word.__name__}[{len(words)}] found", self.get_as_csv.__name__
+        )
         return {"status": "OK"}
 
     def delete_all(self):
         delete_words = self.__session.query(Word).delete()
         self.__session.commit()
-        self.__logger.info(f"{Word.__name__}[{delete_words}] deleted successfully", self.delete_all.__name__)
+        self.__logger.info(
+            f"{Word.__name__}[{delete_words}] deleted successfully",
+            self.delete_all.__name__,
+        )
         return {"deleted": "OK"}
