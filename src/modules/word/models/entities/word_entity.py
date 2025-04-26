@@ -30,3 +30,6 @@ class Word(Base):
         return (
             f"<Word(id={self.id}, word={self.word}), category={self.category}>"
         )
+
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}

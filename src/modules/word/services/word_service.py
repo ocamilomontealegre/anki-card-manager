@@ -31,9 +31,12 @@ class WordService:
         return new_word
 
     def create_many(self, words: List[Word]):
-        new_words = self.__session.add_all(words)
-        self.__session.commit
-        self.__logger.info(f"{new_words}")
+        self.__session.add_all(words)
+        self.__session.commit()
+        self.__logger.info(
+            f"{len(words)} words created successfully.",
+            context=self.create_many.__name__,
+        )
 
     def find_all(self, filters: FindAllParams):
         query = self.__session.query(Word)

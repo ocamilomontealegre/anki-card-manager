@@ -14,7 +14,7 @@ class AnkiController:
     def __register_routes(self):
         @self.__router.post("")
         async def create_cards(body: CreateCardsDto):
-            result = self.__anki_service.create_cards(body)
+            result = self.__anki_service.create_cards(body or {})
             return {"url": result}
 
     def get_router(self) -> APIRouter:

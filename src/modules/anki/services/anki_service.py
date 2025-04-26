@@ -1,10 +1,12 @@
 import requests
+from typing import Dict
 from injector import inject
 from common.loggers.logger import AppLogger
 from common.env.env_config import get_env_variables
 from common.maps import language_model_map, language_deck_map
 from modules.language.models.enums.language_enum import Language
 from modules.word.services.word_service import WordService
+from modules.word.models.entities.word_entity import Word
 from modules.word.transformers.word_transformer import WordTransformer
 from ..models.interfaces.create_cards_interface import CreateCards
 
@@ -28,11 +30,17 @@ class AnkiService:
         return language_model_map.get(language, Language.ENGLISH.value)
 
     def create_cards(self, filters: CreateCards):
-        words = self.__word_service.find_all(filters=filters)
+        words: Dict[Word] = self.__word_service.find_all(filters=filters)[
+            "items"
+        ]
         results = []
 
         for word in words:
+            print("WORD: ", word)
+            word_dict = word.to_dict()
             transformed_word = self.__word_transformer.transform(word)
+
+            language = word_dict.get("language", "")
 
             payload = {
                 "action": "addNote",
@@ -40,15 +48,15 @@ class AnkiService:
                 "params": {
                     "note": {
                         "deckName": self.__get_deck_for_lang(
-                            word.get("language", "")
+                            language=language
                         ),
                         "modelName": self.__get_model_for_lang(
-                            word.get("language", "")
+                            language=language
                         ),
                         "fields": transformed_word,
                         "options": {"allowDuplicate": False},
                         "tags": [
-                            word.get("language", ""),
+                            language,
                             transformed_word.get("category", "uncategorized"),
                         ],
                     }

@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import List, Literal, Optional
 from injector import inject
 from pandas import read_csv
-from pyee import EventEmitter
+from pyee.asyncio import AsyncIOEventEmitter
 from openai import OpenAI
 from common.loggers.logger import AppLogger
 from common.env.env_config import get_env_variables
@@ -21,7 +21,7 @@ class LanguageService:
         self,
         word_service: WordService,
         scraper_service: ScraperService,
-        event_emitter: EventEmitter,
+        event_emitter: AsyncIOEventEmitter,
     ) -> None:
         self.__env = get_env_variables()
 
@@ -57,7 +57,9 @@ class LanguageService:
     def __get_audio_path(
         self, word: str, prefix: Literal["", "plural", "singular"] = ""
     ) -> str:
-        return f"{self.__env.anki.media}/{prefix}_{word}.mp3"
+        full_prefix = f"{prefix}_" if prefix else ""
+
+        return f"{self.__env.anki.media}/{full_prefix}{word}.mp3"
 
     def __check_word_forms(
         self, base_word: str, word_forms: Optional[str]
@@ -67,7 +69,7 @@ class LanguageService:
         else:
             return f"{base_word[0].upper()}{base_word[1:]}"
 
-    def __transform_card(self, card_info: CardResponse) -> Word:
+    async def __transform_card(self, card_info: CardResponse) -> Word:
         try:
             card_info = card_info.model_dump()
             word = card_info["word"]
@@ -88,22 +90,19 @@ class LanguageService:
             giphy_image_url = self.__scraper_service.get_giphy_image_url(
                 query=word
             )
-            giphy_image = self.__download_image(url=giphy_image_url, word=word)
 
-            unplash_url = self.__scraper_service.get_unplash_image_url(
+            unplash_image_url = self.__scraper_service.get_unplash_image_url(
                 query=word
             )
-            unplash_image = self.__download_image(url=unplash_url, word=word)
-
-            sentence_path = GoogleUtils.synthetize_text(
-                text=word,
+            sentence_path = await GoogleUtils.synthetize_text(
+                text=sentence,
                 language=language,
                 output_file=self.__get_audio_path(word=word),
             )
 
             plural_audio_path = ""
             if len(plural) > 0:
-                plural_audio_path = GoogleUtils.synthetize_text(
+                plural_audio_path = await GoogleUtils.synthetize_text(
                     text=plural,
                     language=language,
                     output_file=self.__get_audio_path(
@@ -113,7 +112,7 @@ class LanguageService:
 
             singular_audio_path = ""
             if len(singular) > 0:
-                singular_audio_path = GoogleUtils.synthetize_text(
+                singular_audio_path = await GoogleUtils.synthetize_text(
                     text=singular,
                     language=language,
                     output_file=self.__get_audio_path(
@@ -135,9 +134,10 @@ class LanguageService:
                 plural=plural,
                 plural_audio=plural_audio_path,
                 synonyms=synonyms,
-                image=self.__download_image(giphy_image, word),
-                image_2=self.__download_image(unplash_image, word),
+                image=self.__download_image(giphy_image_url, word),
+                image_2=self.__download_image(unplash_image_url, word),
             )
+            print("NEW_CARD: ", new_word)
             return new_word
         except Exception as e:
             self.__logger.error(
@@ -170,7 +170,7 @@ class LanguageService:
                 self.process_row.__name__,
             )
 
-    def process_csv(self, file_name: str) -> None:
+    async def process_csv(self, file_name: str) -> None:
         df = read_csv(file_name, delimiter=",")
 
         words_data: List[CardResponse] = []
@@ -183,15 +183,13 @@ class LanguageService:
                 continue
 
         transformed_words: List[Word] = []
-        for index, card_response in words_data:
+        for card_response in words_data:
             try:
                 self.__logger.debug(f"WORD: {card_response.word}")
-                transformed_word = self.__transform_card(card_response)
+                transformed_word = await self.__transform_card(card_response)
                 transformed_words.append(transformed_word)
             except Exception as e:
-                self.__logger(
-                    f"Failed to transform card response at index {index}: {e}"
-                )
+                self.__logger.error(f"Failed to transform card response: {e}")
                 continue
 
         self.process_cards(transformed_words)

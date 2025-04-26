@@ -13,20 +13,30 @@ class WordTransformer:
         return f"[sound:{path.basename(audio_path)}]" if audio_path else ""
 
     def transform(self, word: Word) -> TransformedCard:
+        word_dict = word.to_dict()
+
+        print("SENTENCE: ", word_dict.get("sentence_audio"))
+
         return {
-            "id": word.id,
-            "word": word.word,
-            "category": word.category,
-            "definition": word.definition,
-            "sentence": word.sentence,
-            "sentence_audio": self.__format_audio_path(word.sentence_audio),
-            "phonetics": f"/{word.phonetics}/",
-            "partial_sentence": word.partial_sentence,
-            "singular": word.singular,
-            "singular_audio": self.__format_audio_path(word.singular_audio),
-            "plural": word.plural,
-            "plural_audio": self.__format_audio_path(word.plural_audio),
-            "synonyms": word.synonyms,
-            "image": path.basename(word.image),
-            "image_2": path.basename(word.image_2),
+            "id": word_dict.get("id", ""),
+            "word": word_dict.get("word", ""),
+            "category": word_dict.get("category", ""),
+            "definition": word_dict.get("definition", ""),
+            "sentence": word_dict.get("sentence", ""),
+            "sentence_audio": self.__format_audio_path(
+                word_dict.get("sentence_audio", "")
+            ),
+            "phonetics": f"/{word_dict.get('phonetics', '')}/",
+            "partial_sentence": word_dict.get("partial_sentence", ""),
+            "singular": word_dict.get("singular", ""),
+            "singular_audio": self.__format_audio_path(
+                word_dict.get("singular_audio", "")
+            ),
+            "plural": word_dict.get("plural", ""),
+            "plural_audio": self.__format_audio_path(
+                word_dict.get("plural_audio", "")
+            ),
+            "synonyms": word_dict.get("synonyms", ""),
+            "image": path.basename(word_dict.get("image", "")),
+            "image_2": path.basename(word_dict.get("image_2", "")),
         }

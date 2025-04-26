@@ -15,7 +15,7 @@ class UnplashStrategy(BaseStrategy):
         self.__unplash_env = get_env_variables().unplash
 
     def get_image_url(self, query: str) -> str:
-        image_selector = "div[data-testid='masonry-grid-count-three'] img"
+        image_selector = "img[data-testid='photo-grid-masonry-img']"
         driver = None
 
         try:

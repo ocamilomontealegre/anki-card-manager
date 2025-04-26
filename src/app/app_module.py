@@ -1,4 +1,4 @@
-from pyee import EventEmitter
+from pyee.asyncio import AsyncIOEventEmitter
 from injector import Binder, Module, singleton
 from health.health_module import HealthModule
 from common.database.database_module import DatabaseModule
@@ -18,4 +18,6 @@ class AppModule(Module):
         binder.install(module=WordModule)
         binder.install(module=ScraperModule)
         binder.install(module=AnkiModule)
-        binder.bind(EventEmitter, to=EventEmitter, scope=singleton)
+        binder.bind(
+            AsyncIOEventEmitter, to=AsyncIOEventEmitter, scope=singleton
+        )

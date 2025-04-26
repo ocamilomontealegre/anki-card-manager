@@ -1,14 +1,14 @@
 from pathlib import Path
 from injector import inject
 from fastapi import UploadFile
-from pyee import EventEmitter
+from pyee.asyncio import AsyncIOEventEmitter
 from common.loggers.logger import AppLogger
 from common.utils.file_utils import FileUtils
 
 
 class UploadService:
     @inject
-    def __init__(self, event_emitter: EventEmitter):
+    def __init__(self, event_emitter: AsyncIOEventEmitter):
         self.__event_emitter = event_emitter
 
         self.__logger = AppLogger(label=UploadService.__name__)
