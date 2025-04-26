@@ -5,6 +5,7 @@ from common.env.app_env_config import AppEnvVariables
 from common.env.eleven_labs_env_config import ElevenLabsEnvVariables
 from common.env.anki_env_config import AnkiEnvVariables
 from common.env.giphy_env_config import GiphyEnvVariables
+from common.env.google_env_config import GoogleEnvVariables
 from common.env.open_ai_env_config import OpenAIEnvVariables
 from common.env.open_api_env_config import OpenAPIEnvVariables
 from common.env.unplash_env_config import UnplashEnvVariables
@@ -22,6 +23,7 @@ class EnvVariables(BaseSettings):
     app: AppEnvVariables
     elevenlabs: ElevenLabsEnvVariables
     giphy: GiphyEnvVariables
+    google: GoogleEnvVariables
     openai: OpenAIEnvVariables
     openapi: OpenAPIEnvVariables
     pg: PgEnvVariables

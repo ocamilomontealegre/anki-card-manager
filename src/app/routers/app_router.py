@@ -24,33 +24,28 @@ class AppRouter:
         anki_controller = self.__injector.get(AnkiController)
 
         self.__router.include_router(
-            health_controller.get_router(),
-            prefix=AppEndpoints.HEALTH.value
+            health_controller.get_router(), prefix=AppEndpoints.HEALTH.value
         )
 
         self.__router.include_router(
-            upload_controller.get_router(),
-            prefix=AppEndpoints.UPLOAD.value
+            upload_controller.get_router(), prefix=AppEndpoints.UPLOAD.value
         )
 
         self.__router.include_router(
             language_controller.get_router(),
-            prefix=AppEndpoints.LANGUAGE.value
+            prefix=AppEndpoints.LANGUAGE.value,
         )
 
         self.__router.include_router(
-            word_controller.get_router(),
-            prefix=AppEndpoints.WORD.value
+            word_controller.get_router(), prefix=AppEndpoints.WORD.value
         )
 
         self.__router.include_router(
-            scraper_controller.get_router(),
-            prefix=AppEndpoints.SCRAPER.value
+            scraper_controller.get_router(), prefix=AppEndpoints.SCRAPER.value
         )
 
         self.__router.include_router(
-            anki_controller.get_router(),
-            prefix=AppEndpoints.ANKI.value
+            anki_controller.get_router(), prefix=AppEndpoints.ANKI.value
         )
 
     def get_router(self) -> APIRouter:
