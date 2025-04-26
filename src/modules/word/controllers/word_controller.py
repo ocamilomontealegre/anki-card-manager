@@ -15,12 +15,16 @@ class WordController:
     def __register_routes(self):
         @self.__router.get("")
         async def find_all(params: FindAllParams = Depends()):
-            filters: Dict[str, str] = {k: v for k, v in params.dict().items() if v}
+            filters: Dict[str, str] = {
+                k: v for k, v in params.dict().items() if v
+            }
             return self.__word_service.find_all(filters)
 
         @self.__router.get("/csv")
         async def get_as_csv(params: FindAllParams = Depends()):
-            filters: Dict[str, str] = {k: v for k, v in params.dict().items() if v}
+            filters: Dict[str, str] = {
+                k: v for k, v in params.dict().items() if v
+            }
             return self.__word_service.get_as_csv(filters)
 
         @self.__router.delete("")

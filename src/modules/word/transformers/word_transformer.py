@@ -4,7 +4,7 @@ from ..models.entities.word_entity import Word
 from ..models.inferfaces.transformed_card_interface import TransformedCard
 
 
-class WordTransformer():
+class WordTransformer:
     @inject
     def __init__(self):
         pass
