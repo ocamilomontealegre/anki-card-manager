@@ -1,6 +1,7 @@
 from injector import inject
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
 from ..services.anki_service import AnkiService
+from ..models.dto.create_cards_dto import CreateCardsDto
 
 
 class AnkiController:
@@ -12,8 +13,8 @@ class AnkiController:
 
     def __register_routes(self):
         @self.__router.post("")
-        async def create_cards(req: Request):
-            result = self.__anki_service.create_cards()
+        async def create_cards(body: CreateCardsDto):
+            result = self.__anki_service.create_cards(body)
             return {"url": result}
 
     def get_router(self) -> APIRouter:
