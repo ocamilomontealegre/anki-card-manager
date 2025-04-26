@@ -14,3 +14,4 @@ build/
 .python-version
 logs/
 uploads/
+protected/

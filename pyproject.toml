@@ -27,6 +27,7 @@ playwright = "^1.51.0"
 selenium = "^4.31.0"
 webdriver-manager = "^4.0.2"
 beautifulsoup4 = "^4.13.4"
+google-cloud-texttospeech = "^2.26.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"
@@ -36,8 +37,6 @@ alembic = "^1.15.1"
 [tool.black]
 line-length = 79
 target-version = ["py310", "py311", "py312"]
-check = true
-
 
 [tool.poetry.scripts]
 start = "scripts:start"
