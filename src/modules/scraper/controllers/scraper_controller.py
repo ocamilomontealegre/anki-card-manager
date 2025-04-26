@@ -14,7 +14,7 @@ class ScraperController:
         @self.__router.post("")
         async def get_url_image(req: Request):
             body = await req.json()
-            query = body.get('query')
+            query = body.get("query")
             result = self.__scraper_service.get_giphy_image_url(query)
             return {"url": result}
 

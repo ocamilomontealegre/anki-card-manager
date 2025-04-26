@@ -3,9 +3,11 @@ from ..strategies.giphy_strategy import GiphyStrategy
 from ..strategies.unplash_strategy import UnplashStrategy
 
 
-class ScraperService():
+class ScraperService:
     @inject
-    def __init__(self, giphy_strategy: GiphyStrategy, unplash_strategy: UnplashStrategy):
+    def __init__(
+        self, giphy_strategy: GiphyStrategy, unplash_strategy: UnplashStrategy
+    ):
         self.__giphy_strategy = giphy_strategy
         self.__unplash_strategy = unplash_strategy
 

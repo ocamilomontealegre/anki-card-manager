@@ -2,19 +2,21 @@ from time import sleep
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import WebDriverException
 from common.loggers.logger import AppLogger
 from common.env.env_config import get_env_variables
+from common.exceptions import ImageScrapingException
 from .base_strategy import BaseStrategy
 
 
 class UnplashStrategy(BaseStrategy):
     def __init__(self):
         self.__logger = AppLogger(label=UnplashStrategy.__name__)
-
         self.__unplash_env = get_env_variables().unplash
 
-    async def get_image_url(self, query: str) -> str:
+    def get_image_url(self, query: str) -> str:
         image_selector = "div[data-testid='masonry-grid-count-three'] img"
+        driver = None
 
         try:
             options = Options()
@@ -24,14 +26,26 @@ class UnplashStrategy(BaseStrategy):
             sleep(5)
 
             soup = BeautifulSoup(driver.page_source, "html.parser")
-            print("SOUP: ", soup)
             img = soup.select_one(image_selector)
 
             if not img:
-                raise Exception("Could not get image url") 
+                raise ImageScrapingException(
+                    "No image found matching the selector"
+                )
 
             return img["src"]
+        except WebDriverException as e:
+            self.__logger.error(
+                f"Selenium error: {str(e)}", self.get_image_url.__name__
+            )
+            raise ImageScrapingException(f"Failed to scrape image: {str(e)}")
         except Exception as e:
-            self.__logger.error(e, self.get_firts_image_url.__name__)
+            self.__logger.error(
+                f"Unexpected error: {str(e)}", self.get_image_url.__name__
+            )
+            raise ImageScrapingException(
+                f"Unexpected error while scraping: {str(e)}"
+            )
         finally:
-            driver.quit()
+            if driver:
+                driver.quit()
