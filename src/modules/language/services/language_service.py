@@ -1,14 +1,14 @@
 import requests
 from uuid import uuid4
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Literal, Optional
 from injector import inject
 from pandas import read_csv
 from pyee import EventEmitter
 from openai import OpenAI
-from elevenlabs.client import ElevenLabs
 from common.loggers.logger import AppLogger
 from common.env.env_config import get_env_variables
+from common.utils.google_utils import GoogleUtils
 from modules.word.services.word_service import WordService
 from modules.scraper.services.scraper_service import ScraperService
 from modules.word.models.entities.word_entity import Word
@@ -33,10 +33,6 @@ class LanguageService:
         self.__event_emitter = event_emitter
         self.__open_ai_client = OpenAI(api_key=self.__env.openai.key)
 
-        self.__eleven_labs_client = ElevenLabs(
-            api_key=self.__env.elevenlabs.key
-        )
-
         self.__event_emitter.on("upload", self.process_csv)
 
     def __download_image(self, url: str, word: str) -> str:
@@ -58,24 +54,10 @@ class LanguageService:
 
         return str(path)
 
-    def __transform_text_to_audio(
-        self, text: str, word: str, prefix: str = ""
+    def __get_audio_path(
+        self, word: str, prefix: Literal["", "plural", "singular"] = ""
     ) -> str:
-        try:
-            audio = self.__eleven_labs_client.text_to_speech.convert(
-                text=text,
-                voice_id="JBFqnCBsd6RMkjVDRZzb",
-                model_id="eleven_multilingual_v2",
-                output_format="mp3_44100_128",
-            )
-
-            audio_bytes = b"".join(audio)
-            audio_path = f"{self.__env.anki.media}/{prefix}_{word}.mp3"
-            with open(audio_path, "wb") as audio_file:
-                audio_file.write(audio_bytes)
-            return audio_path
-        except Exception as e:
-            self.__logger.error(f"Error transforming text to audio {e}")
+        return f"{self.__env.anki.media}/{prefix}_{word}.mp3"
 
     def __check_word_forms(
         self, base_word: str, word_forms: Optional[str]
@@ -89,6 +71,7 @@ class LanguageService:
         try:
             card_info = card_info.model_dump()
             word = card_info["word"]
+            language = card_info["language"].value
             plural = ", ".join(
                 list(map(lambda x: x.capitalize(), card_info["plural"]))
             )
@@ -112,23 +95,35 @@ class LanguageService:
             )
             unplash_image = self.__download_image(url=unplash_url, word=word)
 
-            sentence_path = self.__transform_text_to_audio(sentence, word)
+            sentence_path = GoogleUtils.synthetize_text(
+                text=word,
+                language=language,
+                output_file=self.__get_audio_path(word=word),
+            )
 
             plural_audio_path = ""
             if len(plural) > 0:
-                plural_audio_path = self.__transform_text_to_audio(
-                    plural, word, "plural"
+                plural_audio_path = GoogleUtils.synthetize_text(
+                    text=plural,
+                    language=language,
+                    output_file=self.__get_audio_path(
+                        word=word, prefix="plural"
+                    ),
                 )
 
             singular_audio_path = ""
             if len(singular) > 0:
-                singular_audio_path = self.__transform_text_to_audio(
-                    singular, word, "singular"
+                singular_audio_path = GoogleUtils.synthetize_text(
+                    text=singular,
+                    language=language,
+                    output_file=self.__get_audio_path(
+                        word=word, prefix="singular"
+                    ),
                 )
 
             new_word = Word(
                 word=self.__check_word_forms(word, word_forms),
-                language=card_info["language"].value,
+                language=language,
                 category=card_info["category"].value.capitalize(),
                 definition=card_info["definition"].capitalize(),
                 sentence=sentence,
