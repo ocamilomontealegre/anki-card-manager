@@ -1,12 +1,15 @@
-from sqlalchemy import create_engine, Engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, Engine, exc
+from common.loggers.logger import AppLogger
+from common.env.env_config import get_env_variables
 from ..entities.base_entity import Base
 from .database_strategy import DatabaseStrategy
-from common.env.env_config import get_env_variables
 
 
 class PgStrategy(DatabaseStrategy):
     def __init__(self):
+        self.__logger = AppLogger(label=PgStrategy.__name__)
+
         self.__env_variables = get_env_variables().pg
         self.__engine = self.create_engine()
 
@@ -19,16 +22,35 @@ class PgStrategy(DatabaseStrategy):
         return f"postgresql://{username}:{password}@{host}:{port}/{database}"
 
     def create_engine(self):
-        return create_engine(self.get_connection_url())
+        try:
+            return create_engine(self.get_connection_url())
+        except exc.DatabaseError as e:
+            self.__logger.error(f"Database engine error: {e}")
+            raise
+        except Exception as e:
+            self.__logger.error(f"Unknown error: {e}")
 
     def create_session(self):
-        engine = self.create_engine()
-        session = sessionmaker(bind=engine)
-        return session()
+        try:
+            engine = self.create_engine()
+            session = sessionmaker(bind=engine)
+            return session()
+        except exc.DatabaseError as e:
+            self.__logger.error(f"Error creating db session: {e}")
+            raise
+        except Exception as e:
+            self.__logger.error(f"Unknown error: {e}")
 
     def create_tables(self):
         Base.metadata.create_all(self.__engine)
 
     def disconnect(self):
-        if isinstance(self.__engine, Engine):
-            self.__engine.dispose()
+        try:
+            if isinstance(self.__engine, Engine):
+                self.__engine.dispose()
+                self.__logger.debug("Database connection successfully closed")
+        except exc.DatabaseError as e:
+            self.__logger.error(f"Error closing db connection: {e}")
+            raise
+        except Exception as e:
+            self.__logger.error(f"Unknown error: {e}")

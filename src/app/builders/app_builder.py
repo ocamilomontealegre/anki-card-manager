@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException
 from app.app_module import AppModule
 from app.routers.app_router import AppRouter
 from common.database.strategies.database_strategy import DatabaseStrategy
-from common.cache.services.cache_service import CacheService
+from common.cache.strategies.cache_strategy import CacheStrategy
 from common.interceptors import HTTPInterceptor
 from common.loggers.logger import AppLogger
 from common.exception_handlers import (
@@ -14,18 +14,16 @@ from common.exception_handlers import (
 from common.env import get_env_variables
 
 
-def create_lifespan(db: DatabaseStrategy, cache: CacheService):
+def create_lifespan(db: DatabaseStrategy, cache: CacheStrategy):
     logger = AppLogger()
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         try:
             db.create_session()
-            db.create_tables()
             logger.info("Database connected successfully")
 
             await cache.connect()
-            logger.info("Redis connection is up!")
         except Exception as e:
             logger.error(f"Database connection failed: {e}")
             raise
@@ -36,8 +34,7 @@ def create_lifespan(db: DatabaseStrategy, cache: CacheService):
         except Exception as e:
             logger.error(f"Error during database disconnection: {e}")
 
-        await cache.disconnect()
-        logger.info("Redis connection closed")
+        await cache.close_connection()
 
     return lifespan
 
@@ -48,7 +45,7 @@ class AppBuilder:
         self.__injector = Injector([AppModule])
         self.__env = get_env_variables()
         self.__db = self.__injector.get(DatabaseStrategy)
-        self.__cache = self.__injector.get(CacheService)
+        self.__cache = self.__injector.get(CacheStrategy)
         self.__lifespan = create_lifespan(db=self.__db, cache=self.__cache)
 
         self.__app = FastAPI(lifespan=self.__lifespan)
