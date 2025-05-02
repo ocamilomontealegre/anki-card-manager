@@ -24,8 +24,8 @@ class RedisStrategy(CacheStrategy):
             self.__logger.error(f"Redis connection error when close: {e}")
             raise
 
-    async def read(self, key: str, value: Any):
-        await self.__redis.set(name=key, value=value)
+    async def read(self, key: str):
+        return await self.__redis.get(name=key)
 
-    async def write(self, key: str):
-        await self.__redis.get(name=key)
+    async def write(self, key: str, value: Any):
+        await self.__redis.set(name=key, value=value)

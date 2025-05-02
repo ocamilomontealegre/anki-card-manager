@@ -7,8 +7,9 @@ from pandas import read_csv
 from pyee.asyncio import AsyncIOEventEmitter
 from openai import OpenAI
 from common.loggers.logger import AppLogger
-from common.env.env_config import get_env_variables
 from common.utils.google_utils import GoogleUtils
+from common.env.env_config import get_env_variables
+from common.cache.strategies.cache_strategy import CacheStrategy
 from modules.word.services.word_service import WordService
 from modules.scraper.services.scraper_service import ScraperService
 from modules.word.models.entities.word_entity import Word
@@ -21,6 +22,7 @@ class LanguageService:
         self,
         word_service: WordService,
         scraper_service: ScraperService,
+        cache_strategy: CacheStrategy,
         event_emitter: AsyncIOEventEmitter,
     ) -> None:
         self.__env = get_env_variables()
@@ -29,6 +31,7 @@ class LanguageService:
 
         self.__word_service = word_service
         self.__scraper_service = scraper_service
+        self.__cache_strategy = cache_strategy
 
         self.__event_emitter = event_emitter
         self.__open_ai_client = OpenAI(api_key=self.__env.openai.key)
@@ -147,8 +150,15 @@ class LanguageService:
     def process_cards(self, cards_info: List[CardResponse]) -> None:
         self.__word_service.create_many(cards_info)
 
-    def process_row(self, row: Row) -> CardResponse:
+    async def process_row(self, row: Row) -> CardResponse:
+        word = row["word"]
+        language = row["language"]
+
         try:
+            if await self.__cache_strategy.read(key=word):
+                self.__logger.debug(f"Word data already in the cache: {word}")
+                return
+
             completion = self.__open_ai_client.beta.chat.completions.parse(
                 model=self.__env.openai.model,
                 messages=[
@@ -158,12 +168,14 @@ class LanguageService:
                     },
                     {
                         "role": "user",
-                        "content": f"please look for the definition of the word: {row["word"]} in the {row["language"]} language",
+                        "content": f"please look for the definition of the word: {word} in the {language} language",
                     },
                 ],
                 response_format=CardResponse,
             )
-            return completion.choices[0].message.parsed
+            data = completion.choices[0].message.parsed
+            await self.__cache_strategy.write(key=word, value=word)
+            return data
         except Exception as e:
             self.__logger.error(
                 f"Error processing row: {row}, Error: {e}",
@@ -176,8 +188,8 @@ class LanguageService:
         words_data: List[CardResponse] = []
         for index, row in df.iterrows():
             try:
-                card_responses = self.process_row(row.to_dict())
-                words_data.append(card_responses)
+                card_response = await self.process_row(row.to_dict())
+                words_data.append(card_response)
             except Exception as e:
                 self.__logger.error(f"Skipping row {index} due to error: {e}")
                 continue

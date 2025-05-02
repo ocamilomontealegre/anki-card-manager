@@ -1,3 +1,4 @@
+from typing import Any
 from abc import ABC, abstractmethod
 
 
@@ -11,9 +12,9 @@ class CacheStrategy(ABC):
         pass
 
     @abstractmethod
-    def read(self) -> None:
+    def read(self, key: str) -> None:
         pass
 
     @abstractmethod
-    def write(self) -> None:
+    def write(self, key: str, value: Any) -> None:
         pass
