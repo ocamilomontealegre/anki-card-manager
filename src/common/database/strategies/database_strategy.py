@@ -17,3 +17,7 @@ class DatabaseStrategy(ABC):
     @abstractmethod
     def create_tables(self):
         pass
+
+    @abstractmethod
+    def disconnect(self):
+        pass

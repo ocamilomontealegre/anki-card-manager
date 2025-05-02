@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Engine
 from sqlalchemy.orm import sessionmaker
 from ..entities.base_entity import Base
 from .database_strategy import DatabaseStrategy
@@ -28,3 +28,7 @@ class PgStrategy(DatabaseStrategy):
 
     def create_tables(self):
         Base.metadata.create_all(self.__engine)
+
+    def disconnect(self):
+        if isinstance(self.__engine, Engine):
+            self.__engine.dispose()
