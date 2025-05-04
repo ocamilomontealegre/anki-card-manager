@@ -1,4 +1,3 @@
 # PENDING
 
-- Evaluate between changing from eleven labs to another tool
-- Evaluate changing from giphy and unplash to a scrapper
+- Add celery in order to manage jobs without blocking the server
