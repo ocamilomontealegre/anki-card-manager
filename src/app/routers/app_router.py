@@ -6,6 +6,7 @@ from modules.language.controllers.language_controller import LanguageController
 from modules.word.controllers.word_controller import WordController
 from modules.scraper.controllers.scraper_controller import ScraperController
 from modules.anki.controllers.anki_controller import AnkiController
+from modules.task.controllers.task_controller import TaskController
 from app.enums.app_endpoints_enum import AppEndpoints
 
 
@@ -22,6 +23,7 @@ class AppRouter:
         word_controller = self.__injector.get(WordController)
         scraper_controller = self.__injector.get(ScraperController)
         anki_controller = self.__injector.get(AnkiController)
+        task_controller = self.__injector.get(TaskController)
 
         self.__router.include_router(
             health_controller.get_router(), prefix=AppEndpoints.HEALTH.value
@@ -46,6 +48,10 @@ class AppRouter:
 
         self.__router.include_router(
             anki_controller.get_router(), prefix=AppEndpoints.ANKI.value
+        )
+
+        self.__router.include_router(
+            task_controller.get_router(), prefix=AppEndpoints.TASK.value
         )
 
     def get_router(self) -> APIRouter:
