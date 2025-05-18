@@ -1,14 +1,14 @@
-from typing import Any
+from typing import Any, Awaitable
 from abc import ABC, abstractmethod
 
 
 class CacheStrategy(ABC):
     @abstractmethod
-    def connect(self) -> None:
+    def connect(self) -> Awaitable:
         pass
 
     @abstractmethod
-    def close_connection(self) -> None:
+    def close_connection(self) -> Awaitable:
         pass
 
     @abstractmethod

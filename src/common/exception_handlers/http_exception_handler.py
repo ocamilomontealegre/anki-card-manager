@@ -14,12 +14,12 @@ class HTTPExceptionHandler:
         logger = AppLogger(label=HTTPExceptionHandler.__name__)
 
         exception_details = extract_exception_details(exc)
-        message = STATUS_MESSAGES.get(exc.status_code)
+        message = STATUS_MESSAGES.get(str(exc.status_code))
 
         response = HTTPResponse(
             status=exc.status_code,
             success=False,
-            message=exc.detail if exc.detail != "" else message,
+            message=exc.detail if exc.detail else (message or ""),
         )
 
         logger.error(

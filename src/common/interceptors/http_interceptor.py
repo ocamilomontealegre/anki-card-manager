@@ -1,8 +1,9 @@
 from json import loads
-from typing import Callable, Awaitable
+from typing import Callable, Awaitable, AsyncIterable
+from starlette.types import ASGIApp
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse, Response
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import Request, HTTPException
 from common.loggers.logger import AppLogger
 from common.models import HTTPResponse
 from common.utils import get_status_message
@@ -13,16 +14,19 @@ from common.exception_handlers import (
 
 
 class HTTPInterceptor(BaseHTTPMiddleware):
-    def __init__(self, app: FastAPI):
+
+    def __init__(self, app: ASGIApp):
         super().__init__(app)
         self.__logger = AppLogger(
             log_level="INFO", label=self.__class__.__name__
         )
 
     async def __format_response(
-        self, body_iterator: bytes, status_code: int
+        self, body_iterator: AsyncIterable[bytes], status_code: int
     ) -> HTTPResponse:
-        response_body = [section async for section in body_iterator]
+        response_body = []
+        async for section in body_iterator:
+            response_body.append(section)
         response_body_str = b"".join(response_body).decode("utf-8")
 
         data = loads(response_body_str)
@@ -46,7 +50,7 @@ class HTTPInterceptor(BaseHTTPMiddleware):
 
             if response.status_code < 400:
                 formated_response = await self.__format_response(
-                    response.body_iterator, response.status_code
+                    response.body_iterator, response.status_code  # type: ignore
                 )
                 self.__logger.info(
                     f"[INCOMING REQUEST] METHOD: {request.method} | URL: {request.url.path} | HEADERS: {request.headers} "

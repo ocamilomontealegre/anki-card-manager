@@ -1,6 +1,6 @@
 from typing import Dict
 
-STATUS_MESSAGES: Dict[str, str] = {
+STATUS_MESSAGES: Dict[int, str] = {
     200: "Request completed successfully",
     201: "Resource successfully created",
     202: "Request accepted for processing, but not yet complete",
