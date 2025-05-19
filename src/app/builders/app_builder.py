@@ -1,6 +1,8 @@
 from contextlib import asynccontextmanager
+
 from injector import Injector
 from fastapi import FastAPI, HTTPException
+
 from app.app_module import AppModule
 from app.routers.app_router import AppRouter
 from common.database.strategies.database_strategy import DatabaseStrategy

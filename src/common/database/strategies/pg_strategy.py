@@ -1,5 +1,5 @@
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine, Engine, exc
+from sqlalchemy.orm import sessionmaker, Session
 from common.loggers.logger import AppLogger
 from common.env.env_config import get_env_variables
 from ..entities.base_entity import Base
@@ -13,7 +13,7 @@ class PgStrategy(DatabaseStrategy):
         self.__env_variables = get_env_variables().pg
         self.__engine = self.create_engine()
 
-    def get_connection_url(self):
+    def get_connection_url(self) -> str:
         host = self.__env_variables.host
         port = self.__env_variables.port
         username = self.__env_variables.username
@@ -21,7 +21,7 @@ class PgStrategy(DatabaseStrategy):
         database = self.__env_variables.database
         return f"postgresql://{username}:{password}@{host}:{port}/{database}"
 
-    def create_engine(self):
+    def create_engine(self) -> Engine:
         try:
             return create_engine(self.get_connection_url())
         except exc.DatabaseError as e:
@@ -29,8 +29,11 @@ class PgStrategy(DatabaseStrategy):
             raise
         except Exception as e:
             self.__logger.error(f"Unknown error: {e}")
+            raise RuntimeError(
+                "Failed to create a database engine due to an unknown error."
+            )
 
-    def create_session(self):
+    def create_session(self) -> Session:
         try:
             engine = self.create_engine()
             session = sessionmaker(bind=engine)
@@ -40,11 +43,14 @@ class PgStrategy(DatabaseStrategy):
             raise
         except Exception as e:
             self.__logger.error(f"Unknown error: {e}")
+            raise RuntimeError(
+                "Failed to create a database session due to an unknown error."
+            )
 
     def create_tables(self):
         Base.metadata.create_all(self.__engine)
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         try:
             if isinstance(self.__engine, Engine):
                 self.__engine.dispose()

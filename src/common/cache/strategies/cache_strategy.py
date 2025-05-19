@@ -12,9 +12,9 @@ class CacheStrategy(ABC):
         pass
 
     @abstractmethod
-    def read(self, key: str) -> None:
+    async def read(self, key: str) -> None:
         pass
 
     @abstractmethod
-    def write(self, key: str, value: Any) -> None:
+    async def write(self, key: str, value: Any) -> None:
         pass

@@ -1,17 +1,19 @@
 from abc import ABC, abstractmethod
+from sqlalchemy import Engine
+from sqlalchemy.orm import Session
 
 
 class DatabaseStrategy(ABC):
     @abstractmethod
-    def get_connection_url(self):
+    def get_connection_url(self) -> str:
         pass
 
     @abstractmethod
-    def create_engine(self):
+    def create_engine(self) -> Engine:
         pass
 
     @abstractmethod
-    def create_session(self):
+    def create_session(self) -> Session:
         pass
 
     @abstractmethod
@@ -19,5 +21,5 @@ class DatabaseStrategy(ABC):
         pass
 
     @abstractmethod
-    def disconnect(self):
+    def disconnect(self) -> None:
         pass

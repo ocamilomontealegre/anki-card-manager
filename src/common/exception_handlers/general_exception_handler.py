@@ -1,7 +1,7 @@
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from common.loggers.logger import AppLogger
-from common.utils import extract_exception_details
+from common.utils import ExceptionUtils
 from common.models import HTTPResponse
 from common.constants import STATUS_MESSAGES
 
@@ -13,12 +13,12 @@ class GeneralExceptionHandler:
     ) -> JSONResponse:
         logger = AppLogger(label=GeneralExceptionHandler.__name__)
 
-        exception_details = extract_exception_details(exc)
+        exception_details = ExceptionUtils.extract_details(exc)
 
         response = HTTPResponse(
             status=500,
             success=False,
-            message=STATUS_MESSAGES.get(500),
+            message=STATUS_MESSAGES[500],
         )
 
         logger.error(

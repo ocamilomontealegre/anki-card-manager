@@ -10,7 +10,12 @@ class RedisStrategy(CacheStrategy):
         self.__logger = AppLogger(label=RedisStrategy.__name__)
 
         self.__env = get_env_variables().redis
-        self.__redis = Redis(host=self.__env.host, port=self.__env.port, db=self.__env.db, decode_responses=True)
+        self.__redis = Redis(
+            host=self.__env.host,
+            port=self.__env.port,
+            db=self.__env.db,
+            decode_responses=True,
+        )
 
     async def connect(self):
         await self.__redis.ping()

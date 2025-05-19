@@ -1,5 +1,3 @@
-import asyncio
-from os import startfile
 from pathlib import Path
 from google.cloud import texttospeech
 from google.oauth2 import service_account
@@ -62,15 +60,3 @@ class GoogleUtils:
 
         except Exception as e:
             logger.error(f"Unexpected error during text synthesis: {e}")
-
-
-async def main():
-    output_path = Path("../../../uploads/random.mp3")
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    await GoogleUtils.synthetize_text(
-        "Ich spreche kein Deutsch", output_file=output_path
-    )
-    startfile(output_path)
-
-if __name__ == "__main__":
-    asyncio.run(main())

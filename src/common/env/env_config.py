@@ -36,6 +36,7 @@ def get_env_variables() -> EnvVariables:
         return env
     except ValidationError as e:
         logger.error(f"{e}")
+        raise
 
 
 if __name__ == "__main__":
