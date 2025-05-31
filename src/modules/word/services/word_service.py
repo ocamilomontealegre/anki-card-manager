@@ -10,25 +10,53 @@ from common.loggers.logger import AppLogger
 from common.env.env_config import get_env_variables
 from ..models.entities.word_entity import Word
 from ..models.inferfaces.find_all_params import FindAllParams
+from ..transformers.word_transformer import WordTransformer
 
 
 class WordService:
     @inject
-    def __init__(self, db: DatabaseStrategy) -> None:
+    def __init__(
+        self, word_transformer: WordTransformer, db: DatabaseStrategy
+    ) -> None:
         self.__session: Session = db.create_session()
+
+        self.__word_transformer = word_transformer
 
         self.__logger: AppLogger = AppLogger(label=WordService.__name__)
         self.__anki_env = get_env_variables().anki
 
+    def __get_filter_query(self, filters: FindAllParams):
+        query = self.__session.query(Word)
+
+        if "limit" in filters:
+            query = query.limit(filters["limit"] or 100)
+
+        if "offset" in filters:
+            query = query.offset(filters["offset"] or 0)
+
+        if "sort" in filters:
+            query = query.order_by(filters["sort"] or Word.created_at.desc())
+
+        if "category" in filters:
+            query = query.filter(Word.category == filters["category"])
+
+        if "word" in filters:
+            query = query.filter(Word.word.contains(filters["word"]))
+
+        if "language" in filters:
+            query = query.filter(Word.language == filters["language"].value)
+
+        return query
+
     def create(self, word: Word) -> Word:
-        new_word = self.__session.add(word)
+        self.__session.add(word)
         self.__session.commit()
         self.__session.refresh(word)
         self.__logger.info(
             f"{Word.__name__}[{word.word}] created successfully.",
             context=self.create.__name__,
         )
-        return new_word
+        return word
 
     def create_many(self, words: List[Word]):
         self.__session.add_all(words)
@@ -39,27 +67,7 @@ class WordService:
         )
 
     def find_all(self, filters: FindAllParams):
-        query = self.__session.query(Word)
-
-        if "limit" in filters:
-            query = query.limit(filters.limit or 100)
-
-        if "offset" in filters:
-            query = query.offset(filters.offset or 0)
-
-        if "sort" in filters:
-            query = query.order_by(filters.sort or Word.created_at.desc())
-
-        if "category" in filters:
-            query = query.filter(Word.category == filters["category"])
-
-        if "word" in filters:
-            query = query.filter(Word.word.contains(filters["word"]))
-
-        if "language" in filters:
-            query = query.filter(Word.language == filters["language"].value)
-
-        words = query.all()
+        words = self.__get_filter_query(filters).all()
         self.__logger.info(
             f"{Word.__name__}[{len(words)}] found", self.find_all.__name__
         )
@@ -69,28 +77,8 @@ class WordService:
         }
 
     def get_as_csv(self, filters: FindAllParams):
-        query = self.__session.query(Word)
-
-        if "limit" in filters:
-            query = query.limit(filters.limit or 100)
-
-        if "offset" in filters:
-            query = query.offset(filters.offset or 0)
-
-        if "sort" in filters:
-            query = query.order_by(filters.sort or Word.created_at.desc())
-
-        if "category" in filters:
-            query = query.filter(Word.category == filters["category"])
-
-        if "word" in filters:
-            query = query.filter(Word.word.contains(filters["word"]))
-
-        if "language" in filters:
-            query = query.filter(Word.language == filters["language"].value)
-
-        result = query.all()
-        words = [self.__transform_word(word) for word in result]
+        result = self.__get_filter_query(filters).all()
+        words = [self.__word_transformer.transform(word) for word in result]
         df = DataFrame(words)
 
         output_path = (

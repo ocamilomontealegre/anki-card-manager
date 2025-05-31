@@ -1,8 +1,8 @@
-from pydantic import BaseModel
+from typing import TypedDict
 from modules.language.models.enums.word_category_enum import WordCategory
 
 
-class TransformedCard(BaseModel):
+class TransformedCard(TypedDict):
     id: str
     word: str
     category: WordCategory

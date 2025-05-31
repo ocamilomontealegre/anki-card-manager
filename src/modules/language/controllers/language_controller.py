@@ -10,7 +10,8 @@ class LanguageController:
         self.__router = APIRouter()
         self.__register_routes()
 
-    def __register_routes(self):
+    def __register_routes(self) -> None:
+        """Required for FastAPI but not necessary for the project"""
         pass
 
     def get_router(self) -> APIRouter:

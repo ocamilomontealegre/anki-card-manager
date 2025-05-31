@@ -16,8 +16,17 @@ class CeleryApp:
             main="app", broker=self.__broker, backend=self.__backend
         )
 
+        self.__configure()
+
     def __configure(self) -> None:
-        self.__app.conf.update()
+        self.__app.conf.update(
+            task_serializer="json",
+            accept_content=["json"],
+            result_serializer="json",
+            timezone="UTC",
+            enable_utc=True,
+            task_acks_late=True,
+        )
 
     def get_app(self) -> Celery:
         return self.__app

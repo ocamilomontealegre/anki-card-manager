@@ -33,7 +33,7 @@ class GiphyStrategy(BaseStrategy):
                     "No image found matching the selector"
                 )
 
-            return img["src"]
+            return str(img["src"])
         except WebDriverException as e:
             self.__logger.error(
                 f"Selenium error: {str(e)}", self.get_image_url.__name__

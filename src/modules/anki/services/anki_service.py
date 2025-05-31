@@ -1,5 +1,5 @@
 import requests
-from typing import Dict
+from typing import List
 from injector import inject
 from common.loggers.logger import AppLogger
 from common.env.env_config import get_env_variables
@@ -30,7 +30,7 @@ class AnkiService:
         return language_model_map.get(language, Language.ENGLISH.value)
 
     def create_cards(self, filters: CreateCards):
-        words: Dict[Word] = self.__word_service.find_all(filters=filters)[
+        words: List[Word] = self.__word_service.find_all(filters=filters)[
             "items"
         ]
         results = []
@@ -57,7 +57,7 @@ class AnkiService:
                         "options": {"allowDuplicate": False},
                         "tags": [
                             language,
-                            transformed_word.get("category", "uncategorized"),
+                            transformed_word["category"],
                         ],
                     }
                 },

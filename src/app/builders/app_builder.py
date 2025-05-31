@@ -70,7 +70,7 @@ class AppBuilder:
             Exception, GeneralExceptionHandler.handle_exception
         )
         self.__app.add_exception_handler(
-            HTTPException, HTTPExceptionHandler.handle_exception
+            HTTPException, HTTPExceptionHandler.handle_exception  # type: ignore
         )
         return self
 

@@ -10,16 +10,18 @@ class RequestValidationExceptionHandler:
     @staticmethod
     async def handle_exception(
         request: Request, exc: RequestValidationError
-    ) -> HTTPResponse:
+    ) -> JSONResponse:
         logger = AppLogger(label=RequestValidationExceptionHandler.__name__)
 
         exception_details = extract_exception_details(exc)
 
-        response = HTTPResponse(status=400, success=False, message=exc.errors)
+        response = HTTPResponse(
+            status=400, success=False, message=str(exc.errors)
+        )
 
         logger.error(
             f"[INCOMING REQUEST] METHOD: {request.method} | URL: {request.url.path} | HEADERS: {request.headers} "
             f"[OUTGOING RESPONSE] STATUS: {response.status} | RESPONSE_BODY: {response} | EXCEPTION: {exception_details}",
         )
 
-        return JSONResponse(content=response.dict(), status_code=400)
+        return JSONResponse(content=response.model_dump(), status_code=400)

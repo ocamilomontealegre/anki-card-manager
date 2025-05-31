@@ -1,9 +1,8 @@
-from typing import List
-from pydantic import BaseModel
+from typing import List, TypedDict
 from ..enums import Language, WordCategory
 
 
-class CardResponse(BaseModel):
+class CardResponse(TypedDict):
     word: str
     language: Language
     definition: str

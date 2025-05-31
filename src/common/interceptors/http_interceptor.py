@@ -58,7 +58,7 @@ class HTTPInterceptor(BaseHTTPMiddleware):
                 )
 
                 return JSONResponse(
-                    content=formated_response.dict(),
+                    content=formated_response.model_dump(),
                     status_code=response.status_code,
                 )
 

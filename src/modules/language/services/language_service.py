@@ -1,7 +1,7 @@
 import requests
 from uuid import uuid4
 from pathlib import Path
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, Union, cast
 from injector import inject
 from pandas import read_csv
 from pyee.asyncio import AsyncIOEventEmitter
@@ -74,7 +74,6 @@ class LanguageService:
 
     async def __transform_card(self, card_info: CardResponse) -> Word:
         try:
-            card_info = card_info.model_dump()
             word = card_info["word"]
             language = card_info["language"].value
             plural = ", ".join(
@@ -99,17 +98,17 @@ class LanguageService:
             )
             sentence_path = await GoogleUtils.synthetize_text(
                 text=sentence,
-                language=language,
-                output_file=self.__get_audio_path(word=word),
+                language=card_info["language"],
+                output_file=Path(self.__get_audio_path(word=word)),
             )
 
             plural_audio_path = ""
             if len(plural) > 0:
                 plural_audio_path = await GoogleUtils.synthetize_text(
                     text=plural,
-                    language=language,
-                    output_file=self.__get_audio_path(
-                        word=word, prefix="plural"
+                    language=card_info["language"],
+                    output_file=Path(
+                        self.__get_audio_path(word=word, prefix="plural")
                     ),
                 )
 
@@ -117,9 +116,9 @@ class LanguageService:
             if len(singular) > 0:
                 singular_audio_path = await GoogleUtils.synthetize_text(
                     text=singular,
-                    language=language,
-                    output_file=self.__get_audio_path(
-                        word=word, prefix="singular"
+                    language=card_info["language"],
+                    output_file=Path(
+                        self.__get_audio_path(word=word, prefix="singular")
                     ),
                 )
 
@@ -146,11 +145,12 @@ class LanguageService:
             self.__logger.error(
                 f"Error transforming card: {e}", self.__transform_card.__name__
             )
+            raise
 
-    def process_cards(self, cards_info: List[CardResponse]) -> None:
+    def process_cards(self, cards_info: List[Word]) -> None:
         self.__word_service.create_many(cards_info)
 
-    async def process_row(self, row: Row) -> CardResponse:
+    async def process_row(self, row: Row) -> Union[CardResponse, None]:
         word = row["word"]
         language = row["language"]
 
@@ -181,6 +181,7 @@ class LanguageService:
                 f"Error processing row: {row}, Error: {e}",
                 self.process_row.__name__,
             )
+            raise
 
     async def process_csv(self, file_name: str) -> None:
         df = read_csv(file_name, delimiter=",")
@@ -188,8 +189,11 @@ class LanguageService:
         words_data: List[CardResponse] = []
         for index, row in df.iterrows():
             try:
-                card_response = await self.process_row(row.to_dict())
-                words_data.append(card_response)
+                card_response = await self.process_row(
+                    cast(Row, row.to_dict())
+                )
+                if card_response:
+                    words_data.append(card_response)
             except Exception as e:
                 self.__logger.error(f"Skipping row {index} due to error: {e}")
                 continue
@@ -197,7 +201,7 @@ class LanguageService:
         transformed_words: List[Word] = []
         for card_response in words_data:
             try:
-                self.__logger.debug(f"WORD: {card_response.word}")
+                self.__logger.debug(f"WORD: {card_response["word"]}")
                 transformed_word = await self.__transform_card(card_response)
                 transformed_words.append(transformed_word)
             except Exception as e:

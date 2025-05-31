@@ -32,7 +32,7 @@ class EnvVariables(BaseSettings):
 
 def get_env_variables() -> EnvVariables:
     try:
-        env = EnvVariables()
+        env = EnvVariables()  # type: ignore
         return env
     except ValidationError as e:
         logger.error(f"{e}")
