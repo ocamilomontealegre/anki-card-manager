@@ -1,33 +1,33 @@
 from pathlib import Path
 from injector import inject
 from fastapi import UploadFile
-from pyee.asyncio import AsyncIOEventEmitter
 from common.loggers.logger import AppLogger
 from common.utils.file_utils import FileUtils
 
 
 class UploadService:
     @inject
-    def __init__(self, event_emitter: AsyncIOEventEmitter):
-        self.__event_emitter = event_emitter
-
+    def __init__(self):
         self.__logger = AppLogger(label=UploadService.__name__)
 
-    async def __save_file(self, file_path: str, file_data: UploadFile) -> Path:
+    async def _write_file_to_disk(
+        self, file_path: Path, file_data: UploadFile
+    ) -> Path:
         with open(file_path, "wb") as file:
             file.write(await file_data.read())
-        self.__logger.info(
-            f"File {file_path} saved successfully", self.__save_file.__name__
+        self.__logger.debug(
+            f"File {file_path} saved successfully",
+            self._write_file_to_disk.__name__,
         )
         return file_path
 
-    async def process_file(self, file: UploadFile):
-        file_path = FileUtils.create_folder("uploads") / file.filename
-        file_name = await self.__save_file(file_path, file)
-        self.__logger.info(
+    async def save_file(self, file: UploadFile):
+        if not file.filename:
+            raise ValueError("Uploaded file must have a filename")
+        file_path = FileUtils.create_folder("uploads") / str(file.filename)
+        file_name = await self._write_file_to_disk(file_path, file)
+        self.__logger.debug(
             f"File {file_name} processed successfully",
-            self.process_file.__name__,
+            self.save_file.__name__,
         )
-        self.__event_emitter.emit("upload", file_name)
-
-        return {"status": "OK"}
+        return str(file_path)

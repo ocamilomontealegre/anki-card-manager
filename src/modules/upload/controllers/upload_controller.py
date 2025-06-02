@@ -18,7 +18,14 @@ class UploadController:
                     status_code=400, detail="Not file provided"
                 )
 
-            await self.__upload_service.process_file(file)
+            file_path = await self.__upload_service.save_file(file)
+
+            return {
+                "name": file.filename,
+                "file_path": file_path,
+                "size": file.size,
+                "content_type": file.content_type,
+            }
 
     def get_router(self) -> APIRouter:
         return self.__router
