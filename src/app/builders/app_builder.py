@@ -1,3 +1,4 @@
+from typing import TypedDict
 from contextlib import asynccontextmanager
 
 from injector import Injector
@@ -7,6 +8,7 @@ from app.app_module import AppModule
 from app.routers.app_router import AppRouter
 from common.database.strategies.database_strategy import DatabaseStrategy
 from common.cache.strategies.cache_strategy import CacheStrategy
+from common.mq.strategies.mq_strategy import MqStrategy
 from common.interceptors import HTTPInterceptor
 from common.loggers.logger import AppLogger
 from common.exception_handlers import (
@@ -16,8 +18,18 @@ from common.exception_handlers import (
 from common.env import get_env_variables
 
 
-def create_lifespan(db: DatabaseStrategy, cache: CacheStrategy):
+class LifespanDependencies(TypedDict):
+    db: DatabaseStrategy
+    cache: CacheStrategy
+    mq: MqStrategy
+
+
+def create_lifespan(deps: LifespanDependencies):
     logger = AppLogger()
+
+    db = deps["db"]
+    cache = deps["cache"]
+    mq = deps["mq"]
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -26,6 +38,9 @@ def create_lifespan(db: DatabaseStrategy, cache: CacheStrategy):
             logger.info("Database connected successfully")
 
             await cache.connect()
+
+            mq.get_app()
+            logger.info("Message queue initialized successfully")
         except Exception as e:
             logger.error(f"Database connection failed: {e}")
             raise
@@ -38,6 +53,10 @@ def create_lifespan(db: DatabaseStrategy, cache: CacheStrategy):
 
         await cache.close_connection()
 
+        if hasattr(mq, "close_connection"):
+            mq.close_connection()
+            logger.info("Message queue connection closed")
+
     return lifespan
 
 
@@ -48,7 +67,10 @@ class AppBuilder:
         self.__env = get_env_variables()
         self.__db = self.__injector.get(DatabaseStrategy)
         self.__cache = self.__injector.get(CacheStrategy)
-        self.__lifespan = create_lifespan(db=self.__db, cache=self.__cache)
+        self.__mq = self.__injector.get(MqStrategy)
+        self.__lifespan = create_lifespan(
+            {"db": self.__db, "cache": self.__cache, "mq": self.__mq}
+        )
 
         self.__app = FastAPI(lifespan=self.__lifespan)
         self.__router = AppRouter(self.__injector).get_router()
