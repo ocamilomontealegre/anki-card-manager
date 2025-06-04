@@ -1,8 +1,12 @@
-from time import sleep
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support import expected_conditions as EC
 from common.loggers.logger import AppLogger
 from common.env.env_config import get_env_variables
 from common.exceptions import ImageScrapingException
@@ -15,18 +19,26 @@ class UnplashStrategy(BaseStrategy):
         self.__unplash_env = get_env_variables().unplash
 
     def get_image_url(self, query: str) -> str:
-        image_selector = "img[data-testid='photo-grid-masonry-img']"
+        first_image_selector = "img[data-testid='photo-grid-masonry-img']"
         driver = None
 
         try:
             options = Options()
             options.add_argument("--headless")
-            driver = webdriver.Chrome(options=options)
+            driver = webdriver.Chrome(
+                service=Service(ChromeDriverManager().install()),
+                options=options,
+            )
             driver.get(f"{self.__unplash_env.url}/{query}")
-            sleep(5)
+
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, first_image_selector)
+                )
+            )
 
             soup = BeautifulSoup(driver.page_source, "html.parser")
-            img = soup.select_one(image_selector)
+            img = soup.select_one(first_image_selector)
 
             if not img:
                 raise ImageScrapingException(

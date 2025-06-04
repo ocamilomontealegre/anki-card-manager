@@ -1,18 +1,25 @@
 from injector import inject
 from fastapi import APIRouter
-from ..services.language_service import LanguageService
+from pydantic import BaseModel
+from ..tasks.language_task import process_csv_task
+
+
+class FileRequest(BaseModel):
+    file_path: str
 
 
 class LanguageController:
     @inject
-    def __init__(self, language_service: LanguageService) -> None:
-        self.language_service = language_service
-        self.__router = APIRouter()
-        self.__register_routes()
+    def __init__(self) -> None:
+        self._router = APIRouter()
+        self._register_routes()
 
-    def __register_routes(self) -> None:
-        """Required for FastAPI but not necessary for the project"""
-        pass
+    def _register_routes(self) -> None:
+
+        @self._router.post("/process")
+        async def process_file(request: FileRequest):
+            result = process_csv_task.delay(file_path=request.file_path)  # type: ignore
+            return {"task_id": result.id}
 
     def get_router(self) -> APIRouter:
-        return self.__router
+        return self._router

@@ -31,6 +31,7 @@ google-cloud-texttospeech = "^2.26.0"
 aioredis = "^2.0.1"
 redis = "^5.2.1"
 celery = "^5.5.2"
+dramatiq = "^1.18.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"
@@ -43,6 +44,7 @@ target-version = ["py310", "py311", "py312"]
 
 [tool.poetry.scripts]
 start = "scripts:start"
+worker = "scripts:start_celery_worker"
 lint = "scripts:lint"
 format = "scripts:format"
 migrate = "scripts:migrate"

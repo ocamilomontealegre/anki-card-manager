@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import List, Literal, Optional, Union, cast
 from injector import inject
 from pandas import read_csv
-from pyee.asyncio import AsyncIOEventEmitter
 from openai import OpenAI
 from common.loggers.logger import AppLogger
 from common.utils.google_utils import GoogleUtils
@@ -23,7 +22,6 @@ class LanguageService:
         word_service: WordService,
         scraper_service: ScraperService,
         cache_strategy: CacheStrategy,
-        event_emitter: AsyncIOEventEmitter,
     ) -> None:
         self.__env = get_env_variables()
 
@@ -33,10 +31,7 @@ class LanguageService:
         self.__scraper_service = scraper_service
         self.__cache_strategy = cache_strategy
 
-        self.__event_emitter = event_emitter
         self.__open_ai_client = OpenAI(api_key=self.__env.openai.key)
-
-        self.__event_emitter.on("upload", self.process_csv)
 
     def __download_image(self, url: str, word: str) -> str:
         response = requests.get(url, stream=True)
@@ -74,18 +69,18 @@ class LanguageService:
 
     async def __transform_card(self, card_info: CardResponse) -> Word:
         try:
-            word = card_info["word"]
-            language = card_info["language"].value
+            word = card_info.word
+            language = card_info.language
             plural = ", ".join(
-                list(map(lambda x: x.capitalize(), card_info["plural"]))
+                list(map(lambda x: x.capitalize(), card_info.plural))
             )
             singular = ", ".join(
-                list(map(lambda x: x.capitalize(), card_info["singular"]))
+                list(map(lambda x: x.capitalize(), card_info.singular))
             )
             synonyms = ", ".join(
-                list(map(lambda x: x.capitalize(), card_info["synonyms"]))
+                list(map(lambda x: x.capitalize(), card_info.synonyms))
             )
-            sentence = card_info["sentence"]
+            sentence = card_info.sentence
             partial_sentence = sentence.replace(word, "[...]")
             word_forms = f"{singular}, {plural}"
 
@@ -98,7 +93,7 @@ class LanguageService:
             )
             sentence_path = await GoogleUtils.synthetize_text(
                 text=sentence,
-                language=card_info["language"],
+                language=language,
                 output_file=Path(self.__get_audio_path(word=word)),
             )
 
@@ -106,7 +101,7 @@ class LanguageService:
             if len(plural) > 0:
                 plural_audio_path = await GoogleUtils.synthetize_text(
                     text=plural,
-                    language=card_info["language"],
+                    language=language,
                     output_file=Path(
                         self.__get_audio_path(word=word, prefix="plural")
                     ),
@@ -116,7 +111,7 @@ class LanguageService:
             if len(singular) > 0:
                 singular_audio_path = await GoogleUtils.synthetize_text(
                     text=singular,
-                    language=card_info["language"],
+                    language=language,
                     output_file=Path(
                         self.__get_audio_path(word=word, prefix="singular")
                     ),
@@ -124,11 +119,11 @@ class LanguageService:
 
             new_word = Word(
                 word=self.__check_word_forms(word, word_forms),
-                language=language,
-                category=card_info["category"].value.capitalize(),
-                definition=card_info["definition"].capitalize(),
+                language=language.value,
+                category=card_info.category.value.capitalize(),
+                definition=card_info.definition.capitalize(),
                 sentence=sentence,
-                phonetics=card_info["sentence_phonetics"],
+                phonetics=card_info.sentence_phonetics,
                 sentence_audio=sentence_path,
                 partial_sentence=partial_sentence,
                 singular=singular,
@@ -201,7 +196,7 @@ class LanguageService:
         transformed_words: List[Word] = []
         for card_response in words_data:
             try:
-                self.__logger.debug(f"WORD: {card_response["word"]}")
+                self.__logger.debug(f"WORD: {card_response.word}")
                 transformed_word = await self.__transform_card(card_response)
                 transformed_words.append(transformed_word)
             except Exception as e:

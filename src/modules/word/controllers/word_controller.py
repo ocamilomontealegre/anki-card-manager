@@ -1,4 +1,3 @@
-from typing import Dict
 from injector import inject
 from fastapi import APIRouter, Depends
 from ..models.inferfaces.find_all_params import FindAllParams
@@ -13,21 +12,16 @@ class WordController:
         self.__register_routes()
 
     def __register_routes(self):
-        @self.__router.get("")
+
+        @self.__router.get("/")
         async def find_all(params: FindAllParams = Depends()):
-            filters: Dict[str, str] = {
-                k: v for k, v in params.dict().items() if v
-            }
-            return self.__word_service.find_all(filters)
+            return self.__word_service.find_all(params)
 
         @self.__router.get("/csv")
         async def get_as_csv(params: FindAllParams = Depends()):
-            filters: Dict[str, str] = {
-                k: v for k, v in params.dict().items() if v
-            }
-            return self.__word_service.get_as_csv(filters)
+            return self.__word_service.get_as_csv(params)
 
-        @self.__router.delete("")
+        @self.__router.delete("/")
         async def delete_all():
             return self.__word_service.delete_all()
 

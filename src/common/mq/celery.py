@@ -1,10 +1,8 @@
-from typing import Any
 from celery import Celery
 from common.env.env_config import get_env_variables
-from .mq_strategy import MqStrategy
 
 
-class CeleryStrategy(MqStrategy):
+class CeleryMq:
     def __init__(self):
         self._env = get_env_variables().redis
         self._broker = (
@@ -18,6 +16,9 @@ class CeleryStrategy(MqStrategy):
             main="app", broker=self._broker, backend=self._backend
         )
 
+        self._config()
+
+    def _config(self):
         self._app.conf.update(
             task_serializer="json",
             accept_content=["json"],
@@ -26,12 +27,7 @@ class CeleryStrategy(MqStrategy):
             enable_utc=True,
             task_acks_late=True,
         )
+        self._app.autodiscover_tasks()
 
-    def get_app(self) -> Any:
+    def get_app(self) -> Celery:
         return self._app
-
-    def send_task(self, name: str, *args: Any, **kwargs: Any) -> Any:
-        return self._app.send_task(name, args=args, kwargs=kwargs)
-
-    def close_connection(self) -> None:
-        return self._app.close()
