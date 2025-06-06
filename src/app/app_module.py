@@ -7,6 +7,7 @@ from modules.language.language_module import LanguageModule
 from modules.word.word_module import WordModule
 from modules.scraper.scraper_module import ScraperModule
 from modules.anki.anki_module import AnkiModule
+from modules.task.task_module import TaskModule
 
 
 class AppModule(Module):
@@ -19,3 +20,4 @@ class AppModule(Module):
         binder.install(module=WordModule)
         binder.install(module=ScraperModule)
         binder.install(module=AnkiModule)
+        binder.install(module=TaskModule)

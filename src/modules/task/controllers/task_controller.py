@@ -1,18 +1,19 @@
 from injector import inject
 from fastapi import APIRouter
-from celery.result import AsyncResult
+from ..services.task_service import TaskService
 
 
 class TaskController:
     @inject
-    def __init__(self) -> None:
-        self.__router = APIRouter()
-        self.__register_routes()
+    def __init__(self, task_service: TaskService) -> None:
+        self._router = APIRouter()
+        self._task_service = task_service
+        self._register_routes()
 
-    def __register_routes(self):
-        @self.__router.get("")
-        async def get_task(task_id: str):
-            return AsyncResult(id=task_id)
+    def _register_routes(self):
+        @self._router.get("/{id}")
+        async def get_task_by_id(id: str):
+            return self._task_service.get_task_by_id(id)
 
     def get_router(self) -> APIRouter:
-        return self.__router
+        return self._router
