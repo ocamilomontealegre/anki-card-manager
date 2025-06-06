@@ -30,7 +30,7 @@ def start_celery_worker() -> None:
                 "run",
                 "celery",
                 "-A",
-                "modules.language.tasks.language_task",
+                "common.mq.celery",
                 "worker",
                 "--loglevel=info",
                 "--pool=solo",

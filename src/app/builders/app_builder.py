@@ -35,8 +35,6 @@ def create_lifespan(deps: LifespanDependencies):
             logger.info("Database connected successfully")
 
             await cache.connect()
-
-            logger.info("Message queue initialized successfully")
         except Exception as e:
             logger.error(f"Database connection failed: {e}")
             raise

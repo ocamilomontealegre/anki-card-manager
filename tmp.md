@@ -1,3 +1,3 @@
-PYTHONPATH=src poetry run celery -A app.builders.app_builder worker --loglevel=info --pool=solo
+# TASKS
 
-PYTHONPATH=src poetry run celery -A common.mq.strategies.celery_strategy worker --loglevel=info --pool=solo
+- Fix issues related to db in docker. If possibly create a dedicated db
