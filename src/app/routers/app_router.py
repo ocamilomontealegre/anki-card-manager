@@ -7,7 +7,6 @@ from modules.word.controllers.word_controller import WordController
 from modules.scraper.controllers.scraper_controller import ScraperController
 from modules.anki.controllers.anki_controller import AnkiController
 from modules.task.controllers.task_controller import TaskController
-from app.enums.app_endpoints_enum import AppEndpoints
 
 
 class AppRouter:
@@ -25,34 +24,13 @@ class AppRouter:
         anki_controller = self.__injector.get(AnkiController)
         task_controller = self.__injector.get(TaskController)
 
-        self.__router.include_router(
-            health_controller.get_router(), prefix=AppEndpoints.HEALTH.value
-        )
-
-        self.__router.include_router(
-            upload_controller.get_router(), prefix=AppEndpoints.UPLOAD.value
-        )
-
-        self.__router.include_router(
-            language_controller.get_router(),
-            prefix=AppEndpoints.LANGUAGE.value,
-        )
-
-        self.__router.include_router(
-            word_controller.get_router(), prefix=AppEndpoints.WORD.value
-        )
-
-        self.__router.include_router(
-            scraper_controller.get_router(), prefix=AppEndpoints.SCRAPER.value
-        )
-
-        self.__router.include_router(
-            anki_controller.get_router(), prefix=AppEndpoints.ANKI.value
-        )
-
-        self.__router.include_router(
-            task_controller.get_router(), prefix=AppEndpoints.TASK.value
-        )
+        self.__router.include_router(health_controller.get_router())
+        self.__router.include_router(upload_controller.get_router())
+        self.__router.include_router(language_controller.get_router())
+        self.__router.include_router(word_controller.get_router())
+        self.__router.include_router(scraper_controller.get_router())
+        self.__router.include_router(anki_controller.get_router())
+        self.__router.include_router(task_controller.get_router())
 
     def get_router(self) -> APIRouter:
         return self.__router

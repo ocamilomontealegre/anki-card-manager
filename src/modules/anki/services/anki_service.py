@@ -30,7 +30,9 @@ class AnkiService:
         return language_model_map.get(language, Language.ENGLISH.value)
 
     async def create_cards(self, filters: FindAllParams):
-        word_service_result = self.__word_service.find_all(filters=filters)
+        word_service_result = self.__word_service.list_paginated(
+            filters=filters
+        )
         words: List[Word] = (
             word_service_result["items"]
             if word_service_result and "items" in word_service_result

@@ -1,17 +1,20 @@
 from injector import inject
 from fastapi import APIRouter
+from common.enums import AppEndpoints
 from ..services.task_service import TaskService
+from ..models.dto.task_dto import TaskDto
 
 
 class TaskController:
     @inject
     def __init__(self, task_service: TaskService) -> None:
-        self._router = APIRouter()
+        self._router = APIRouter(prefix=AppEndpoints.TASK.value, tags=["Task"])
         self._task_service = task_service
         self._register_routes()
 
     def _register_routes(self):
-        @self._router.get("/{id}")
+
+        @self._router.get("/{id}", response_model=TaskDto)
         async def get_task_by_id(id: str):
             return self._task_service.get_task_by_id(id)
 

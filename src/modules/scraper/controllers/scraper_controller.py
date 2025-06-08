@@ -1,5 +1,6 @@
 from injector import inject
 from fastapi import APIRouter, Request
+from common.enums import AppEndpoints
 from ..services.scraper_service import ScraperService
 
 
@@ -7,7 +8,9 @@ class ScraperController:
     @inject
     def __init__(self, scraper_service: ScraperService) -> None:
         self.__scraper_service = scraper_service
-        self.__router = APIRouter()
+        self.__router = APIRouter(
+            prefix=AppEndpoints.SCRAPER.value, tags=["Scraper"]
+        )
         self.__register_routes()
 
     def __register_routes(self):

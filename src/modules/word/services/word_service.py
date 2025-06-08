@@ -5,6 +5,7 @@ from uuid import uuid4
 from pandas import DataFrame
 from injector import inject
 from sqlalchemy.orm import Session
+from common.models import ListPaginated, DeleteMany
 from common.database.strategies.database_strategy import DatabaseStrategy
 from common.loggers.logger import AppLogger
 from common.env.env_config import get_env_variables
@@ -25,7 +26,7 @@ class WordService:
         self.__logger: AppLogger = AppLogger(label=WordService.__name__)
         self.__anki_env = get_env_variables().anki
 
-    def __get_filter_query(self, filters: FindAllParams):
+    def _get_filter_query(self, filters: FindAllParams):
         query = self.__session.query(Word)
 
         query = query.order_by(Word.created_at.desc())
@@ -43,9 +44,6 @@ class WordService:
                 else filters.language
             )
             query = query.filter(Word.language == language)
-
-        query = query.limit(filters.limit or 100)
-        query = query.offset(filters.offset or 0)
 
         return query
 
@@ -67,18 +65,26 @@ class WordService:
             context=self.create_many.__name__,
         )
 
-    def find_all(self, filters: FindAllParams):
-        words = self.__get_filter_query(filters).all()
+    def list_paginated(self, filters: FindAllParams) -> ListPaginated:
+        off_set = filters.offset or 0
+        limit = filters.limit or 100
+
+        query = self._get_filter_query(filters)
+        words = query.offset(off_set).limit(limit).all()
+
         self.__logger.info(
-            f"{Word.__name__}[{len(words)}] found", self.find_all.__name__
+            f"{Word.__name__}[{len(words)}] found",
+            self.list_paginated.__name__,
         )
-        return {
-            "items": words,
-            "total": len(words),
-        }
+        return ListPaginated[Word](
+            items=words,
+            total=(len(words) or 0),
+            page=(off_set // limit) + 1 if limit else 1,
+            size=limit,
+        )
 
     def get_as_csv(self, filters: FindAllParams):
-        result = self.__get_filter_query(filters).all()
+        result = self._get_filter_query(filters).all()
         words = [self.__word_transformer.transform(word) for word in result]
         df = DataFrame(words)
 
@@ -93,11 +99,11 @@ class WordService:
         )
         return {"status": "OK"}
 
-    def delete_all(self):
+    def delete_all(self) -> DeleteMany:
         delete_words = self.__session.query(Word).delete()
         self.__session.commit()
         self.__logger.info(
             f"{Word.__name__}[{delete_words}] deleted successfully",
             self.delete_all.__name__,
         )
-        return {"deleted": "OK"}
+        return DeleteMany(deleted="OK", total=delete_words)

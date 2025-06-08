@@ -11,6 +11,8 @@ def start() -> None:
         python_path = executable
         print(python_path)
         check_call([python_path, "src/main.py"])
+
+        start_celery_worker()
     except KeyboardInterrupt:
         print("\nServer stopped manually.")
         exit(0)
