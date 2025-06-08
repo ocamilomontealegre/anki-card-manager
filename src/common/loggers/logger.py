@@ -27,6 +27,7 @@ class AppLogger:
             ),
             colorize=True,
             level=log_level,
+            enqueue=True,
         )
 
     def _set_file_logging(self):
@@ -40,6 +41,8 @@ class AppLogger:
                 "[FastAPI] {extra[pid]} | {time:MMM-DD-YY HH:mm:ss} | [{extra[label]}] | "
                 "<level>{level}</level>: <level>{message}</level>"
             ),
+            enqueue=True,
+            catch=True,
         )
 
     def debug(self, message: str, context: str | None = None) -> None:

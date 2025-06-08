@@ -27,10 +27,15 @@ class CeleryMq:
             enable_utc=True,
             task_acks_late=True,
         )
-        self._app.autodiscover_tasks(["modules.language.tasks.language_task"])
+        self._app.autodiscover_tasks(
+            [
+                "modules.language.tasks.language_task",
+                "modules.anki.tasks.anki_task",
+            ]
+        )
 
     def get_app(self) -> Celery:
         return self._app
 
 
-celery = CeleryMq().get_app()
+celery_app = CeleryMq().get_app()

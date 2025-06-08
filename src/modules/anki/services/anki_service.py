@@ -7,8 +7,8 @@ from common.maps import language_model_map, language_deck_map
 from modules.language.models.enums.language_enum import Language
 from modules.word.services.word_service import WordService
 from modules.word.models.entities.word_entity import Word
+from modules.word.models.inferfaces.find_all_params import FindAllParams
 from modules.word.transformers.word_transformer import WordTransformer
-from ..models.interfaces.create_cards_interface import CreateCards
 
 
 class AnkiService:
@@ -29,14 +29,16 @@ class AnkiService:
     def __get_model_for_lang(self, language: Language) -> str:
         return language_model_map.get(language, Language.ENGLISH.value)
 
-    def create_cards(self, filters: CreateCards):
-        words: List[Word] = self.__word_service.find_all(filters=filters)[
-            "items"
-        ]
+    async def create_cards(self, filters: FindAllParams):
+        word_service_result = self.__word_service.find_all(filters=filters)
+        words: List[Word] = (
+            word_service_result["items"]
+            if word_service_result and "items" in word_service_result
+            else []
+        )
         results = []
 
         for word in words:
-            print("WORD: ", word)
             word_dict = word.to_dict()
             transformed_word = self.__word_transformer.transform(word)
 
@@ -48,10 +50,10 @@ class AnkiService:
                 "params": {
                     "note": {
                         "deckName": self.__get_deck_for_lang(
-                            language=language
+                            language=Language(language)
                         ),
                         "modelName": self.__get_model_for_lang(
-                            language=language
+                            language=Language(language)
                         ),
                         "fields": transformed_word,
                         "options": {"allowDuplicate": False},
@@ -62,6 +64,10 @@ class AnkiService:
                     }
                 },
             }
+            print(
+                "LANGUAGE: ",
+                self.__get_model_for_lang(language=language),
+            )
 
             try:
                 response = requests.post(self.__anki_env.connect, json=payload)

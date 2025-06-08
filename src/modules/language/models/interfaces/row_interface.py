@@ -1,7 +1,8 @@
 from typing import TypedDict
-from ..enums.language_enum import Language
+from ..enums import Language, WordCategory
 
 
 class Row(TypedDict):
     language: Language
     word: str
+    category: WordCategory

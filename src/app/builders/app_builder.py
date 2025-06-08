@@ -32,6 +32,7 @@ def create_lifespan(deps: LifespanDependencies):
     async def lifespan(app: FastAPI):
         try:
             db.create_session()
+            db.create_tables()
             logger.info("Database connected successfully")
 
             await cache.connect()

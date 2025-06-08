@@ -45,7 +45,7 @@ class UnplashStrategy(BaseStrategy):
                     "No image found matching the selector"
                 )
 
-            return str(img["src"])
+            return str(img["src"]) or ""
         except WebDriverException as e:
             self.__logger.error(
                 f"Selenium error: {str(e)}", self.get_image_url.__name__

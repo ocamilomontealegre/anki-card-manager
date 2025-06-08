@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List
 from ..enums import Language, WordCategory
 
@@ -12,4 +12,7 @@ class CardResponse(BaseModel):
     singular: List[str]
     synonyms: List[str]
     sentence: str
-    sentence_phonetics: str
+    sentence_phonetics: str = Field(
+        ...,
+        description="Official IPA",
+    )

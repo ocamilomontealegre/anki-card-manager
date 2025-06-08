@@ -13,7 +13,7 @@ class WordController:
 
     def __register_routes(self):
 
-        @self.__router.get("/")
+        @self.__router.get("")
         async def find_all(params: FindAllParams = Depends()):
             return self.__word_service.find_all(params)
 
@@ -21,7 +21,7 @@ class WordController:
         async def get_as_csv(params: FindAllParams = Depends()):
             return self.__word_service.get_as_csv(params)
 
-        @self.__router.delete("/")
+        @self.__router.delete("")
         async def delete_all():
             return self.__word_service.delete_all()
 

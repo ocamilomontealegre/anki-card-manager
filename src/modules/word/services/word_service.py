@@ -28,23 +28,24 @@ class WordService:
     def __get_filter_query(self, filters: FindAllParams):
         query = self.__session.query(Word)
 
-        if "limit" in filters:
-            query = query.limit(filters["limit"] or 100)
+        query = query.order_by(Word.created_at.desc())
 
-        if "offset" in filters:
-            query = query.offset(filters["offset"] or 0)
+        if filters.category:
+            query = query.filter(Word.category == filters.category)
 
-        if "sort" in filters:
-            query = query.order_by(filters["sort"] or Word.created_at.desc())
+        if filters.word:
+            query = query.filter(Word.word.contains(filters.word))
 
-        if "category" in filters:
-            query = query.filter(Word.category == filters["category"])
+        if filters.language:
+            language = (
+                filters.language.value
+                if hasattr(filters.language, "value")
+                else filters.language
+            )
+            query = query.filter(Word.language == language)
 
-        if "word" in filters:
-            query = query.filter(Word.word.contains(filters["word"]))
-
-        if "language" in filters:
-            query = query.filter(Word.language == filters["language"].value)
+        query = query.limit(filters.limit or 100)
+        query = query.offset(filters.offset or 0)
 
         return query
 

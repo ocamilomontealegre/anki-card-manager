@@ -1,4 +1,5 @@
 import requests
+from re import sub, escape
 from uuid import uuid4
 from pathlib import Path
 from typing import List, Literal, Optional, Union, cast
@@ -81,7 +82,7 @@ class LanguageService:
                 list(map(lambda x: x.capitalize(), card_info.synonyms))
             )
             sentence = card_info.sentence
-            partial_sentence = sentence.replace(word, "[...]")
+            partial_sentence = sub(rf"\b{escape(word)}\b", "[...]", sentence)
             word_forms = f"{singular}, {plural}"
 
             giphy_image_url = self.__scraper_service.get_giphy_image_url(
@@ -148,6 +149,8 @@ class LanguageService:
     async def process_row(self, row: Row) -> Union[CardResponse, None]:
         word = row["word"]
         language = row["language"]
+        category = row["category"]
+        print("CATEGORY: ", category)
 
         try:
             if await self.__cache_strategy.read(key=word):
@@ -159,11 +162,11 @@ class LanguageService:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a polyglot expert with over 10 years of experience",
+                        "content": "You are a polyglot language expert with over 10 years of experience in linguistics, translation, and cross-linguistic analysis.",
                     },
                     {
                         "role": "user",
-                        "content": f"please look for the definition of the word: {word} in the {language} language",
+                        "content": f"Could you provide the definition of the word '{word}' in {language}, when it functions as a {category}? Please include any relevant nuances, usage examples, and cultural or contextual insights, if applicable.",
                     },
                 ],
                 response_format=CardResponse,

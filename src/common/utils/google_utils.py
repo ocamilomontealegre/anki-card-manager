@@ -17,7 +17,7 @@ class GoogleUtils:
     @staticmethod
     async def synthetize_text(
         text: str, language: Language, output_file: Path
-    ):
+    ) -> str:
         try:
             google_env = get_env_variables().google
             print("GOOGLE ENV: ", google_env)
@@ -51,12 +51,15 @@ class GoogleUtils:
             with open(output_file, "wb") as out:
                 out.write(response.audio_content)
                 logger.debug(f"Audio content written to {output_file}")
-            return output_file
+            return str(output_file)
         except DefaultCredentialsError as e:
             logger.error(f"Google credentials error: {e}")
+            raise
 
         except GoogleAPIError as e:
             logger.error(f"Google API error: {e}")
+            raise
 
         except Exception as e:
             logger.error(f"Unexpected error during text synthesis: {e}")
+            raise

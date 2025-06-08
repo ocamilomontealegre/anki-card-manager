@@ -9,4 +9,4 @@ class AppEndpoints(Enum):
     WORD = "/words"
     SCRAPER = "/scrapers"
     ANKI = "/anki"
-    TASK = "/task"
+    TASK = "/tasks"
