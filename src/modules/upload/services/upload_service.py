@@ -26,7 +26,7 @@ class UploadService:
         if not file.filename:
             raise ValueError("Uploaded file must have a filename")
 
-        if file.content_type != "csv":
+        if file.content_type != "text/csv":
             raise ValueError(
                 f"Content type {file.content_type} currently not supported"
             )

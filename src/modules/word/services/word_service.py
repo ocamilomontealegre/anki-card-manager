@@ -76,8 +76,8 @@ class WordService:
             f"{Word.__name__}[{len(words)}] found",
             self.list_paginated.__name__,
         )
-        return ListPaginated[Word](
-            items=words,
+        return ListPaginated(
+            items=[w.to_dict() for w in words],
             total=(len(words) or 0),
             page=(off_set // limit) + 1 if limit else 1,
             size=limit,

@@ -4,6 +4,6 @@ from ..enums import Language, WordCategory
 
 
 class Row(TypedDict):
-    language: Language
     word: str
+    language: Language
     category: NotRequired[WordCategory]
