@@ -10,3 +10,4 @@ class WordCategory(Enum):
     PROPOSITION = "proposition"
     CONJUNCTION = "conjunction"
     INTERJECTION = "interjection"
+    IDIOM = "idiom"

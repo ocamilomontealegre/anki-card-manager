@@ -11,8 +11,6 @@ def start() -> None:
         python_path = executable
         print(python_path)
         check_call([python_path, "src/main.py"])
-
-        start_celery_worker()
     except KeyboardInterrupt:
         print("\nServer stopped manually.")
         exit(0)
@@ -21,7 +19,7 @@ def start() -> None:
         exit(1)
 
 
-def start_celery_worker() -> None:
+def start_mq() -> None:
     """Start Celery worker."""
     try:
         env = environ.copy()

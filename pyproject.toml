@@ -44,7 +44,7 @@ target-version = ["py310", "py311", "py312"]
 
 [tool.poetry.scripts]
 start = "scripts:start"
-worker = "scripts:start_celery_worker"
+mq = "scripts:start_mq"
 lint = "scripts:lint"
 format = "scripts:format"
 migrate = "scripts:migrate"

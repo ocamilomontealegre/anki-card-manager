@@ -149,8 +149,9 @@ class LanguageService:
     async def process_row(self, row: Row) -> Union[CardResponse, None]:
         word = row["word"]
         language = row["language"]
-        category = row["category"]
-        print("CATEGORY: ", category)
+        category = row.get("category") or "general"
+        if category == "general":
+            self.__logger.warning(f"Using default category for word: {word}")
 
         try:
             if await self.__cache_strategy.read(key=word):
