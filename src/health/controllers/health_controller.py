@@ -1,8 +1,8 @@
 from injector import inject
 from fastapi import APIRouter
 from common.enums import AppEndpoints
-from health.services.health_service import HealthService
-from health.models.health_message_model import HealthMessage
+from health.models.abstracts.health_service_abstract import HealthService
+from health.models.dto.health_message_dto import HealthMessageDto
 
 
 class HealthController:
@@ -18,12 +18,12 @@ class HealthController:
 
         @self._router.get(
             "",
-            response_model=HealthMessage,
+            response_model=HealthMessageDto,
             summary="Check application status",
             description="Check the availability of the server",
         )
         async def check():
-            return self._health_service.check()
+            return HealthMessageDto(message=self._health_service.check())
 
     def get_router(self) -> APIRouter:
         return self._router

@@ -1,8 +1,9 @@
-from health.models.health_message_model import HealthMessage
+from health.models.abstracts.health_service_abstract import HealthService
 from health.constants.all_constants import HEALTH_MESSAGE
 
 
-class HealthService:
-    def check(self) -> HealthMessage:
+class HealthServiceImpl(HealthService):
+
+    def check(self) -> str:
         """Return app status"""
         return HEALTH_MESSAGE
