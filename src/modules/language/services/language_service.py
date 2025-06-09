@@ -2,7 +2,7 @@ import requests
 from re import sub, escape
 from uuid import uuid4
 from pathlib import Path
-from typing import List, Literal, Optional, Union, cast
+from typing import Literal, Optional, Union, cast
 from injector import inject
 from pandas import read_csv
 from openai import OpenAI
@@ -26,7 +26,7 @@ class LanguageService:
     ) -> None:
         self.__env = get_env_variables()
 
-        self.__logger = AppLogger(label=LanguageService.__name__)
+        self._logger = AppLogger(label=LanguageService.__name__)
 
         self.__word_service = word_service
         self.__scraper_service = scraper_service
@@ -34,7 +34,7 @@ class LanguageService:
 
         self.__open_ai_client = OpenAI(api_key=self.__env.openai.key)
 
-    def __download_image(self, url: str, word: str) -> str:
+    def _download_image(self, url: str, word: str) -> str:
         response = requests.get(url, stream=True)
 
         extension = ""
@@ -53,14 +53,14 @@ class LanguageService:
 
         return str(path)
 
-    def __get_audio_path(
+    def _get_audio_path(
         self, word: str, prefix: Literal["", "plural", "singular"] = ""
     ) -> str:
         full_prefix = f"{prefix}_" if prefix else ""
 
         return f"{self.__env.anki.media}/{full_prefix}{word}.mp3"
 
-    def __check_word_forms(
+    def _check_word_forms(
         self, base_word: str, word_forms: Optional[str]
     ) -> str:
         if word_forms and word_forms != ", ":
@@ -68,7 +68,12 @@ class LanguageService:
         else:
             return f"{base_word[0].upper()}{base_word[1:]}"
 
-    async def __transform_card(self, card_info: CardResponse) -> Word:
+    async def _transform_card(self, card_info: CardResponse) -> Word:
+        self._logger.debug(
+            f"Transforming word[{card_info.word}]",
+            self._transform_card.__name__,
+        )
+
         try:
             word = card_info.word
             language = card_info.language
@@ -95,7 +100,7 @@ class LanguageService:
             sentence_path = await GoogleUtils.synthetize_text(
                 text=sentence,
                 language=language,
-                output_file=Path(self.__get_audio_path(word=word)),
+                output_file=Path(self._get_audio_path(word=word)),
             )
 
             plural_audio_path = ""
@@ -104,7 +109,7 @@ class LanguageService:
                     text=plural,
                     language=language,
                     output_file=Path(
-                        self.__get_audio_path(word=word, prefix="plural")
+                        self._get_audio_path(word=word, prefix="plural")
                     ),
                 )
 
@@ -114,12 +119,12 @@ class LanguageService:
                     text=singular,
                     language=language,
                     output_file=Path(
-                        self.__get_audio_path(word=word, prefix="singular")
+                        self._get_audio_path(word=word, prefix="singular")
                     ),
                 )
 
             new_word = Word(
-                word=self.__check_word_forms(word, word_forms),
+                word=self._check_word_forms(word, word_forms),
                 language=language.value,
                 category=card_info.category.value.capitalize(),
                 definition=card_info.definition.capitalize(),
@@ -132,30 +137,27 @@ class LanguageService:
                 plural=plural,
                 plural_audio=plural_audio_path,
                 synonyms=synonyms,
-                image=self.__download_image(giphy_image_url, word),
-                image_2=self.__download_image(unplash_image_url, word),
+                image=self._download_image(giphy_image_url, word),
+                image_2=self._download_image(unplash_image_url, word),
             )
             print("NEW_CARD: ", new_word)
             return new_word
         except Exception as e:
-            self.__logger.error(
-                f"Error transforming card: {e}", self.__transform_card.__name__
+            self._logger.error(
+                f"Error transforming card: {e}", self._transform_card.__name__
             )
             raise
-
-    def process_cards(self, cards_info: List[Word]) -> None:
-        self.__word_service.create_many(cards_info)
 
     async def process_row(self, row: Row) -> Union[CardResponse, None]:
         word = row["word"]
         language = row["language"]
         category = row.get("category") or "general"
         if category == "general":
-            self.__logger.warning(f"Using default category for word: {word}")
+            self._logger.warning(f"Using default category for word: {word}")
 
         try:
             if await self.__cache_strategy.read(key=word):
-                self.__logger.debug(f"Word data already in the cache: {word}")
+                self._logger.debug(f"Word data already in the cache: {word}")
                 return
 
             completion = self.__open_ai_client.beta.chat.completions.parse(
@@ -176,7 +178,7 @@ class LanguageService:
             await self.__cache_strategy.write(key=word, value=word)
             return data
         except Exception as e:
-            self.__logger.error(
+            self._logger.error(
                 f"Error processing row: {row}, Error: {e}",
                 self.process_row.__name__,
             )
@@ -185,26 +187,18 @@ class LanguageService:
     async def process_csv(self, file_name: str) -> None:
         df = read_csv(file_name, delimiter=",")
 
-        words_data: List[CardResponse] = []
         for index, row in df.iterrows():
             try:
                 card_response = await self.process_row(
                     cast(Row, row.to_dict())
                 )
-                if card_response:
-                    words_data.append(card_response)
-            except Exception as e:
-                self.__logger.error(f"Skipping row {index} due to error: {e}")
-                continue
 
-        transformed_words: List[Word] = []
-        for card_response in words_data:
-            try:
-                self.__logger.debug(f"WORD: {card_response.word}")
-                transformed_word = await self.__transform_card(card_response)
-                transformed_words.append(transformed_word)
-            except Exception as e:
-                self.__logger.error(f"Failed to transform card response: {e}")
-                continue
+                if not card_response:
+                    return
 
-        self.process_cards(transformed_words)
+                transformed_word = await self._transform_card(card_response)
+                self.__word_service.create(word=transformed_word)
+
+            except Exception as e:
+                self._logger.error(f"Skipping row[{index}] due to error: {e}")
+                continue
