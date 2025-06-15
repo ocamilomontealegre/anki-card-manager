@@ -7,19 +7,23 @@ from ..services.scraper_service import ScraperService
 class ScraperController:
     @inject
     def __init__(self, scraper_service: ScraperService) -> None:
-        self.__scraper_service = scraper_service
-        self.__router = APIRouter(
+        self._scraper_service = scraper_service
+        self._router = APIRouter(
             prefix=AppEndpoints.SCRAPER.value, tags=["Scraper"]
         )
-        self.__register_routes()
+        self._register_routes()
 
-    def __register_routes(self):
-        @self.__router.post("")
+    def _register_routes(self):
+        @self._router.post("")
         async def get_url_image(req: Request):
             body = await req.json()
             query = body.get("query")
-            result = self.__scraper_service.get_unplash_image_url(query)
+            language = body.get("language")
+            source = body.get("source")
+            result = await self._scraper_service.get_image_url(
+                {"query": query, "target_language": language, "source": source}
+            )
             return {"url": result}
 
     def get_router(self) -> APIRouter:
-        return self.__router
+        return self._router

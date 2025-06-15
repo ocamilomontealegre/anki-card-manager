@@ -9,7 +9,7 @@ from common.env.open_ai_env_config import OpenAIEnvVariables
 from common.env.open_api_env_config import OpenAPIEnvVariables
 from common.env.pg_env_config import PgEnvVariables
 from common.env.redis_env_config import RedisEnvVariables
-from common.env.unplash_env_config import UnplashEnvVariables
+from common.env.pinterest_env_config import PinterestEnvVariables
 
 logger = AppLogger(label="Env")
 
@@ -27,7 +27,7 @@ class EnvVariables(BaseSettings):
     openapi: OpenAPIEnvVariables
     pg: PgEnvVariables
     redis: RedisEnvVariables
-    unplash: UnplashEnvVariables
+    pinterest: PinterestEnvVariables
 
 
 def get_env_variables() -> EnvVariables:

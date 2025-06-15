@@ -5,7 +5,7 @@ from google.api_core.exceptions import GoogleAPIError
 from google.auth.exceptions import DefaultCredentialsError
 
 from common.loggers.logger import AppLogger
-from modules.language.models.enums import Language
+from common.enums import Language
 from ..env.env_config import get_env_variables
 from ..maps import language_voice_map
 

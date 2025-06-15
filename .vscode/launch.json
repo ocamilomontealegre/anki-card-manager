@@ -4,17 +4,17 @@
     {
       "name": "FastAPI Debug (Uvicorn)",
       "type": "debugpy",
-      "request": "launch",
-      "module": "uvicorn",
-      "args": [
-        "app.app_module:app",
-        "--reload"
-      ],
-      "cwd": "${workspaceFolder}/src",
-      "env": {
-        "PYTHONPATH": "${workspaceFolder}/src"
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 5678
       },
-      "console": "integratedTerminal",
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/src",
+          "remoteRoot": "/app"
+        }
+      ],
       "justMyCode": true
     }
   ]

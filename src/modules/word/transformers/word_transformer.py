@@ -1,7 +1,32 @@
 from os import path
+from typing import Optional
+from datetime import datetime
+from pydantic import BaseModel
 from injector import inject
+from common.enums import WordCategory
 from ..models.entities.word_entity import Word
-from ..models.inferfaces.transformed_card_interface import TransformedCard
+
+
+class WordSchema(BaseModel):
+    id: str
+    word: str
+    category: str
+    definition: str
+    sentence: str
+    phonetics: str
+    sentence_audio: str
+    partial_sentence: str
+    singular: Optional[str] = None
+    singular_audio: Optional[str] = None
+    plural: Optional[str] = None
+    plural_audio: Optional[str] = None
+    synonyms: Optional[str] = None
+    image: str
+    image_2: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+    model_config = {"from_attributes": True}
 
 
 class WordTransformer:
@@ -10,34 +35,30 @@ class WordTransformer:
         # This constructor is intentionally left empty because
         pass
 
-    def __format_audio_path(self, audio_path) -> str:
+    def _format_audio_path(self, audio_path) -> str:
         return f"[sound:{path.basename(audio_path)}]" if audio_path else ""
 
-    def transform(self, word: Word) -> TransformedCard:
-        word_dict = word.to_dict()
+    def transform(self, word: Word) -> WordSchema:
+        word_dict = WordSchema.model_validate(word)
 
-        print("SENTENCE: ", word_dict.get("sentence_audio"))
-
-        return TransformedCard(
-            id=word_dict.get("id", ""),
-            word=word_dict.get("word", ""),
-            category=word_dict.get("category", ""),
-            definition=word_dict.get("definition", ""),
-            sentence=word_dict.get("sentence", ""),
-            sentence_audio=self.__format_audio_path(
-                word_dict.get("sentence_audio", "")
+        return WordSchema(
+            id=word_dict.id,
+            word=word_dict.word,
+            category=WordCategory(
+                word_dict.category.lower()
+            ).value.capitalize(),
+            definition=word_dict.definition,
+            sentence=word_dict.sentence,
+            sentence_audio=self._format_audio_path(word_dict.sentence_audio),
+            phonetics=f"/{word_dict.phonetics}/",
+            partial_sentence=word_dict.partial_sentence,
+            singular=word_dict.singular or "",
+            singular_audio=self._format_audio_path(
+                word_dict.singular_audio or ""
             ),
-            phonetics=f"/{word_dict.get('phonetics', '')}/",
-            partial_sentence=word_dict.get("partial_sentence", ""),
-            singular=word_dict.get("singular", ""),
-            singular_audio=self.__format_audio_path(
-                word_dict.get("singular_audio", "")
-            ),
-            plural=word_dict.get("plural", ""),
-            plural_audio=self.__format_audio_path(
-                word_dict.get("plural_audio", "")
-            ),
-            synonyms=word_dict.get("synonyms", ""),
-            image=path.basename(word_dict.get("image", "")),
-            image_2=path.basename(word_dict.get("image_2", "")),
+            plural=word_dict.plural or "",
+            plural_audio=self._format_audio_path(word_dict.plural_audio or ""),
+            synonyms=word_dict.synonyms or "",
+            image=path.basename(word_dict.image),
+            image_2=path.basename(word_dict.image_2 or ""),
         )

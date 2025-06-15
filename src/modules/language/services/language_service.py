@@ -7,7 +7,7 @@ from injector import inject
 from pandas import read_csv
 from openai import OpenAI
 from common.loggers.logger import AppLogger
-from common.utils.google_utils import GoogleUtils
+from common.utils import GoogleUtils, ImageUtils
 from common.env.env_config import get_env_variables
 from common.cache.strategies.cache_strategy import CacheStrategy
 from modules.word.services.word_service import WordService
@@ -24,15 +24,15 @@ class LanguageService:
         scraper_service: ScraperService,
         cache_strategy: CacheStrategy,
     ) -> None:
-        self.__env = get_env_variables()
+        self._env = get_env_variables()
 
         self._logger = AppLogger(label=LanguageService.__name__)
 
-        self.__word_service = word_service
-        self.__scraper_service = scraper_service
-        self.__cache_strategy = cache_strategy
+        self._word_service = word_service
+        self._scraper_service = scraper_service
+        self._cache_strategy = cache_strategy
 
-        self.__open_ai_client = OpenAI(api_key=self.__env.openai.key)
+        self._open_ai_client = OpenAI(api_key=self._env.openai.key)
 
     def _download_image(self, url: str, word: str) -> str:
         response = requests.get(url, stream=True)
@@ -44,7 +44,7 @@ class LanguageService:
             extension = "jpg"
 
         path = (
-            Path(self.__env.anki.media)
+            Path(self._env.anki.media)
             / f"{word}_{uuid4().hex[:8]}.{extension}"
         )
         with open(path, "wb") as f:
@@ -58,7 +58,7 @@ class LanguageService:
     ) -> str:
         full_prefix = f"{prefix}_" if prefix else ""
 
-        return f"{self.__env.anki.media}/{full_prefix}{word}.mp3"
+        return f"{self._env.anki.media}/{full_prefix}{word}.mp3"
 
     def _check_word_forms(
         self, base_word: str, word_forms: Optional[str]
@@ -90,13 +90,18 @@ class LanguageService:
             partial_sentence = sub(rf"\b{escape(word)}\b", "[...]", sentence)
             word_forms = f"{singular}, {plural}"
 
-            giphy_image_url = self.__scraper_service.get_giphy_image_url(
-                query=word
+            giphy_image_url = await self._scraper_service.get_image_url(
+                {"query": word, "target_language": language, "source": "giphy"}
             )
 
-            unplash_image_url = self.__scraper_service.get_unplash_image_url(
-                query=word
+            pinterest_image_url = await self._scraper_service.get_image_url(
+                {
+                    "query": word,
+                    "target_language": language,
+                    "source": "pinterest",
+                }
             )
+
             sentence_path = await GoogleUtils.synthetize_text(
                 text=sentence,
                 language=language,
@@ -137,8 +142,20 @@ class LanguageService:
                 plural=plural,
                 plural_audio=plural_audio_path,
                 synonyms=synonyms,
-                image=self._download_image(giphy_image_url, word),
-                image_2=self._download_image(unplash_image_url, word),
+                image=await ImageUtils.download_from_url(
+                    {
+                        "url": giphy_image_url,
+                        "word": word,
+                        "source": self._env.anki.media,
+                    }
+                ),
+                image_2=await ImageUtils.download_from_url(
+                    {
+                        "url": pinterest_image_url,
+                        "word": word,
+                        "source": self._env.anki.media,
+                    }
+                ),
             )
             print("NEW_CARD: ", new_word)
             return new_word
@@ -156,12 +173,12 @@ class LanguageService:
             self._logger.warning(f"Using default category for word: {word}")
 
         try:
-            if await self.__cache_strategy.read(key=word):
+            if await self._cache_strategy.read(key=word):
                 self._logger.debug(f"Word data already in the cache: {word}")
                 return
 
-            completion = self.__open_ai_client.beta.chat.completions.parse(
-                model=self.__env.openai.model,
+            completion = self._open_ai_client.beta.chat.completions.parse(
+                model=self._env.openai.model,
                 messages=[
                     {
                         "role": "system",
@@ -175,7 +192,7 @@ class LanguageService:
                 response_format=CardResponse,
             )
             data = completion.choices[0].message.parsed
-            await self.__cache_strategy.write(key=word, value=word)
+            await self._cache_strategy.write(key=word, value=word)
             return data
         except Exception as e:
             self._logger.error(
@@ -197,7 +214,7 @@ class LanguageService:
                     return
 
                 transformed_word = await self._transform_card(card_response)
-                self.__word_service.create(word=transformed_word)
+                self._word_service.create(word=transformed_word)
 
             except Exception as e:
                 self._logger.error(f"Skipping row[{index}] due to error: {e}")

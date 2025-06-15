@@ -33,4 +33,4 @@ class RedisStrategy(CacheStrategy):
         return await self.__redis.get(name=key)
 
     async def write(self, key: str, value: Any):
-        await self.__redis.set(name=key, value=value)
+        await self.__redis.set(name=key, value=value, ex=120)

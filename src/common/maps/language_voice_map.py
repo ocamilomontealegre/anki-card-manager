@@ -1,5 +1,5 @@
 from typing import Dict
-from modules.language.models.enums import Language
+from common.enums import Language
 
 language_voice_map: Dict[Language, Dict[str, str]] = {
     Language.ENGLISH: {
@@ -20,6 +20,6 @@ language_voice_map: Dict[Language, Dict[str, str]] = {
     },
     Language.PORTUGUESE: {
         "language_code": "pt-BR",
-        "name": "pt-BR-Wavenet-B",
+        "voice_model": "pt-BR-Wavenet-B",
     },
 }

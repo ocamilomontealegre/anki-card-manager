@@ -1,11 +1,11 @@
-from typing import List
+from typing import List, Tuple
 from pathlib import Path
 from datetime import datetime
 from uuid import uuid4
 from pandas import DataFrame
 from injector import inject
 from sqlalchemy.orm import Session
-from common.models import ListPaginated, DeleteMany
+from common.models import DeleteMany
 from common.database.strategies.database_strategy import DatabaseStrategy
 from common.loggers.logger import AppLogger
 from common.env.env_config import get_env_variables
@@ -65,7 +65,7 @@ class WordService:
             context=self.create_many.__name__,
         )
 
-    def list_paginated(self, filters: FindAllParams) -> ListPaginated:
+    def list_paginated(self, filters: FindAllParams) -> Tuple[List[Word], int]:
         off_set = filters.offset or 0
         limit = filters.limit or 100
 
@@ -76,12 +76,8 @@ class WordService:
             f"{Word.__name__}[{len(words)}] found",
             self.list_paginated.__name__,
         )
-        return ListPaginated(
-            items=[w.to_dict() for w in words],
-            total=(len(words) or 0),
-            page=(off_set // limit) + 1 if limit else 1,
-            size=limit,
-        )
+
+        return (words, len(words))
 
     def get_as_csv(self, filters: FindAllParams):
         result = self._get_filter_query(filters).all()
@@ -90,7 +86,7 @@ class WordService:
 
         output_path = (
             Path(self.__anki_env.output)
-            / f"{datetime.today().strftime("%Y-%m-%d")}-{uuid4()}.csv"
+            / f"{datetime.today().strftime('%Y-%m-%d')}-{uuid4()}.csv"
         )
 
         df.to_csv(output_path, index=False, header=False)

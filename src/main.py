@@ -1,5 +1,6 @@
 from sys import exit
 from uvicorn import run
+from debugpy import listen, wait_for_client
 from app.builders.app_builder import AppBuilder
 from common.loggers.logger import AppLogger
 from common.env.env_config import get_env_variables
@@ -16,6 +17,12 @@ app = (
 )
 
 if __name__ == "__main__":
+    # listen(("localhost", 5678))
+    # print("Waiting for debugger to attach...")
+
+    # wait_for_client()
+    # print("Debugger attached, continuing execution")
+
     try:
         run(
             "main:app",

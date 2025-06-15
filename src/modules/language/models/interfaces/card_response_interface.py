@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import List
-from ..enums import Language, WordCategory
+from common.enums import Language
+from ..enums import WordCategory
 
 
 class CardResponse(BaseModel):

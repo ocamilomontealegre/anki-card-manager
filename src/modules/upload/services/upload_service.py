@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import datetime, timezone
 from injector import inject
 from fastapi import UploadFile
 from common.loggers.logger import AppLogger
@@ -31,15 +32,17 @@ class UploadService:
                 f"Content type {file.content_type} currently not supported"
             )
 
-        file_path = FileUtils.create_folder("uploads") / str(file.filename)
-        file_name = await self._write_file_to_disk(file_path, file)
+        timestamp = datetime.now(tz=timezone.utc).strftime("%Y%m%d_%H%M%S")
+        file_name = f"{timestamp}_{file.filename}"
+        file_path = FileUtils.create_folder("uploads") / file_name
+        await self._write_file_to_disk(file_path, file)
         self.__logger.debug(
             f"File {file_name} processed successfully",
             self.save_file.__name__,
         )
 
         return SavedFile(
-            name=file.filename,
+            name=file_name,
             file_path=str(file_path),
             size=file.size,
             content_type=file.content_type,
