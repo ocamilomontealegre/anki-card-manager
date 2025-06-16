@@ -157,7 +157,6 @@ class LanguageService:
                     }
                 ),
             )
-            print("NEW_CARD: ", new_word)
             return new_word
         except Exception as e:
             self._logger.error(

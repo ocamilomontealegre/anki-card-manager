@@ -20,7 +20,6 @@ class GoogleUtils:
     ) -> str:
         try:
             google_env = get_env_variables().google
-            print("GOOGLE ENV: ", google_env)
 
             credentials = (
                 service_account.Credentials.from_service_account_file(
