@@ -10,6 +10,7 @@ from common.env.open_api_env_config import OpenAPIEnvVariables
 from common.env.pg_env_config import PgEnvVariables
 from common.env.redis_env_config import RedisEnvVariables
 from common.env.pinterest_env_config import PinterestEnvVariables
+from common.env.debuggy_env_config import DebuggyEnvVariables
 
 logger = AppLogger(label="Env")
 
@@ -21,6 +22,7 @@ class EnvVariables(BaseSettings):
 
     anki: AnkiEnvVariables
     app: AppEnvVariables
+    debuggy: DebuggyEnvVariables
     giphy: GiphyEnvVariables
     google: GoogleEnvVariables
     openai: OpenAIEnvVariables

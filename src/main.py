@@ -17,11 +17,12 @@ app = (
 )
 
 if __name__ == "__main__":
-    # listen(("localhost", 5678))
-    # print("Waiting for debugger to attach...")
+    if env_variables.debuggy.active:
+        listen(("localhost", 5678))
+        logger.debug("Waiting for debugger to attach...")
 
-    # wait_for_client()
-    # print("Debugger attached, continuing execution")
+        wait_for_client()
+        logger.debug("Debugger attached, continuing execution")
 
     try:
         run(
@@ -32,5 +33,5 @@ if __name__ == "__main__":
             log_level="debug",
         )
     except KeyboardInterrupt:
-        print("Server interrupted. Shutting down gracefully...")
+        logger.debug("Server interrupted. Shutting down gracefully...")
         exit(0)
