@@ -1,6 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel
-from modules.language.models.enums import Language, WordCategory
+from common.enums import Language, WordCategory
 
 
 class FindAllParams(BaseModel):
@@ -10,3 +10,6 @@ class FindAllParams(BaseModel):
     word: Optional[str] = None
     category: Optional[WordCategory] = None
     language: Optional[Language] = None
+
+    class Config:
+        use_enum_values = True

@@ -39,6 +39,7 @@ undetected-chromedriver = "^3.5.5"
 setuptools = "^80.9.0"
 pillow = "^11.2.1"
 aiohttp = "^3.12.13"
+click = "^8.2.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"
@@ -55,7 +56,7 @@ start = "scripts:start"
 mq = "scripts:start_mq"
 lint = "scripts:lint"
 format = "scripts:format"
-migrate = "scripts:migrate"
+migrate = "cli:cli"
 
 [build-system]
 requires = ["poetry-core"]
