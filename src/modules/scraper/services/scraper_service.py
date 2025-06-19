@@ -8,7 +8,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from common.enums import Language
 from common.loggers.logger import AppLogger
-from common.exceptions.image_scraping_exception import ImageScrapingException
 from common.utils.language_utils import LanguageUtils
 from common.env import get_env_variables
 
@@ -84,6 +83,4 @@ class ScraperService:
             self._logger.error(
                 f"Unexpected error: {e}", self.get_image_url.__name__
             )
-            raise ImageScrapingException(
-                f"Unexpected error while scraping: {e}"
-            )
+            return ""
