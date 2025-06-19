@@ -1,6 +1,9 @@
 from pathlib import Path
 from re import escape, sub
 from typing import Literal, Optional, List
+
+from injector import inject
+
 from common.loggers.logger import AppLogger
 from common.utils import GoogleUtils, ImageUtils
 from common.env.env_config import get_env_variables
@@ -10,6 +13,8 @@ from ..models.interfaces.card_response_interface import CardResponse
 
 
 class LanguageTransformer:
+
+    @inject
     def __init__(self, scraper_service: ScraperService):
         self._scraper_service = scraper_service
 
@@ -49,7 +54,7 @@ class LanguageTransformer:
             singular = self._capitalize_text_array(card_info.singular)
             synonyms = self._capitalize_text_array(card_info.synonyms)
             sentence = card_info.sentence
-            partial_sentence = sub(rf"\b{escape(word)}\b", "[...]", sentence)
+            partial_sentence = sub(rf"\b{escape(word)}\b", "{...}", sentence)
             word_forms = f"{singular}, {plural}"
 
             giphy_image_url = await self._scraper_service.get_image_url(
