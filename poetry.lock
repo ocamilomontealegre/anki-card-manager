@@ -701,6 +701,26 @@ files = [
 ]
 
 [[package]]
+name = "dnspython"
+version = "2.7.0"
+description = "DNS toolkit"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "dnspython-2.7.0-py3-none-any.whl", hash = "sha256:b4c34b7d10b51bcc3a5071e7b8dee77939f1e878477eeecc965e9835f63c6c86"},
+    {file = "dnspython-2.7.0.tar.gz", hash = "sha256:ce9c432eda0dc91cf618a5cedf1a4e142651196bbcd2c80e89ed5a907e5cfaf1"},
+]
+
+[package.extras]
+dev = ["black (>=23.1.0)", "coverage (>=7.0)", "flake8 (>=7)", "hypercorn (>=0.16.0)", "mypy (>=1.8)", "pylint (>=3)", "pytest (>=7.4)", "pytest-cov (>=4.1.0)", "quart-trio (>=0.11.0)", "sphinx (>=7.2.0)", "sphinx-rtd-theme (>=2.0.0)", "twine (>=4.0.0)", "wheel (>=0.42.0)"]
+dnssec = ["cryptography (>=43)"]
+doh = ["h2 (>=4.1.0)", "httpcore (>=1.0.0)", "httpx (>=0.26.0)"]
+doq = ["aioquic (>=1.0.0)"]
+idna = ["idna (>=3.7)"]
+trio = ["trio (>=0.23)"]
+wmi = ["wmi (>=1.5.1)"]
+
+[[package]]
 name = "dramatiq"
 version = "1.18.0"
 description = "Background Processing for Python 3."
@@ -722,6 +742,24 @@ memcached = ["pylibmc (>=1.5,<2.0)"]
 rabbitmq = ["pika (>=1.0,<2.0)"]
 redis = ["redis (>=2.0,<7.0)"]
 watch = ["watchdog (>=4.0)", "watchdog_gevent (>=0.2)"]
+
+[[package]]
+name = "eventlet"
+version = "0.40.0"
+description = "Highly concurrent networking library"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "eventlet-0.40.0-py3-none-any.whl", hash = "sha256:496915bc92d054236bad872d5143112a13b0216a7bbeeb832e1a858ae131fe8a"},
+    {file = "eventlet-0.40.0.tar.gz", hash = "sha256:f659d735e06795a26167b666008798c7a203fcd8119b08b84036e41076432ff1"},
+]
+
+[package.dependencies]
+dnspython = ">=1.15.0"
+greenlet = ">=1.0"
+
+[package.extras]
+dev = ["black", "build", "commitizen", "isort", "pip-tools", "pre-commit", "twine"]
 
 [[package]]
 name = "fastapi"
@@ -3580,4 +3618,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "60af57f76d267720250e16cbe81ecd66e45762f249c9313530ffe601fd48ebfc"
+content-hash = "a273343bf1e4d46cd9b25df62d4e2c613a55888d402e4ff27c99c5b5b771bd94"

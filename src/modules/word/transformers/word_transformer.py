@@ -1,8 +1,10 @@
 from os import path
 from typing import Optional
 from datetime import datetime
+
 from pydantic import BaseModel
 from injector import inject
+
 from common.enums import WordCategory
 from ..models.entities.word_entity import Word
 
