@@ -22,9 +22,14 @@ class LanguageTransformer:
         self._env = get_env_variables()
 
     def _capitalize_text_array(self, text: List[str]) -> str:
-        return ", ".join(
-            list(map(lambda x: x.capitalize(), text))
-        )
+        if len(text) == 0:
+            return ""
+
+        first_word = text[0].capitalize()
+        if len(text) == 1:
+            return first_word
+
+        return ", ".join([first_word] + text[1:])
 
     def _get_audio_path(
         self, word: str, prefix: Literal["", "plural", "singular"] = ""
@@ -41,10 +46,10 @@ class LanguageTransformer:
         else:
             return f"{base_word[0].upper()}{base_word[1:]}"
 
-    async def transform(self, card_info: CardResponse):
+    async def to_entity(self, card_info: CardResponse):
         self._logger.debug(
             f"Transforming word[{card_info.word}]",
-            self.transform.__name__,
+            self.to_entity.__name__,
         )
 
         try:
@@ -53,9 +58,15 @@ class LanguageTransformer:
             plural = self._capitalize_text_array(card_info.plural)
             singular = self._capitalize_text_array(card_info.singular)
             synonyms = self._capitalize_text_array(card_info.synonyms)
-            sentence = card_info.sentence
-            partial_sentence = sub(rf"\b{escape(word)}\b", "{...}", sentence)
-            word_forms = f"{singular}, {plural}"
+            sentence = sub(
+                rf"\b{escape(word)}\b", f"[{word}]", card_info.sentence
+            )
+            partial_sentence = sub(
+                rf"\b{escape(word)}\b", "{...}", card_info.sentence
+            )
+            word_forms = self._capitalize_text_array(
+                card_info.singular + card_info.plural
+            )
 
             giphy_image_url = await self._scraper_service.get_image_url(
                 {"query": word, "target_language": language, "source": "giphy"}
@@ -127,6 +138,6 @@ class LanguageTransformer:
             return new_word
         except Exception as e:
             self._logger.error(
-                f"Error transforming card: {e}", self.transform.__name__
+                f"Error transforming card: {e}", self.to_entity.__name__
             )
             raise

@@ -1,8 +1,12 @@
+from pathlib import Path
 from typing import cast, Union
 from injector import inject
+
 from pandas import read_csv
 from openai import OpenAI
+
 from common.loggers.logger import AppLogger
+from common.utils import FileUtils
 from common.env.env_config import get_env_variables
 from common.cache.strategies.cache_strategy import CacheStrategy
 from modules.word.services.word_service import WordService
@@ -32,14 +36,15 @@ class LanguageService:
         word = row["word"]
         language = row["language"]
         category = row.get("category") or "general"
-        if category == "general":
-            self._logger.warning(f"Using default category for word: {word}")
 
         try:
             if await self._cache_strategy.read(key=word):
                 self._logger.debug(f"Word data already in the cache: {word}")
                 return
 
+            self._logger.debug(
+                f"Fetchin data for word[{word}] with language[{language}] and category[{category}]"
+            )
             completion = self._open_ai_client.beta.chat.completions.parse(
                 model=self._env.openai.model,
                 messages=[
@@ -56,7 +61,7 @@ class LanguageService:
                             f"Generate a structured language card for the word '{word}' in {language}. "
                             f"Focus on the most commonly used sense of the word when it functions as a {category}. "
                             "Provide:\n"
-                            "- A clear, learner-friendly definition\n"
+                            "- A clear, learner-friendly definition, it should not content the word I'm searching for\n"
                             "- Plural and singular forms (if relevant)\n"
                             "- A list of common synonyms\n"
                             "- A natural example sentence using the word\n"
@@ -89,11 +94,13 @@ class LanguageService:
                 if not card_response:
                     return
 
-                transformed_word = await self._language_transformer.transform(
-                    card_response
+                transformed_word = await self._language_transformer.to_entity(
+                    card_info=card_response
                 )
                 self._word_service.create(word=transformed_word)
 
             except Exception as e:
                 self._logger.error(f"Skipping row[{index}] due to error: {e}")
                 continue
+
+        # FileUtils.remove_file(file_path=Path(file_name))
