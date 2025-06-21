@@ -14,6 +14,7 @@ class CardResponse(BaseModel):
         description=(
             "A clear and concise definition of the word suitable for learners. "
             "Do not include the word itself in the definition."
+            "Do not include any other word forms in the definition"
         ),
     )
     category: WordCategory = Field(
@@ -22,20 +23,24 @@ class CardResponse(BaseModel):
     )
     plural: List[str] = Field(
         default_factory=list,
-        description="A list of plural forms of the word, if applicable. Leave empty if not relevant.",
+        description="A list of plural forms of the word, if applicable, including both feminine and masculine forms. Leave empty if not relevant.",
     )
     singular: List[str] = Field(
         default_factory=list,
-        description="A list of singular forms of the word, if applicable. Leave empty if not relevant.",
+        description="A list of singular forms of the word, if applicable, including both feminine and masculine forms. Leave empty if not relevant.",
     )
     synonyms: List[str] = Field(
         default_factory=list,
         description="A list of synonyms or words with similar meanings.",
     )
     sentence: str = Field(
-        ..., description="An example sentence using the word in context."
+        ...,
+        description=(
+            "An example sentence using the exact word in context"
+            "Do not include any other word forms in the sentence, it has to be the exact one"
+        ),
     )
     sentence_phonetics: str = Field(
         ...,
-        description="The official IPA (International Phonetic Alphabet) transcription of the sentence.",
+        description="The official IPA (International Phonetic Alphabet) transcription of the sentence",
     )
