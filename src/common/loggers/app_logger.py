@@ -21,8 +21,8 @@ class AppLogger:
             sys.stderr,
             format=(
                 f"{ANSIColors.YELLOW.value}[FastAPI] {{extra[pid]}} | {ANSIColors.RESET.value}"
-                f"{ANSIColors.WHITE.value}{{time:MMM-DD-YY HH:mm:ss}} | {ANSIColors.RESET.value}"
-                f"{ANSIColors.YELLOW.value}[{{extra[label]}}] | {ANSIColors.RESET.value}"
+                f"{ANSIColors.WHITE.value}{{time:MMM-DD-YY HH:mm:ss}} {ANSIColors.RESET.value}"
+                f"{ANSIColors.YELLOW.value} | [{{extra[label]}}] | {ANSIColors.RESET.value}"
                 "<level>{level}</level>: <level>{message}</level>"
             ),
             colorize=True,
@@ -46,23 +46,23 @@ class AppLogger:
         )
 
     def debug(self, message: str, context: str | None = None) -> None:
-        prefix = f"📜 [{context}]:" if context else "🐛 "
+        prefix = f"[{context}]:" if context else ""
         self.logger.debug(f"{prefix} {message}")
 
     def info(self, message: str, context: str | None = None) -> None:
-        prefix = f"📜 [{context}]:" if context else "📄 "
+        prefix = f"[{context}]:" if context else ""
         self.logger.info(f"{prefix} {message}")
 
     def warning(self, message: str, context: str | None = None) -> None:
-        prefix = f"📜 [{context}]:" if context else "⚠️ "
+        prefix = f"[{context}]:" if context else ""
         self.logger.warning(f"{prefix} {message}")
 
     def error(self, message: str, context: str | None = None) -> None:
-        prefix = f"📜 [{context}]:" if context else "❌ "
+        prefix = f"[{context}]:" if context else ""
         self.logger.error(f"{prefix} {message}")
 
     def critical(self, message: str, context: str | None = None) -> None:
-        prefix = f"📜 [{context}]:" if context else "💥 "
+        prefix = f"[{context}]:" if context else ""
         self.logger.critical(f"{prefix} {message}")
 
     def set_level(self, level) -> None:

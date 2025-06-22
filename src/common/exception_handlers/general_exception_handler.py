@@ -1,6 +1,6 @@
 from fastapi import Request
 from fastapi.responses import JSONResponse
-from common.loggers.logger import AppLogger
+from common.loggers.app_logger import AppLogger
 from common.utils import ExceptionUtils
 from common.models import HTTPResponse
 from common.constants import STATUS_MESSAGES

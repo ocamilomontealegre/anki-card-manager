@@ -2,7 +2,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 from injector import inject
 from fastapi import UploadFile
-from common.loggers.logger import AppLogger
+from common.loggers.app_logger import AppLogger
 from common.utils.file_utils import FileUtils
 from ..models.saved_file_model import SavedFile
 

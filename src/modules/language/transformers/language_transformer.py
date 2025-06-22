@@ -4,7 +4,7 @@ from typing import Literal, Optional, List
 
 from injector import inject
 
-from common.loggers.logger import AppLogger
+from common.loggers.app_logger import AppLogger
 from common.utils import GoogleUtils, ImageUtils
 from common.env.env_config import get_env_variables
 from modules.scraper.services.scraper_service import ScraperService

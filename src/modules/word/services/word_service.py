@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from common.models import DeleteMany
 from common.database.strategies.database_strategy import DatabaseStrategy
-from common.loggers.logger import AppLogger
+from common.loggers.app_logger import AppLogger
 from common.env.env_config import get_env_variables
 from ..models.entities.word_entity import Word
 from ..models.inferfaces.find_all_params import FindAllParams

@@ -2,7 +2,7 @@ from sys import exit
 from uvicorn import run
 from debugpy import listen, wait_for_client
 from app.builders.app_builder import AppBuilder
-from common.loggers.logger import AppLogger
+from common.loggers.app_logger import AppLogger
 from common.env.env_config import get_env_variables
 
 logger = AppLogger()

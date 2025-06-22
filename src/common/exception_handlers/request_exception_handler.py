@@ -1,7 +1,7 @@
 from starlette.requests import Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from common.loggers.logger import AppLogger
+from common.loggers.app_logger import AppLogger
 from common.utils import extract_exception_details
 from common.models import HTTPResponse
 

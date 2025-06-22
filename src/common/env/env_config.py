@@ -1,6 +1,6 @@
 from pydantic import ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from common.loggers.logger import AppLogger
+from common.loggers.app_logger import AppLogger
 from common.env.app_env_config import AppEnvVariables
 from common.env.anki_env_config import AnkiEnvVariables
 from common.env.giphy_env_config import GiphyEnvVariables

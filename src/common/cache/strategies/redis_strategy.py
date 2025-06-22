@@ -1,7 +1,7 @@
 from typing import Any
 from redis.asyncio import Redis, RedisError
 from common.env.env_config import get_env_variables
-from common.loggers.logger import AppLogger
+from common.loggers.app_logger import AppLogger
 from .cache_strategy import CacheStrategy
 
 

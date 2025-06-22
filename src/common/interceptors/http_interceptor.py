@@ -4,7 +4,7 @@ from starlette.types import ASGIApp
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse, Response
 from fastapi import Request, HTTPException
-from common.loggers.logger import AppLogger
+from common.loggers.app_logger import AppLogger
 from common.models import HTTPResponse
 from common.utils import get_status_message
 from common.exception_handlers import (

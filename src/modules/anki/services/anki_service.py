@@ -1,7 +1,7 @@
 import httpx
 from requests import RequestException
 from injector import inject
-from common.loggers.logger import AppLogger
+from common.loggers.app_logger import AppLogger
 from common.env.env_config import get_env_variables
 from common.maps import language_model_map, language_deck_map
 from common.enums import Language

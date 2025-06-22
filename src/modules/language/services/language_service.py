@@ -5,7 +5,7 @@ from injector import inject
 from pandas import read_csv
 from openai import OpenAI
 
-from common.loggers.logger import AppLogger
+from common.loggers.app_logger import AppLogger
 from common.utils import FileUtils
 from common.env.env_config import get_env_variables
 from common.cache.strategies.cache_strategy import CacheStrategy

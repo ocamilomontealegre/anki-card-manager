@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from common.enums import Language
-from common.loggers.logger import AppLogger
+from common.loggers.app_logger import AppLogger
 from common.utils.language_utils import LanguageUtils
 from common.env import get_env_variables
 

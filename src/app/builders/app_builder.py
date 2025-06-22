@@ -9,7 +9,7 @@ from app.routers.app_router import AppRouter
 from common.database.strategies.database_strategy import DatabaseStrategy
 from common.cache.strategies.cache_strategy import CacheStrategy
 from common.interceptors import HTTPInterceptor
-from common.loggers.logger import AppLogger
+from common.loggers.app_logger import AppLogger
 from common.exception_handlers import (
     GeneralExceptionHandler,
     HTTPExceptionHandler,

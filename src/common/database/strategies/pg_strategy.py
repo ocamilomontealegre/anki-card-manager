@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, Engine, exc
 from sqlalchemy.orm import sessionmaker, Session
-from common.loggers.logger import AppLogger
+from common.loggers.app_logger import AppLogger
 from common.env.env_config import get_env_variables
 from ..entities.base_entity import Base
 from .database_strategy import DatabaseStrategy
