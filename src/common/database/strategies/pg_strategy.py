@@ -1,62 +1,92 @@
 from sqlalchemy import create_engine, Engine, exc
 from sqlalchemy.orm import sessionmaker, Session
 from common.loggers.app_logger import AppLogger
-from common.env.env_config import get_env_variables
+from common.env.env_config import EnvVariables
 from ..entities.base_entity import Base
 from .database_strategy import DatabaseStrategy
 
 
 class PgStrategy(DatabaseStrategy):
     def __init__(self):
-        self.__logger = AppLogger(label=PgStrategy.__name__)
+        self._file = PgStrategy.__name__
 
-        self.__env_variables = get_env_variables().pg
-        self.__engine = self.create_engine()
+        self._logger = AppLogger(label=PgStrategy.__name__)
+
+        self._env = EnvVariables.get().pg
+        self._engine = self.create_engine()
 
     def get_connection_url(self) -> str:
-        host = self.__env_variables.host
-        port = self.__env_variables.port
-        username = self.__env_variables.username
-        password = self.__env_variables.password
-        database = self.__env_variables.database
+        host = self._env.host
+        port = self._env.port
+        username = self._env.username
+        password = self._env.password
+        database = self._env.database
         return f"postgresql://{username}:{password}@{host}:{port}/{database}"
 
     def create_engine(self) -> Engine:
+        method = self.create_engine.__name__
+
         try:
             return create_engine(self.get_connection_url())
         except exc.DatabaseError as e:
-            self.__logger.error(f"Database engine error: {e}")
+            self._logger.error(
+                f"Database engine error: {e}",
+                file=self._file,
+                method=method,
+            )
             raise
         except Exception as e:
-            self.__logger.error(f"Unknown error: {e}")
+            self._logger.error(
+                f"Unknown error: {e}", file=self._file, method=method
+            )
             raise RuntimeError(
                 "Failed to create a database engine due to an unknown error."
             )
 
     def create_session(self) -> Session:
+        method = self.create_session.__name__
+
         try:
             engine = self.create_engine()
             session = sessionmaker(bind=engine)
             return session()
         except exc.DatabaseError as e:
-            self.__logger.error(f"Error creating db session: {e}")
+            self._logger.error(
+                f"Error creating db session: {e}",
+                file=self._file,
+                method=method,
+            )
             raise
         except Exception as e:
-            self.__logger.error(f"Unknown error: {e}")
+            self._logger.error(
+                f"Unknown error: {e}", file=self._file, method=method
+            )
             raise RuntimeError(
                 "Failed to create a database session due to an unknown error."
             )
 
     def create_tables(self):
-        Base.metadata.create_all(self.__engine)
+        Base.metadata.create_all(self._engine)
 
     def disconnect(self) -> None:
+        method = self.disconnect.__name__
+
         try:
-            if isinstance(self.__engine, Engine):
-                self.__engine.dispose()
-                self.__logger.debug("Database connection successfully closed")
+            if isinstance(self._engine, Engine):
+                self._engine.dispose()
+                self._logger.debug(
+                    "Database connection successfully closed",
+                    file=self._file,
+                    method=method,
+                )
         except exc.DatabaseError as e:
-            self.__logger.error(f"Error closing db connection: {e}")
+            self._logger.error(
+                f"Error closing db connection: {e}",
+                file=self._file,
+                method=method,
+            )
             raise
         except Exception as e:
-            self.__logger.error(f"Unknown error: {e}")
+            self._logger.error(
+                f"Unknown error: {e}", file=self._file, method=method
+            )

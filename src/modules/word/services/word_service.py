@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from common.models import DeleteMany
 from common.database.strategies.database_strategy import DatabaseStrategy
 from common.loggers.app_logger import AppLogger
-from common.env.env_config import get_env_variables
+from common.env.env_config import EnvVariables
 from ..models.entities.word_entity import Word
 from ..models.inferfaces.find_all_params import FindAllParams
 from ..transformers.word_transformer import WordTransformer
@@ -26,7 +26,7 @@ class WordService:
         self.__word_transformer = word_transformer
 
         self.__logger: AppLogger = AppLogger(label=WordService.__name__)
-        self.__anki_env = get_env_variables().anki
+        self.__anki_env = EnvVariables.get()
 
     def _get_filter_query(self, filters: FindAllParams):
         query = self.__session.query(Word)
@@ -55,7 +55,7 @@ class WordService:
         self.__session.refresh(word)
         self.__logger.info(
             f"{Word.__name__}[{word.word}] created successfully.",
-            context=self.create.__name__,
+            method=self.create.__name__,
         )
         return word
 
@@ -64,7 +64,7 @@ class WordService:
         self.__session.commit()
         self.__logger.info(
             f"{len(words)} words created successfully.",
-            context=self.create_many.__name__,
+            method=self.create_many.__name__,
         )
 
     def list_paginated(self, filters: FindAllParams) -> Tuple[List[Word], int]:

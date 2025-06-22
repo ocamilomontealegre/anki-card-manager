@@ -7,7 +7,7 @@ from openai import OpenAI
 
 from common.loggers.app_logger import AppLogger
 from common.utils import FileUtils
-from common.env.env_config import get_env_variables
+from common.env.env_config import EnvVariables
 from common.cache.strategies.cache_strategy import CacheStrategy
 from modules.word.services.word_service import WordService
 from ..transformers.language_transformer import LanguageTransformer
@@ -22,7 +22,9 @@ class LanguageService:
         language_transformer: LanguageTransformer,
         cache_strategy: CacheStrategy,
     ) -> None:
-        self._env = get_env_variables()
+        self._file = LanguageService.__name__
+
+        self._env = EnvVariables.get()
 
         self._logger = AppLogger(label=LanguageService.__name__)
 
@@ -33,17 +35,25 @@ class LanguageService:
         self._open_ai_client = OpenAI(api_key=self._env.openai.key)
 
     async def _process_row(self, row: Row) -> Union[CardResponse, None]:
+        method = self._process_row.__name__
+
         word = row["word"]
         language = row["language"]
         category = row.get("category") or "general"
 
         try:
             if await self._cache_strategy.read(key=word):
-                self._logger.debug(f"Word data already in the cache: {word}")
+                self._logger.debug(
+                    f"Word data already in the cache: {word}",
+                    file=self._file,
+                    method=method,
+                )
                 return
 
             self._logger.debug(
-                f"Fetchin data for word[{word}] with language[{language}] and category[{category}]"
+                f"Fetchin data for word[{word}] with language[{language}] and category[{category}]",
+                file=self._file,
+                method=method,
             )
             completion = self._open_ai_client.beta.chat.completions.parse(
                 model=self._env.openai.model,
@@ -78,7 +88,8 @@ class LanguageService:
         except Exception as e:
             self._logger.error(
                 f"Error processing row: {row}, Error: {e}",
-                self._process_row.__name__,
+                file=self._file,
+                method=method,
             )
             raise
 
@@ -100,7 +111,11 @@ class LanguageService:
                 self._word_service.create(word=transformed_word)
 
             except Exception as e:
-                self._logger.error(f"Skipping row[{index}] due to error: {e}")
+                self._logger.error(
+                    f"Skipping row[{index}] due to error: {e}",
+                    file=self._file,
+                    method=self.process_csv.__name__,
+                )
                 continue
 
         # FileUtils.remove_file(file_path=Path(file_name))

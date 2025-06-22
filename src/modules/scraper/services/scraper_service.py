@@ -9,7 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from common.enums import Language
 from common.loggers.app_logger import AppLogger
 from common.utils.language_utils import LanguageUtils
-from common.env import get_env_variables
+from common.env import EnvVariables
 
 
 ImageSource = Literal["pinterest", "giphy"]
@@ -26,7 +26,7 @@ class GetImage(TypedDict):
 class ScraperService:
     @inject
     def __init__(self):
-        self._env = get_env_variables()
+        self._env = EnvVariables.get()
         self._logger = AppLogger(label=ScraperService.__name__)
 
         self._html_selectors: ImageSourceMap = {

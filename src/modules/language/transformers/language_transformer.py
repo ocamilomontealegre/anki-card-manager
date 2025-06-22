@@ -6,7 +6,7 @@ from injector import inject
 
 from common.loggers.app_logger import AppLogger
 from common.utils import GoogleUtils, ImageUtils
-from common.env.env_config import get_env_variables
+from common.env.env_config import EnvVariables
 from modules.scraper.services.scraper_service import ScraperService
 from modules.word.models.entities.word_entity import Word
 from ..models.interfaces.card_response_interface import CardResponse
@@ -19,7 +19,7 @@ class LanguageTransformer:
         self._scraper_service = scraper_service
 
         self._logger = AppLogger(label=LanguageTransformer.__name__)
-        self._env = get_env_variables()
+        self._env = EnvVariables.get()
 
     def _capitalize_text_array(self, text: List[str]) -> str:
         if len(text) == 0:

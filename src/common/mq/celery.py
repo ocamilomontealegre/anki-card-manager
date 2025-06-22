@@ -1,10 +1,10 @@
 from celery import Celery
-from common.env.env_config import get_env_variables
+from common.env.env_config import EnvVariables
 
 
 class CeleryMq:
     def __init__(self):
-        self._env = get_env_variables().redis
+        self._env = EnvVariables.get().redis
         self._broker = (
             f"redis://{self._env.host}:{self._env.port}/{self._env.mq}"
         )

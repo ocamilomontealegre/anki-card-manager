@@ -1,30 +1,53 @@
 import sys
 from os import getpid
+from typing import Optional, Dict, Literal
+
 from loguru import logger
-from .enums.ansi_colors_enum import ANSIColors
+
+from common.decorators.singleton_decorator import singleton
+from .models.abstracts.logger_abstract import Logger
+from .models.enums.ansi_colors_enum import ANSIColors
 
 
-class AppLogger:
+@singleton
+class AppLogger(Logger):
     def __init__(self, log_level="DEBUG", label="App"):
-        self.logger = logger.bind(label=label)
         self._configure_logger(log_level)
 
     def _configure_logger(self, log_level):
         logger.remove()
         self._set_console_logging(log_level=log_level)
         self._set_file_logging()
-        self.logger = self.logger.bind(pid=getpid())
+        self._logger = logger.bind(pid=getpid())
+
+    def __format_log(self, record, type: Literal["console", "file"]):
+        extra = record["extra"]
+        pid = extra.get("pid")
+        file = extra.get("file", "App")
+        method = extra.get("method", "App")
+        time = record["time"].strftime("%b-%d-%y %H:%M:%S")
+        level = record["level"].name
+        message = record["message"]
+
+        if type == "console":
+            return (
+                f"{ANSIColors.YELLOW.value}[FastAPI] {pid} | {ANSIColors.RESET.value}"
+                f"{ANSIColors.WHITE.value}{time}{ANSIColors.RESET.value}"
+                f"{ANSIColors.YELLOW.value} | [{file}:{method}] | {ANSIColors.RESET.value}"
+                f"{level}: {message}\n"
+            )
+        else:
+            return (
+                f"[FastAPI] {pid} | {time} | [{file}:{method}] "
+                f"{level}: {message}\n"
+            )
 
     def _set_console_logging(self, log_level):
         """Configure console logging."""
+
         logger.add(
             sys.stderr,
-            format=(
-                f"{ANSIColors.YELLOW.value}[FastAPI] {{extra[pid]}} | {ANSIColors.RESET.value}"
-                f"{ANSIColors.WHITE.value}{{time:MMM-DD-YY HH:mm:ss}} {ANSIColors.RESET.value}"
-                f"{ANSIColors.YELLOW.value} | [{{extra[label]}}] | {ANSIColors.RESET.value}"
-                "<level>{level}</level>: <level>{message}</level>"
-            ),
+            format=lambda record: self.__format_log(record, type="console"),
             colorize=True,
             level=log_level,
             enqueue=True,
@@ -37,33 +60,65 @@ class AppLogger:
             rotation="1 MB",
             retention="5 days",
             compression="zip",
-            format=(
-                "[FastAPI] {extra[pid]} | {time:MMM-DD-YY HH:mm:ss} | [{extra[label]}] | "
-                "<level>{level}</level>: <level>{message}</level>"
-            ),
+            format=lambda record: self.__format_log(record, type="file"),
             enqueue=True,
             catch=True,
         )
 
-    def debug(self, message: str, context: str | None = None) -> None:
-        prefix = f"[{context}]:" if context else ""
-        self.logger.debug(f"{prefix} {message}")
+    def _format_context(
+        self, file: str, method: Optional[str] = None
+    ) -> Dict[str, str]:
+        extra = {"file": file}
+        if method:
+            extra["method"] = method
+        return extra
 
-    def info(self, message: str, context: str | None = None) -> None:
-        prefix = f"[{context}]:" if context else ""
-        self.logger.info(f"{prefix} {message}")
+    def debug(
+        self,
+        message: str,
+        *,
+        file: str,
+        method: Optional[str] = None,
+    ) -> None:
+        extra = self._format_context(file, method)
+        self._logger.bind(**extra).debug(message)
 
-    def warning(self, message: str, context: str | None = None) -> None:
-        prefix = f"[{context}]:" if context else ""
-        self.logger.warning(f"{prefix} {message}")
+    def info(
+        self,
+        message: str,
+        *,
+        file: str,
+        method: Optional[str] = None,
+    ) -> None:
+        extra = self._format_context(file, method)
+        self._logger.bind(**extra).info(message)
 
-    def error(self, message: str, context: str | None = None) -> None:
-        prefix = f"[{context}]:" if context else ""
-        self.logger.error(f"{prefix} {message}")
+    def warning(
+        self,
+        message: str,
+        *,
+        file: str,
+        method: Optional[str] = None,
+    ) -> None:
+        extra = self._format_context(file, method)
+        self._logger.bind(**extra).warning(message)
 
-    def critical(self, message: str, context: str | None = None) -> None:
-        prefix = f"[{context}]:" if context else ""
-        self.logger.critical(f"{prefix} {message}")
+    def error(
+        self,
+        message: str,
+        *,
+        file: str,
+        method: Optional[str] = None,
+    ) -> None:
+        extra = self._format_context(file, method)
+        self._logger.bind(**extra).error(message)
 
-    def set_level(self, level) -> None:
-        self._configure_logger(level)
+    def critical(
+        self,
+        message: str,
+        *,
+        file: str,
+        method: Optional[str] = None,
+    ) -> None:
+        extra = self._format_context(file, method)
+        self._logger.bind(**extra).critical(message)

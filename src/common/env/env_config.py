@@ -12,10 +12,10 @@ from common.env.redis_env_config import RedisEnvVariables
 from common.env.pinterest_env_config import PinterestEnvVariables
 from common.env.debuggy_env_config import DebuggyEnvVariables
 
-logger = AppLogger(label="Env")
+logger = AppLogger()
 
 
-class EnvVariables(BaseSettings):
+class Env(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env", env_nested_delimiter="_"
     )
@@ -32,18 +32,26 @@ class EnvVariables(BaseSettings):
     pinterest: PinterestEnvVariables
 
 
-def get_env_variables() -> EnvVariables:
-    try:
-        env = EnvVariables()  # type: ignore
-        return env
-    except ValidationError as e:
-        logger.error(f"{e}")
+class EnvVariables:
+    @staticmethod
+    def get() -> Env:
+        try:
+            env = Env()  # type: ignore
+            return env
+        except ValidationError as e:
+            logger.error(
+                f"{e}",
+                file=EnvVariables.__name__,
+                method=EnvVariables.get.__name__,
+            )
         raise
 
 
 if __name__ == "__main__":
-    env_vars = get_env_variables()
+    env_vars = EnvVariables.get()
     if env_vars:
-        logger.info(f"Loaded env vars: {env_vars}")
+        logger.info(f"Loaded env vars: {env_vars}", file=EnvVariables.__name__)
     else:
-        logger.error("Failed to load environment variables.")
+        logger.error(
+            "Failed to load environment variables.", file=EnvVariables.__name__
+        )

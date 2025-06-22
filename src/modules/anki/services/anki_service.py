@@ -1,8 +1,8 @@
 import httpx
 from requests import RequestException
 from injector import inject
-from common.loggers.app_logger import AppLogger
-from common.env.env_config import get_env_variables
+from common.loggers.models.abstracts.logger_abstract import Logger
+from common.env.env_config import EnvVariables
 from common.maps import language_model_map, language_deck_map
 from common.enums import Language
 from modules.word.services.word_service import WordService
@@ -13,11 +13,16 @@ from modules.word.transformers.word_transformer import WordTransformer
 class AnkiService:
     @inject
     def __init__(
-        self, word_service: WordService, word_transformer: WordTransformer
+        self,
+        word_service: WordService,
+        word_transformer: WordTransformer,
+        logger: Logger,
     ) -> None:
-        self._anki_env = get_env_variables().anki
+        self._file = AnkiService.__name__
 
-        self._logger = AppLogger(label=AnkiService.__name__)
+        self._anki_env = EnvVariables.get().anki
+
+        self._logger = logger
 
         self._word_service = word_service
         self._word_transformer = word_transformer
@@ -29,6 +34,8 @@ class AnkiService:
         return language_model_map.get(language, Language.ENGLISH.value)
 
     async def create_cards(self, filters: FindAllParams):
+        method = self.create_cards.__name__
+
         (words, size) = self._word_service.list_paginated(filters=filters)
 
         results = []
@@ -59,6 +66,12 @@ class AnkiService:
 
             try:
                 async with httpx.AsyncClient() as client:
+                    self._logger.debug(
+                        f"Adding card for word: {word}",
+                        file=self._file,
+                        method=method,
+                    )
+
                     response = await client.post(
                         self._anki_env.connect, json=payload
                     )
@@ -67,12 +80,18 @@ class AnkiService:
 
                 if "error" in data and data["error"]:
                     self._logger.error(
-                        f"Error adding card for word: {word} -> {data['error']}"
+                        f"Error adding card for word: {word} -> {data['error']}",
+                        file=self._file,
+                        method=method,
                     )
                 else:
                     results.append(data.get("result"))
             except RequestException as e:
-                self._logger.error(f"Failed to connect to AnkiConnect: {e}")
+                self._logger.error(
+                    f"Failed to connect to AnkiConnect: {e}",
+                    file=self._file,
+                    method=method,
+                )
                 continue
 
         return results

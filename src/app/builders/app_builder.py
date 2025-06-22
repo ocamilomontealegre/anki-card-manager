@@ -14,7 +14,9 @@ from common.exception_handlers import (
     GeneralExceptionHandler,
     HTTPExceptionHandler,
 )
-from common.env import get_env_variables
+from common.env.env_config import EnvVariables
+
+file = "AppBuilder"
 
 
 class LifespanDependencies(TypedDict):
@@ -30,21 +32,35 @@ def create_lifespan(deps: LifespanDependencies):
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
+        method = lifespan.__name__
+
         try:
             db.create_session()
             db.create_tables()
-            logger.info("Database connected successfully")
+            logger.info(
+                "Database connected successfully",
+                file=file,
+                method=method,
+            )
 
             await cache.connect()
         except Exception as e:
-            logger.error(f"Database connection failed: {e}")
+            logger.error(
+                f"Database connection failed: {e}",
+                file=file,
+                method=method,
+            )
             raise
         yield
         try:
             db.disconnect()
-            logger.info("Database connection closed")
+            logger.info("Database connection closed", file=file, method=method)
         except Exception as e:
-            logger.error(f"Error during database disconnection: {e}")
+            logger.error(
+                f"Error during database disconnection: {e}",
+                file=file,
+                method=method,
+            )
 
         await cache.close_connection()
 
@@ -55,7 +71,7 @@ class AppBuilder:
 
     def __init__(self):
         self.__injector = Injector([AppModule])
-        self.__env = get_env_variables()
+        self.__env = EnvVariables.get()
         self.__db = self.__injector.get(DatabaseStrategy)
         self.__cache = self.__injector.get(CacheStrategy)
         self.__lifespan = create_lifespan(
