@@ -1,16 +1,20 @@
 from pathlib import Path
 from datetime import datetime, timezone
+
 from injector import inject
 from fastapi import UploadFile
-from common.loggers.app_logger import AppLogger
+
+from common.loggers.models.abstracts.logger_abstract import Logger
 from common.utils.file_utils import FileUtils
 from ..models.saved_file_model import SavedFile
 
 
 class UploadService:
     @inject
-    def __init__(self):
-        self.__logger = AppLogger(label=UploadService.__name__)
+    def __init__(self, logger: Logger):
+        self._file = UploadService.__name__
+
+        self.__logger = logger
 
     async def _write_file_to_disk(
         self, file_path: Path, file_data: UploadFile
@@ -19,7 +23,8 @@ class UploadService:
             file.write(await file_data.read())
         self.__logger.debug(
             f"File {file_path} saved successfully",
-            self._write_file_to_disk.__name__,
+            file=self._file,
+            method=self._write_file_to_disk.__name__,
         )
         return file_path
 
@@ -38,7 +43,8 @@ class UploadService:
         await self._write_file_to_disk(file_path, file)
         self.__logger.debug(
             f"File {file_name} processed successfully",
-            self.save_file.__name__,
+            file=self._file,
+            method=self.save_file.__name__,
         )
 
         return SavedFile(

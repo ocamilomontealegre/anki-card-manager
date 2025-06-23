@@ -1,7 +1,10 @@
-from injector import Binder, Module
+from injector import Binder, Module, singleton
+
 from health.health_module import HealthModule
 from common.cache.cache_module import CacheModule
 from common.database.database_module import DatabaseModule
+from common.loggers.models.abstracts.logger_abstract import Logger
+from common.loggers.app_logger import AppLogger
 from modules.upload.upload_module import UploadModule
 from modules.language.language_module import LanguageModule
 from modules.word.word_module import WordModule
@@ -21,3 +24,5 @@ class AppModule(Module):
         binder.install(module=ScraperModule)
         binder.install(module=AnkiModule)
         binder.install(module=TaskModule)
+
+        binder.bind(Logger, to=AppLogger, scope=singleton)

@@ -14,8 +14,8 @@ class LanguageUtils:
     async def translate(data: Translate):
         translator = Translator()
         result = await translator.translate(
-            text=data['text'],
+            text=data["text"],
             src=data["source"].value,
-            dest=data["target"].value
+            dest=data["target"].value,
         )
         return result.text
