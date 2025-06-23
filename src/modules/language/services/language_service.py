@@ -118,4 +118,5 @@ class LanguageService:
                 )
                 continue
 
-        # FileUtils.remove_file(file_path=Path(file_name))
+        if self._env.actions:
+            FileUtils.remove_file(file_path=Path(file_name))

@@ -11,6 +11,7 @@ from common.env.pg_env_config import PgEnvVariables
 from common.env.redis_env_config import RedisEnvVariables
 from common.env.pinterest_env_config import PinterestEnvVariables
 from common.env.debuggy_env_config import DebuggyEnvVariables
+from common.env.actions_env_config import ActionsEnvVariables
 
 logger = AppLogger()
 
@@ -20,6 +21,7 @@ class Env(BaseSettings):
         env_file=".env", env_nested_delimiter="_"
     )
 
+    actions: ActionsEnvVariables
     anki: AnkiEnvVariables
     app: AppEnvVariables
     debuggy: DebuggyEnvVariables
