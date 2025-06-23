@@ -118,5 +118,5 @@ class LanguageService:
                 )
                 continue
 
-        if self._env.actions:
+        if self._env.actions.delete:
             FileUtils.remove_file(file_path=Path(file_name))

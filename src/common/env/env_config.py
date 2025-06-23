@@ -16,7 +16,7 @@ from common.env.actions_env_config import ActionsEnvVariables
 logger = AppLogger()
 
 
-class Env(BaseSettings):
+class EnvConfig(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env", env_nested_delimiter="_"
     )
@@ -36,9 +36,9 @@ class Env(BaseSettings):
 
 class EnvVariables:
     @staticmethod
-    def get() -> Env:
+    def get() -> EnvConfig:
         try:
-            env = Env()  # type: ignore
+            env = EnvConfig()  # type: ignore
             return env
         except ValidationError as e:
             logger.error(
