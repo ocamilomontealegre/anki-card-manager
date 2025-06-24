@@ -11,7 +11,9 @@ class RequestValidationExceptionHandler:
     async def handle_exception(
         request: Request, exc: RequestValidationError
     ) -> JSONResponse:
-        logger = AppLogger(label=RequestValidationExceptionHandler.__name__)
+        file = RequestValidationExceptionHandler.__name__
+
+        logger = AppLogger()
 
         exception_details = extract_exception_details(exc)
 
@@ -22,6 +24,8 @@ class RequestValidationExceptionHandler:
         logger.error(
             f"[INCOMING REQUEST] METHOD: {request.method} | URL: {request.url.path} | HEADERS: {request.headers} "
             f"[OUTGOING RESPONSE] STATUS: {response.status} | RESPONSE_BODY: {response} | EXCEPTION: {exception_details}",
+            file=file,
+            method=RequestValidationExceptionHandler.handle_exception.__name__,
         )
 
         return JSONResponse(content=response.model_dump(), status_code=400)

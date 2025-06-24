@@ -20,7 +20,7 @@ class AppLogger(Logger):
         self._set_file_logging()
         self._logger = logger.bind(pid=getpid())
 
-    def __format_log(self, record, type: Literal["console", "file"]):
+    def _format_log(self, record, type: Literal["console", "file"]):
         extra = record["extra"]
         pid = extra.get("pid")
         file = extra.get("file", "App")
@@ -34,7 +34,7 @@ class AppLogger(Logger):
                 f"{ANSIColors.YELLOW.value}[FastAPI] {pid} | {ANSIColors.RESET.value}"
                 f"{ANSIColors.WHITE.value}{time}{ANSIColors.RESET.value}"
                 f"{ANSIColors.YELLOW.value} | [{file}:{method}] | {ANSIColors.RESET.value}"
-                f"{level}: {message}\n"
+                f"{level}: {dict(message)}\n"
             )
         else:
             return (
@@ -47,7 +47,7 @@ class AppLogger(Logger):
 
         logger.add(
             sys.stderr,
-            format=lambda record: self.__format_log(record, type="console"),
+            format=lambda record: self._format_log(record, type="console"),
             colorize=True,
             level=log_level,
             enqueue=True,
@@ -60,7 +60,7 @@ class AppLogger(Logger):
             rotation="1 MB",
             retention="5 days",
             compression="zip",
-            format=lambda record: self.__format_log(record, type="file"),
+            format=lambda record: self._format_log(record, type="file"),
             enqueue=True,
             catch=True,
         )

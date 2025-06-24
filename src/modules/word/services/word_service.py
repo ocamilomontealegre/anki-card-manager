@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from common.models import DeleteMany
 from common.database.strategies.database_strategy import DatabaseStrategy
-from common.loggers.app_logger import AppLogger
+from common.loggers.models.abstracts.logger_abstract import Logger
 from common.env.env_config import EnvVariables
 from ..models.entities.word_entity import Word
 from ..models.inferfaces.find_all_params import FindAllParams
@@ -19,17 +19,22 @@ from ..transformers.word_transformer import WordTransformer
 class WordService:
     @inject
     def __init__(
-        self, word_transformer: WordTransformer, db: DatabaseStrategy
+        self,
+        word_transformer: WordTransformer,
+        db: DatabaseStrategy,
+        logger: Logger,
     ) -> None:
-        self.__session: Session = db.create_session()
+        self._file = WordService.__name__
 
-        self.__word_transformer = word_transformer
+        self._session: Session = db.create_session()
 
-        self.__logger: AppLogger = AppLogger(label=WordService.__name__)
-        self.__anki_env = EnvVariables.get()
+        self._word_transformer = word_transformer
+
+        self._logger = logger
+        self._env = EnvVariables.get().anki
 
     def _get_filter_query(self, filters: FindAllParams):
-        query = self.__session.query(Word)
+        query = self._session.query(Word)
 
         query = query.order_by(Word.created_at.desc())
 
@@ -50,20 +55,22 @@ class WordService:
         return query
 
     def create(self, word: Word) -> Word:
-        self.__session.add(word)
-        self.__session.commit()
-        self.__session.refresh(word)
-        self.__logger.info(
+        self._session.add(word)
+        self._session.commit()
+        self._session.refresh(word)
+        self._logger.info(
             f"{Word.__name__}[{word.word}] created successfully.",
+            file=self._file,
             method=self.create.__name__,
         )
         return word
 
     def create_many(self, words: List[Word]):
-        self.__session.add_all(words)
-        self.__session.commit()
-        self.__logger.info(
+        self._session.add_all(words)
+        self._session.commit()
+        self._logger.info(
             f"{len(words)} words created successfully.",
+            file=self._file,
             method=self.create_many.__name__,
         )
 
@@ -74,34 +81,38 @@ class WordService:
         query = self._get_filter_query(filters)
         words = query.offset(off_set).limit(limit).all()
 
-        self.__logger.info(
+        self._logger.info(
             f"{Word.__name__}[{len(words)}] found",
-            self.list_paginated.__name__,
+            file=self._file,
+            method=self.list_paginated.__name__,
         )
 
         return (words, len(words))
 
     def get_as_csv(self, filters: FindAllParams):
         result = self._get_filter_query(filters).all()
-        words = [self.__word_transformer.transform(word) for word in result]
+        words = [self._word_transformer.transform(word) for word in result]
         df = DataFrame(words)
 
         output_path = (
-            Path(self.__anki_env.output)
+            Path(self._env.output)
             / f"{datetime.today().strftime('%Y-%m-%d')}-{uuid4()}.csv"
         )
 
         df.to_csv(output_path, index=False, header=False)
-        self.__logger.info(
-            f"{Word.__name__}[{len(words)}] found", self.get_as_csv.__name__
+        self._logger.info(
+            f"{Word.__name__}[{len(words)}] found",
+            file=self._file,
+            method=self.get_as_csv.__name__,
         )
         return {"status": "OK"}
 
     def delete_all(self) -> DeleteMany:
-        delete_words = self.__session.query(Word).delete()
-        self.__session.commit()
-        self.__logger.info(
+        delete_words = self._session.query(Word).delete()
+        self._session.commit()
+        self._logger.info(
             f"{Word.__name__}[{delete_words}] deleted successfully",
-            self.delete_all.__name__,
+            file=self._file,
+            method=self.delete_all.__name__,
         )
         return DeleteMany(deleted="OK", total=delete_words)

@@ -5,7 +5,7 @@ from injector import inject
 from pandas import read_csv
 from openai import OpenAI
 
-from common.loggers.app_logger import AppLogger
+from common.loggers.models.abstracts.logger_abstract import Logger
 from common.utils import FileUtils
 from common.env.env_config import EnvVariables
 from common.cache.strategies.cache_strategy import CacheStrategy
@@ -21,12 +21,13 @@ class LanguageService:
         word_service: WordService,
         language_transformer: LanguageTransformer,
         cache_strategy: CacheStrategy,
+        logger: Logger,
     ) -> None:
         self._file = LanguageService.__name__
 
         self._env = EnvVariables.get()
 
-        self._logger = AppLogger(label=LanguageService.__name__)
+        self._logger = logger
 
         self._word_service = word_service
         self._language_transformer = language_transformer
@@ -51,7 +52,7 @@ class LanguageService:
                 return
 
             self._logger.debug(
-                f"Fetchin data for word[{word}] with language[{language}] and category[{category}]",
+                f"Fetching data for word[{word}] with language[{language}] and category[{category}]",
                 file=self._file,
                 method=method,
             )
@@ -103,7 +104,7 @@ class LanguageService:
                 )
 
                 if not card_response:
-                    return
+                    continue
 
                 transformed_word = await self._language_transformer.to_entity(
                     card_info=card_response

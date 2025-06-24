@@ -1,15 +1,20 @@
 from typing import Any
+
+from injector import inject
 from redis.asyncio import Redis, RedisError
+
 from common.env.env_config import EnvVariables
-from common.loggers.app_logger import AppLogger
+from common.loggers.models.abstracts.logger_abstract import Logger
 from .cache_strategy import CacheStrategy
 
 
 class RedisStrategy(CacheStrategy):
-    def __init__(self):
+
+    @inject
+    def __init__(self, logger: Logger):
         self._file = RedisStrategy.__name__
 
-        self._logger = AppLogger(label=RedisStrategy.__name__)
+        self._logger = logger
 
         self._env = EnvVariables.get().redis
         self._redis = Redis(

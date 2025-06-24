@@ -11,7 +11,9 @@ class HTTPExceptionHandler:
     async def handle_exception(
         request: Request, exc: HTTPException
     ) -> JSONResponse:
-        logger = AppLogger(label=HTTPExceptionHandler.__name__)
+        file = HTTPExceptionHandler.__name__
+
+        logger = AppLogger()
 
         exception_details = ExceptionUtils.extract_details(exc)
         message = STATUS_MESSAGES.get(exc.status_code)
@@ -24,7 +26,9 @@ class HTTPExceptionHandler:
 
         logger.error(
             f"[INCOMING REQUEST] METHOD: {request.method} | URL: {request.url.path} | HEADERS: {request.headers} "
-            f"[OUTGOING RESPONSE] STATUS: {response.status} | RESPONSE_BODY: {response} | EXCEPTION: {exception_details}"
+            f"[OUTGOING RESPONSE] STATUS: {response.status} | RESPONSE_BODY: {response} | EXCEPTION: {exception_details}",
+            file=file,
+            method=HTTPExceptionHandler.handle_exception.__name__,
         )
 
         return JSONResponse(

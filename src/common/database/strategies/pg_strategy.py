@@ -1,16 +1,20 @@
+from injector import inject
 from sqlalchemy import create_engine, Engine, exc
 from sqlalchemy.orm import sessionmaker, Session
-from common.loggers.app_logger import AppLogger
+
+from common.loggers.models.abstracts.logger_abstract import Logger
 from common.env.env_config import EnvVariables
 from ..entities.base_entity import Base
 from .database_strategy import DatabaseStrategy
 
 
 class PgStrategy(DatabaseStrategy):
-    def __init__(self):
+
+    @inject
+    def __init__(self, logger: Logger):
         self._file = PgStrategy.__name__
 
-        self._logger = AppLogger(label=PgStrategy.__name__)
+        self._logger = logger
 
         self._env = EnvVariables.get().pg
         self._engine = self.create_engine()

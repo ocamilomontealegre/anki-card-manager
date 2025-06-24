@@ -11,7 +11,8 @@ class GeneralExceptionHandler:
     async def handle_exception(
         request: Request, exc: Exception
     ) -> JSONResponse:
-        logger = AppLogger(label=GeneralExceptionHandler.__name__)
+        file = GeneralExceptionHandler.__name__
+        logger = AppLogger()
 
         exception_details = ExceptionUtils.extract_details(exc)
 
@@ -24,6 +25,8 @@ class GeneralExceptionHandler:
         logger.error(
             f"[INCOMING REQUEST] METHOD: {request.method} | URL: {request.url.path} | HEADERS: {request.headers} "
             f"[OUTGOING RESPONSE] STATUS: {response.status} | RESPONSE_BODY: {response} | EXCEPTION: {exception_details}",
+            file=file,
+            method=GeneralExceptionHandler.handle_exception.__name__,
         )
 
         return JSONResponse(content=response.model_dump(), status_code=500)

@@ -4,7 +4,7 @@ from typing import Literal, Optional, List
 
 from injector import inject
 
-from common.loggers.app_logger import AppLogger
+from common.loggers.models.abstracts.logger_abstract import Logger
 from common.utils import GoogleUtils, ImageUtils
 from common.env.env_config import EnvVariables
 from modules.scraper.services.scraper_service import ScraperService
@@ -15,10 +15,12 @@ from ..models.interfaces.card_response_interface import CardResponse
 class LanguageTransformer:
 
     @inject
-    def __init__(self, scraper_service: ScraperService):
+    def __init__(self, scraper_service: ScraperService, logger: Logger):
+        self._file = LanguageTransformer.__name__
+
         self._scraper_service = scraper_service
 
-        self._logger = AppLogger(label=LanguageTransformer.__name__)
+        self._logger = logger
         self._env = EnvVariables.get()
 
     def _capitalize_text_array(self, text: List[str]) -> str:
@@ -47,9 +49,12 @@ class LanguageTransformer:
             return f"{base_word[0].upper()}{base_word[1:]}"
 
     async def to_entity(self, card_info: CardResponse):
+        method = self.to_entity.__name__
+
         self._logger.debug(
             f"Transforming word[{card_info.word}]",
-            self.to_entity.__name__,
+            file=self._file,
+            method=method,
         )
 
         try:
@@ -138,6 +143,8 @@ class LanguageTransformer:
             return new_word
         except Exception as e:
             self._logger.error(
-                f"Error transforming card: {e}", self.to_entity.__name__
+                f"Error transforming card: {e}",
+                file=self._file,
+                method=method,
             )
             raise

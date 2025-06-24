@@ -17,9 +17,7 @@ class HTTPInterceptor(BaseHTTPMiddleware):
 
     def __init__(self, app: ASGIApp):
         super().__init__(app)
-        self.__logger = AppLogger(
-            log_level="INFO", label=self.__class__.__name__
-        )
+        self._logger = AppLogger(log_level="INFO")
 
     async def __format_response(
         self, body_iterator: AsyncIterable[bytes], status_code: int
@@ -52,9 +50,11 @@ class HTTPInterceptor(BaseHTTPMiddleware):
                 formated_response = await self.__format_response(
                     response.body_iterator, response.status_code  # type: ignore
                 )
-                self.__logger.info(
+                self._logger.info(
                     f"[INCOMING REQUEST] METHOD: {request.method} | URL: {request.url.path} | HEADERS: {request.headers} "
-                    f"[OUTGOING RESPONSE] STATUS: {response.status_code} | RESPONSE_BODY: {formated_response.data}"
+                    f"[OUTGOING RESPONSE] STATUS: {response.status_code} | RESPONSE_BODY: {formated_response.data}",
+                    file=HTTPInterceptor.__name__,
+                    method=self.dispatch.__name__,
                 )
 
                 return JSONResponse(

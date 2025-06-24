@@ -1,0 +1,248 @@
+// Front
+
+<div class="card-container">
+  <div class="card-section">
+    <div class="card-label">Definition</div>
+    <div class="card-content">{{Definition}}</div>
+  </div>
+
+  <div class="card-section">
+    <div class="card-label">Sentence</div>
+    <div class="card-content">{{Partial_Sentence}}</div>
+  </div>
+
+  <div class="card-section">
+    <div class="card-label">Type</div>
+    <div class="card-content">{{type:Word}}</div>
+  </div>
+</div>
+
+<script>
+  setTimeout(function () {
+    let sentenceElements = document.querySelectorAll('.card-content');
+
+    sentenceElements.forEach(function (el) {
+      if (el.innerHTML.includes('{...}')) {
+        el.innerHTML = el.innerHTML.replace(
+          '{...}',
+          '<span class="highlight">{...}</span>'
+        );
+      }
+    });
+  }, 50);
+</script>
+
+// Back
+<div class="card-container">
+
+  <!-- Type -->
+  <div class="card-section">
+    <div class="card-label">Type</div>
+    <div class="card-content">{{type:Word}}</div>
+  </div>
+
+  <!-- Sentence -->
+  <div class="card-section">
+    <div class="card-label">Sentence</div>
+    
+    <div class="card-content sentence-block">
+      <span>{{Sentence}}</span>
+      <button class="audio-btn">{{Sentence_Audio}}</button>
+    </div>
+
+    <div class="card-content phonetics">{{Phonetics}}</div>
+  </div>
+
+  <!-- Images -->
+  {{#Image}}
+  <div class="card-section">
+    <div class="card-label">Visual</div>
+    <div class="card-content image-row">
+      <img src="{{Image}}" alt="Image 1">
+      {{#Image_2}}<img src="{{Image_2}}" alt="Image 2">{{/Image_2}}
+    </div>
+  </div>
+  {{/Image}}
+
+  <!-- Grammar -->
+  <div class="card-section">
+    <div class="card-label">Grammar</div>
+    
+    <div class="card-content">{{Category}}</div>
+
+    {{#Singular}}
+    <div class="card-content grammar-row">
+      <span>{{Singular}}</span>
+      <button class="audio-btn">{{Singular_Audio}}</button>
+    </div>
+    {{/Singular}}
+
+    {{#Plural}}
+    <div class="card-content grammar-row">
+      <span>{{Plural}}</span>
+      <button class="audio-btn">{{Plural_Audio}}</button>
+    </div>
+    {{/Plural}}
+  </div>
+
+</div>
+
+
+<script>
+  setTimeout(function () {
+    document.querySelectorAll('.card-content').forEach(function (element) {
+      element.innerHTML = element.innerHTML.replace(
+        /\[(.*?)\]/g,
+        '<span class="highlight">$1</span>'
+      );
+    });
+  }, 50);
+</script>
+
+
+// CSS
+
+:root {
+  --primary: #333;
+  --secondary: #666;
+  --accent: #007acc;
+  --highlight-bg: #E74C3C;
+  --background: #ffffff;
+}
+
+.card {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  background-color: var(--background);
+  color: var(--primary);
+  font-size: 18px;
+  text-align: left;
+  padding: 24px;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+}
+
+.card-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.card-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.card-label {
+  font-size: 0.85rem;
+	font-weight: 800;
+  color: var(--highlight-bg);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-content {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.highlight {
+  background-color: var(--highlight-bg);
+  font-weight: 600;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+/* Audio button style */
+.audio-btn {
+  background: var(--background);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 2px 2px;         /* less padding */
+  font-size: 0.5rem;        /* smaller font */
+  border-radius: 0.25rem;
+  cursor: pointer;
+  min-width: 50px;          /* narrower width */
+  text-align: center;
+  line-height: 1;
+  user-select: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.audio-btn:hover {
+  background-color: var(--accent);
+  color: var(--background);
+}
+
+/* Responsive image layout */
+
+.image-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+  justify-content: center; /* center images horizontally */
+}
+
+.image-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 12px;
+  justify-content: center;
+}
+
+.image-row img {
+  width: 220px;       /* moderate width */
+  height: 140px;      /* proportional height */
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.image-row img:hover {
+  transform: scale(1.05);
+}
+
+/* Mobile adjustments */
+@media screen and (max-width: 480px) {
+  .card {
+    padding: 16px;
+    font-size: 16px;
+  }
+
+  .card-content {
+    font-size: 1.1rem;
+  }
+
+	.image-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .image-row img {
+    width: 90vw;  /* almost full width on mobile */
+    height: auto;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .card {
+    background-color: var(--background);
+    color: var(--primary);
+    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.05); /* soft white glow */
+  }
+
+	.card-label {
+    color: var(--highlight-bg) !important;
+  }
+
+	.image-row img {
+    box-shadow: 0 2px 6px rgba(255, 255, 255, 0.05);
+  }
+}
