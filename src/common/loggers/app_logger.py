@@ -16,9 +16,9 @@ class AppLogger(Logger):
 
     def _configure_logger(self, log_level):
         logger.remove()
+        self._logger = logger.bind(pid=getpid())
         self._set_console_logging(log_level=log_level)
         self._set_file_logging()
-        self._logger = logger.bind(pid=getpid())
 
     def _format_log(self, record, type: Literal["console", "file"]):
         extra = record["extra"]
@@ -26,20 +26,18 @@ class AppLogger(Logger):
         file = extra.get("file", "App")
         method = extra.get("method", "App")
         time = record["time"].strftime("%b-%d-%y %H:%M:%S")
-        level = record["level"].name
-        message = record["message"]
 
         if type == "console":
             return (
                 f"{ANSIColors.YELLOW.value}[FastAPI] {pid} | {ANSIColors.RESET.value}"
                 f"{ANSIColors.WHITE.value}{time}{ANSIColors.RESET.value}"
                 f"{ANSIColors.YELLOW.value} | [{file}:{method}] | {ANSIColors.RESET.value}"
-                f"{level}: {dict(message)}\n"
+                "<level>{level}</level>: <level>{message}</level>"
             )
         else:
             return (
                 f"[FastAPI] {pid} | {time} | [{file}:{method}] "
-                f"{level}: {message}\n"
+                "<level>{level}</level>: <level>{message}</level>"
             )
 
     def _set_console_logging(self, log_level):
@@ -68,10 +66,10 @@ class AppLogger(Logger):
     def _format_context(
         self, file: str, method: Optional[str] = None
     ) -> Dict[str, str]:
-        extra = {"file": file}
-        if method:
-            extra["method"] = method
-        return extra
+        return {
+            "file": str(file),
+            "method": str(method) if method else "App",
+        }
 
     def debug(
         self,

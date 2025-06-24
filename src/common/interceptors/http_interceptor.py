@@ -19,7 +19,7 @@ class HTTPInterceptor(BaseHTTPMiddleware):
         super().__init__(app)
         self._logger = AppLogger(log_level="INFO")
 
-    async def __format_response(
+    async def _format_response(
         self, body_iterator: AsyncIterable[bytes], status_code: int
     ) -> HTTPResponse:
         response_body = []
@@ -47,11 +47,12 @@ class HTTPInterceptor(BaseHTTPMiddleware):
             response = await call_next(request)
 
             if response.status_code < 400:
-                formated_response = await self.__format_response(
+                formated_response = await self._format_response(
                     response.body_iterator, response.status_code  # type: ignore
                 )
+
                 self._logger.info(
-                    f"[INCOMING REQUEST] METHOD: {request.method} | URL: {request.url.path} | HEADERS: {request.headers} "
+                    f"[INCOMING REQUEST] METHOD: {request.method} | URL: {request.url.path} | HEADERS: {request.headers} | "
                     f"[OUTGOING RESPONSE] STATUS: {response.status_code} | RESPONSE_BODY: {formated_response.data}",
                     file=HTTPInterceptor.__name__,
                     method=self.dispatch.__name__,
