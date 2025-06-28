@@ -86,7 +86,7 @@ class LanguageTransformer:
             )
 
             sentence_path = await GoogleUtils.synthetize_text(
-                text=sentence,
+                text=card_info.sentence,
                 language=language,
                 output_file=Path(self._get_audio_path(word=word)),
             )
