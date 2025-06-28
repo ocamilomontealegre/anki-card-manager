@@ -32,7 +32,7 @@ class AppLogger(Logger):
                 f"{ANSIColors.YELLOW.value}[FastAPI] {pid} | {ANSIColors.RESET.value}"
                 f"{ANSIColors.WHITE.value}{time}{ANSIColors.RESET.value}"
                 f"{ANSIColors.YELLOW.value} | [{file}:{method}] | {ANSIColors.RESET.value}"
-                "<level>{level}</level>: <level>{message}</level>"
+                "<level>{level}</level>: <level>{message}</level>\n"
             )
         else:
             return (

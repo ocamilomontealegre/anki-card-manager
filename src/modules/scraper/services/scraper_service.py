@@ -73,7 +73,9 @@ class ScraperService:
                 "--disable-blink-features=AutomationControlled"
             )
 
-            driver = Chrome(options=options)
+            driver = Chrome(
+                options=options, version_main=137, use_subprocess=True
+            )
             try:
                 driver.get(url)
                 WebDriverWait(driver, 10).until(
