@@ -48,6 +48,20 @@ class LanguageTransformer:
         else:
             return f"{base_word[0].upper()}{base_word[1:]}"
 
+    def _scape_word(
+        self,
+        text: str,
+        *,
+        word_forms: List[str],
+        type: Literal["simple", "compound"],
+    ) -> str:
+        pattern = r"\b(" + "|".join(escape(w) for w in word_forms) + r")\b"
+
+        if type == "simple":
+            return sub(pattern, "{...}", text)
+        else:
+            return sub(pattern, lambda m: f"[{m.group(0)}]", text)
+
     async def to_entity(self, card_info: CardResponse):
         method = self.to_entity.__name__
 
@@ -63,12 +77,18 @@ class LanguageTransformer:
             plural = self._capitalize_text_array(card_info.plural)
             singular = self._capitalize_text_array(card_info.singular)
             synonyms = self._capitalize_text_array(card_info.synonyms)
-            sentence = sub(
-                rf"\b{escape(word)}\b", f"[{word}]", card_info.sentence
+
+            sentence = self._scape_word(
+                card_info.sentence,
+                word_forms=card_info.singular + card_info.plural,
+                type="compound",
             )
-            partial_sentence = sub(
-                rf"\b{escape(word)}\b", "{...}", card_info.sentence
+            partial_sentence = self._scape_word(
+                card_info.sentence,
+                word_forms=card_info.singular + card_info.plural,
+                type="simple",
             )
+
             word_forms = self._capitalize_text_array(
                 card_info.singular + card_info.plural
             )
