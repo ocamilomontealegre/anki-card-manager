@@ -7,7 +7,6 @@ __pycache__/
 
 # Virtual environments
 venv/
-.env/
 
 # Poetry-related
 # Poetry caches can be large and should be excluded.
