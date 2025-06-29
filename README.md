@@ -4,10 +4,10 @@
   </a>
 </p>
 
-<h1 align="center">🚀 FastAPI Service Template ⚡</h1>
+<h1 align="center">🚀 Anki Card Manager ⚡</h1>
 
 <p align="center">
-  Template for new services based on FastAPI
+  Automation for creating Anki Flashcards
 </p>
 
 <p align="center">
