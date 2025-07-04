@@ -7,3 +7,4 @@ class Row(TypedDict):
     word: str
     language: Language
     category: NotRequired[WordCategory]
+    context: NotRequired[str]

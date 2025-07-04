@@ -35,12 +35,40 @@ class LanguageService:
 
         self._open_ai_client = OpenAI(api_key=self._env.openai.key)
 
+    def _build_promp(self, row: Row) -> str:
+        word = row["word"]
+        language = row["language"]
+        category = row.get("category") or "general"
+        context = row.get("context")
+
+        user_prompt = (
+            f"Generate a structured language card for the word '{word}' in {language}. "
+            f"Focus on the most commonly used sense of the word when it functions as a {category}. "
+        )
+
+        if context:
+            user_prompt += (
+                f'The word appears in the following context: "{context}". '
+                "Use this to guide your definition and example. "
+            )
+
+        user_prompt += (
+            "Provide:\n"
+            "- A clear, learner-friendly definition, it should not contain the word I'm searching for\n"
+            "- Plural and singular forms (if relevant)\n"
+            "- A list of common synonyms\n"
+            "- A natural example sentence using the word\n"
+            "- The IPA transcription of that sentence\n"
+            "Add subtle usage or cultural notes if they help clarify the meaning or usage."
+        )
+
+        return user_prompt
+
     async def _process_row(self, row: Row) -> Union[CardResponse, None]:
         method = self._process_row.__name__
 
         word = row["word"]
         language = row["language"]
-        category = row.get("category") or "general"
 
         try:
             if await self._cache_strategy.read(key=word):
@@ -52,7 +80,7 @@ class LanguageService:
                 return
 
             self._logger.debug(
-                f"Fetching data for word[{word}] with language[{language}] and category[{category}]",
+                f"Fetching data for word[{word}] with language[{language}]",
                 file=self._file,
                 method=method,
             )
@@ -66,20 +94,7 @@ class LanguageService:
                             "You specialize in identifying the most common and natural usages of words across different languages, providing accurate and culturally aware definitions and examples."
                         ),
                     },
-                    {
-                        "role": "user",
-                        "content": (
-                            f"Generate a structured language card for the word '{word}' in {language}. "
-                            f"Focus on the most commonly used sense of the word when it functions as a {category}. "
-                            "Provide:\n"
-                            "- A clear, learner-friendly definition, it should not content the word I'm searching for\n"
-                            "- Plural and singular forms (if relevant)\n"
-                            "- A list of common synonyms\n"
-                            "- A natural example sentence using the word\n"
-                            "- The IPA transcription of that sentence\n"
-                            "Add subtle usage or cultural notes if they help clarify the meaning or usage."
-                        ),
-                    },
+                    {"role": "user", "content": self._build_promp(row)},
                 ],
                 response_format=CardResponse,
             )
