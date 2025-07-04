@@ -9,6 +9,7 @@ from common.loggers.models.abstracts.logger_abstract import Logger
 from common.utils import FileUtils
 from common.env.env_config import EnvVariables
 from common.cache.strategies.cache_strategy import CacheStrategy
+from common.enums import Language
 from modules.word.services.word_service import WordService
 from ..transformers.language_transformer import LanguageTransformer
 from ..models.interfaces import CardResponse, Row
@@ -39,7 +40,10 @@ class LanguageService:
         word = row["word"]
         language = row["language"]
         category = row.get("category") or "general"
-        context = row.get("context")
+        context = (
+            row.get("context")
+            or f"Informal, everyday {Language(language).value} used in spoken conversation or {Language(language).value} as second language learning"
+        )
 
         user_prompt = (
             f"Generate a structured language card for the word '{word}' in {language}. "
