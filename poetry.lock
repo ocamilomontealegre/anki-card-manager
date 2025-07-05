@@ -1249,6 +1249,21 @@ socks = ["socksio (==1.*)"]
 zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
+name = "httpx-aiohttp"
+version = "0.1.6"
+description = "Aiohttp transport for HTTPX"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "httpx_aiohttp-0.1.6-py3-none-any.whl", hash = "sha256:f0700de793d31efa245afeac6f66f4c277aae0578211be51c690695404081f37"},
+    {file = "httpx_aiohttp-0.1.6.tar.gz", hash = "sha256:ce777e166dacd91de8b93f0ad564649c9f65341e0b61ce16391fa7445c8f3f7d"},
+]
+
+[package.dependencies]
+aiohttp = ">=3.10.0,<4"
+httpx = ">=0.27.0"
+
+[[package]]
 name = "hyperframe"
 version = "6.1.0"
 description = "Pure-Python HTTP/2 framing"
@@ -1874,9 +1889,11 @@ files = [
 ]
 
 [package.dependencies]
+aiohttp = {version = "*", optional = true, markers = "extra == \"aiohttp\""}
 anyio = ">=3.5.0,<5"
 distro = ">=1.7.0,<2"
 httpx = ">=0.23.0,<1"
+httpx-aiohttp = {version = ">=0.1.6", optional = true, markers = "extra == \"aiohttp\""}
 jiter = ">=0.4.0,<1"
 pydantic = ">=1.9.0,<3"
 sniffio = "*"
@@ -3555,4 +3572,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "244ad14ee5195090058c176cd79ecc8a1f6903eb3771ad3d66354426342f2940"
+content-hash = "091c34561c23e5f2d463cf7c3180691e351f5c6da25d377c4cc9db2a8614c327"

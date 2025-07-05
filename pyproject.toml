@@ -18,7 +18,6 @@ python-multipart = "^0.0.17"
 pandas = "^2.2.3"
 pyee = "^12.1.1"
 openapi = "^2.0.0"
-openai = "^1.58.1"
 sqlalchemy = "^2.0.36"
 python-dotenv = "^1.0.1"
 psycopg2 = "^2.9.10"
@@ -42,6 +41,7 @@ aiohttp = "^3.12.13"
 click = "^8.2.1"
 eventlet = "^0.40.0"
 colorama = "^0.4.6"
+openai = {extras = ["aiohttp"], version = "^1.93.0"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"
