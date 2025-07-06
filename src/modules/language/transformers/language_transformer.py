@@ -93,16 +93,8 @@ class LanguageTransformer:
                 card_info.singular + card_info.plural
             )
 
-            giphy_image_url = await self._scraper_service.get_image_url(
-                {"query": word, "target_language": language, "source": "giphy"}
-            )
-
-            pinterest_image_url = await self._scraper_service.get_image_url(
-                {
-                    "query": word,
-                    "target_language": language,
-                    "source": "pinterest",
-                }
+            images = self._scraper_service.get_image_url(
+                {"query": word, "source": "google"}
             )
 
             sentence_path = await GoogleUtils.synthetize_text(
@@ -131,6 +123,8 @@ class LanguageTransformer:
                     ),
                 )
 
+            print("IMAGES: ", images)
+
             new_word = Word(
                 word=self._check_word_forms(word, word_forms),
                 language=language.value,
@@ -147,18 +141,20 @@ class LanguageTransformer:
                 synonyms=synonyms,
                 image=await ImageUtils.download_from_url(
                     {
-                        "url": giphy_image_url,
+                        "url": images[0],
                         "word": word,
                         "source": self._env.anki.media,
                     }
-                ),
+                )
+                or "",
                 image_2=await ImageUtils.download_from_url(
                     {
-                        "url": pinterest_image_url,
+                        "url": images[1],
                         "word": word,
                         "source": self._env.anki.media,
                     }
-                ),
+                )
+                or "",
             )
             return new_word
         except Exception as e:

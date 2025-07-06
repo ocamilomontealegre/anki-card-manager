@@ -1,5 +1,4 @@
 from time import sleep
-from base64 import b64decode
 from urllib.parse import quote
 from undetected_chromedriver import Chrome, ChromeOptions
 from selenium.webdriver.common.by import By
@@ -29,7 +28,7 @@ def get_image(query: str) -> str:
         sleep(2)
 
         images = driver.find_elements(By.CSS_SELECTOR, "#center_col img[src^='data:image']")
-        
+
         image_urls = []
         for idx, img in enumerate(images):
             try:

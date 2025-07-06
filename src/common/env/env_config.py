@@ -3,13 +3,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from common.loggers.app_logger import AppLogger
 from common.env.app_env_config import AppEnvVariables
 from common.env.anki_env_config import AnkiEnvVariables
-from common.env.giphy_env_config import GiphyEnvVariables
 from common.env.google_env_config import GoogleEnvVariables
 from common.env.open_ai_env_config import OpenAIEnvVariables
 from common.env.open_api_env_config import OpenAPIEnvVariables
 from common.env.pg_env_config import PgEnvVariables
 from common.env.redis_env_config import RedisEnvVariables
-from common.env.pinterest_env_config import PinterestEnvVariables
 from common.env.debuggy_env_config import DebuggyEnvVariables
 from common.env.actions_env_config import ActionsEnvVariables
 
@@ -25,13 +23,11 @@ class EnvConfig(BaseSettings):
     anki: AnkiEnvVariables
     app: AppEnvVariables
     debuggy: DebuggyEnvVariables
-    giphy: GiphyEnvVariables
     google: GoogleEnvVariables
     openai: OpenAIEnvVariables
     openapi: OpenAPIEnvVariables
     pg: PgEnvVariables
     redis: RedisEnvVariables
-    pinterest: PinterestEnvVariables
 
 
 class EnvVariables:

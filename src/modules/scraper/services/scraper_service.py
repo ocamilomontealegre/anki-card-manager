@@ -1,25 +1,22 @@
-from typing import Dict, TypedDict, Literal
-from urllib.parse import quote
-from bs4 import BeautifulSoup
+from time import sleep
+from urllib.parse import quote_plus
+from typing import Dict, TypedDict, Literal, List
 from injector import inject
 from undetected_chromedriver import Chrome, ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from common.loggers.models.abstracts.logger_abstract import Logger
-from common.utils.language_utils import LanguageUtils
-from common.enums import Language
 from common.env import EnvVariables
 
 
-ImageSource = Literal["pinterest", "giphy"]
+ImageSource = Literal["google"]
 
 ImageSourceMap = Dict[ImageSource, str]
 
 
 class GetImage(TypedDict):
     query: str
-    target_language: Language
     source: ImageSource
 
 
@@ -32,30 +29,18 @@ class ScraperService:
         self._logger = logger
 
         self._html_selectors: ImageSourceMap = {
-            "pinterest": "div[role='list'] div[role='listitem'] img",
-            "giphy": ".giphy-grid img",
+            "google": "#center_col img[src^='data:image']",
         }
 
         self._image_engine: ImageSourceMap = {
-            "pinterest": self._env.pinterest.url,
-            "giphy": self._env.giphy.url,
+            "google": self._env.google.images,
         }
 
-    async def get_image_url(self, data: GetImage) -> str:
+    def get_image_url(self, data: GetImage) -> List[str]:
         method = self.get_image_url.__name__
 
         query = data["query"]
-        target_language = Language(data["target_language"])
         source = data["source"]
-
-        if target_language != Language.ENGLISH:
-            query = await LanguageUtils.translate(
-                {
-                    "text": query,
-                    "source": target_language,
-                    "target": Language.ENGLISH,
-                }
-            )
 
         self._logger.debug(
             f"Try to fetch image for word[{data['query']}]",
@@ -64,8 +49,8 @@ class ScraperService:
         )
 
         try:
-            query_encoded = quote(query)
-            url = f"{self._image_engine[source]}/{query_encoded}"
+            query_encoded = quote_plus(query)
+            search_url = f"{self._image_engine[source]}{query_encoded}"
 
             options = ChromeOptions()
             options.add_argument("--headless")
@@ -73,28 +58,64 @@ class ScraperService:
                 "--disable-blink-features=AutomationControlled"
             )
 
-            driver = Chrome(
+            image_urls = []
+
+            with Chrome(
                 options=options, version_main=137, use_subprocess=True
-            )
-            try:
-                driver.get(url)
+            ) as driver:
+                driver.get(search_url)
                 WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located(
                         (By.CSS_SELECTOR, self._html_selectors[source])
                     )
                 )
-                page_source = driver.page_source
-            finally:
-                driver.quit()
 
-            soup = BeautifulSoup(page_source, "html.parser")
-            imgs = soup.select(self._html_selectors[source])
+                sleep(2)
 
-            return str(imgs[0]["src"]) or ""
+                images = driver.find_elements(
+                    By.CSS_SELECTOR, self._html_selectors[source]
+                )
+
+                for _, image in enumerate(images):
+                    try:
+                        width = driver.execute_script(
+                            "return arguments[0].naturalWidth;", image
+                        )
+                        height = driver.execute_script(
+                            "return arguments[0].naturalHeight;", image
+                        )
+
+                        if width < 100 or height < 100:
+                            continue
+
+                        image.click()
+
+                        full_image = WebDriverWait(driver, 5).until(
+                            EC.presence_of_element_located(
+                                (
+                                    By.XPATH,
+                                    "//img[@src and starts-with(@src, 'http') and not(contains(@src, 'gstatic.com')) and not(starts-with(@src, 'data:'))]",
+                                )
+                            )
+                        )
+                        image_url = full_image.get_attribute("src")
+                        if image_url and image_url.startswith("http"):
+                            image_urls.append(image_url)
+
+                        if len(image_urls) == 2:
+                            break
+                    except Exception as e:
+                        self._logger.error(
+                            f"Error processing an image: {e}",
+                            file=self._file,
+                            method=method,
+                        )
+                        continue
+            return image_urls
         except Exception as e:
             self._logger.error(
                 f"Unexpected error: {e}",
                 file=self._file,
                 method=method,
             )
-            return ""
+            return []
