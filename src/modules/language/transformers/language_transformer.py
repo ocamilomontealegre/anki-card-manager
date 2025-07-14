@@ -123,8 +123,6 @@ class LanguageTransformer:
                     ),
                 )
 
-            print("IMAGES: ", images)
-
             new_word = Word(
                 word=self._check_word_forms(word, word_forms),
                 language=language.value,
