@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["ocamilomontealegre <ocamilomontealegre@gmail.com>"]
 readme = "README.md"
-packages = [{ include = "src" }]
+packages = [{ include = "src" }, { include = "scripts" }]
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -42,6 +42,7 @@ click = "^8.2.1"
 eventlet = "^0.40.0"
 colorama = "^0.4.6"
 openai = {extras = ["aiohttp"], version = "^1.93.0"}
+alembic = "^1.16.4"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"
@@ -54,10 +55,10 @@ line-length = 79
 target-version = ["py310", "py311", "py312"]
 
 [tool.poetry.scripts]
-start = "scripts:start"
-mq = "scripts:start_mq"
-lint = "scripts:lint"
-format = "scripts:format"
+start = "scripts.start:start"
+mq = "scripts.start_mq:start_mq"
+lint = "scripts.lint:lint"
+format = "scripts.format:format"
 migrate = "cli:cli"
 
 [build-system]

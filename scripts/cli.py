@@ -1,5 +1,5 @@
 from click import command, option
-from .scripts import migrate
+from .migrate import migrate
 
 
 @command()
