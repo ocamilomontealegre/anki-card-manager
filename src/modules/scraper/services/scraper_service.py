@@ -36,6 +36,17 @@ class ScraperService:
             "google": self._env.google.images,
         }
 
+    def _build_search_url(self, query: str, source: ImageSource) -> str:
+        query_encoded = quote_plus(query)
+        return f"{self._image_engine[source]}{query_encoded}"
+
+    def _init_driver(self) -> Chrome:
+        options = ChromeOptions()
+
+        options.add_argument("--headless")
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        return Chrome(options=options, version_main=137, use_subprocess=True)
+
     def get_image_url(self, data: GetImage) -> List[str]:
         method = self.get_image_url.__name__
 
@@ -49,20 +60,11 @@ class ScraperService:
         )
 
         try:
-            query_encoded = quote_plus(query)
-            search_url = f"{self._image_engine[source]}{query_encoded}"
-
-            options = ChromeOptions()
-            options.add_argument("--headless")
-            options.add_argument(
-                "--disable-blink-features=AutomationControlled"
-            )
+            search_url = self._build_search_url(query=query, source=source)
 
             image_urls = []
 
-            with Chrome(
-                options=options, version_main=137, use_subprocess=True
-            ) as driver:
+            with self._init_driver() as driver:
                 driver.get(search_url)
                 WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located(
