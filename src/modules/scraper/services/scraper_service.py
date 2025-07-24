@@ -43,7 +43,7 @@ class ScraperService:
     def _init_driver(self) -> Chrome:
         options = ChromeOptions()
 
-        # options.add_argument("--headless")
+        options.add_argument("--headless")
         options.add_argument("--disable-blink-features=AutomationControlled")
         return Chrome(options=options, version_main=137, use_subprocess=True)
 
