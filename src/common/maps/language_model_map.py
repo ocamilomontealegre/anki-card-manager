@@ -1,7 +1,6 @@
-from typing import Dict
-from common.enums import Language
+from src.common.enums import Language
 
-language_model_map: Dict[Language, str] = {
+language_model_map: dict[Language, str] = {
     Language.ENGLISH: "English - Lava",
     Language.FRENCH: "Français - Lave",
     Language.GERMAN: "",

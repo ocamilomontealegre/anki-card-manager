@@ -1,8 +1,8 @@
 from injector import inject
 from fastapi import APIRouter
 from pydantic import BaseModel
-from common.enums import AppEndpoints, MqTaskStatus
-from common.models import TaskResponse
+from src.common.enums import AppEndpoints, MqTaskStatus
+from src.common.models import TaskResponse
 from ..tasks.language_task import process_csv_task
 
 

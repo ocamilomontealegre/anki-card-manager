@@ -1,6 +1,6 @@
 from time import sleep
 from urllib.parse import quote_plus
-from typing import Dict, TypedDict, Literal, List
+from typing import TypedDict, Literal
 from injector import inject
 from undetected_chromedriver import Chrome, ChromeOptions
 from selenium.webdriver.common.by import By
@@ -12,7 +12,7 @@ from common.env import EnvVariables
 
 ImageSource = Literal["google"]
 
-ImageSourceMap = Dict[ImageSource, str]
+ImageSourceMap = dict[ImageSource, str]
 
 
 class GetImage(TypedDict):
@@ -43,11 +43,11 @@ class ScraperService:
     def _init_driver(self) -> Chrome:
         options = ChromeOptions()
 
-        options.add_argument("--headless")
+        # options.add_argument("--headless")
         options.add_argument("--disable-blink-features=AutomationControlled")
         return Chrome(options=options, version_main=137, use_subprocess=True)
 
-    def get_image_url(self, data: GetImage) -> List[str]:
+    def get_image_url(self, data: GetImage) -> list[str]:
         method = self.get_image_url.__name__
 
         query = data["query"]

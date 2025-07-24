@@ -1,10 +1,10 @@
 import sys
 from os import getpid
-from typing import Optional, Dict, Literal
+from typing import Literal
 
 from loguru import logger
 
-from common.decorators.singleton_decorator import singleton
+from src.common.decorators.singleton_decorator import singleton
 from .models.abstracts.logger_abstract import Logger
 from .models.enums.ansi_colors_enum import ANSIColors
 
@@ -64,8 +64,8 @@ class AppLogger(Logger):
         )
 
     def _format_context(
-        self, file: str, method: Optional[str] = None
-    ) -> Dict[str, str]:
+        self, file: str, method: str | None = None
+    ) -> dict[str, str]:
         return {
             "file": str(file),
             "method": str(method) if method else "App",
@@ -76,7 +76,7 @@ class AppLogger(Logger):
         message: str,
         *,
         file: str,
-        method: Optional[str] = None,
+        method: str | None = None,
     ) -> None:
         extra = self._format_context(file, method)
         self._logger.bind(**extra).debug(message)
@@ -86,7 +86,7 @@ class AppLogger(Logger):
         message: str,
         *,
         file: str,
-        method: Optional[str] = None,
+        method: str | None = None,
     ) -> None:
         extra = self._format_context(file, method)
         self._logger.bind(**extra).info(message)
@@ -96,7 +96,7 @@ class AppLogger(Logger):
         message: str,
         *,
         file: str,
-        method: Optional[str] = None,
+        method: str | None = None,
     ) -> None:
         extra = self._format_context(file, method)
         self._logger.bind(**extra).warning(message)
@@ -106,7 +106,7 @@ class AppLogger(Logger):
         message: str,
         *,
         file: str,
-        method: Optional[str] = None,
+        method: str | None = None,
     ) -> None:
         extra = self._format_context(file, method)
         self._logger.bind(**extra).error(message)
@@ -116,7 +116,7 @@ class AppLogger(Logger):
         message: str,
         *,
         file: str,
-        method: Optional[str] = None,
+        method: str | None = None,
     ) -> None:
         extra = self._format_context(file, method)
-        self._logger.bind(**extra).critical(message)
+        self._logger.bind(**extra).exception(message)

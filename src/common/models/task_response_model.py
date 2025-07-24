@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from common.enums import MqTaskStatus
+from src.common.enums import MqTaskStatus
 
 
 class TaskResponse(BaseModel):

@@ -1,6 +1,6 @@
 from os import remove
 from pathlib import Path
-from common.loggers.app_logger import AppLogger
+from src.common.loggers.app_logger import AppLogger
 
 logger = AppLogger()
 

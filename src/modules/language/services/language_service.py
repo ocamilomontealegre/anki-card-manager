@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import cast, Union
+from typing import cast
 from injector import inject
 
 from pandas import read_csv
@@ -68,7 +68,7 @@ class LanguageService:
 
         return user_prompt
 
-    async def _process_row(self, row: Row) -> Union[CardResponse, None]:
+    async def _process_row(self, row: Row) -> CardResponse | None:
         method = self._process_row.__name__
 
         word = row["word"]

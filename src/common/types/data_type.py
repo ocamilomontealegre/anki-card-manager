@@ -1,3 +1,3 @@
-from typing import Dict, List, Union, Any
+from typing import Any
 
-DataType = Union[Dict[str, Any], List[Any]]
+DataType = dict[str, Any] | list[Any]

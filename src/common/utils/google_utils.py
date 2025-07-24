@@ -1,11 +1,12 @@
 from pathlib import Path
+from aiofiles import open
 from google.cloud import texttospeech
 from google.oauth2 import service_account
 from google.api_core.exceptions import GoogleAPIError
 from google.auth.exceptions import DefaultCredentialsError
 
-from common.loggers.app_logger import AppLogger
-from common.enums import Language
+from src.common.loggers.app_logger import AppLogger
+from src.common.enums import Language
 from ..env.env_config import EnvVariables
 from ..maps import language_voice_map
 
@@ -37,8 +38,10 @@ class GoogleUtils:
             synthesis_input = texttospeech.SynthesisInput(text=text)
 
             voice = texttospeech.VoiceSelectionParams(
-                language_code=language_voice_map[language]["language_code"],
-                name=language_voice_map[language]["voice_model"],
+                language_code=language_voice_map[language.value][
+                    "language_code"
+                ],
+                name=language_voice_map[language.value]["voice_model"],
                 ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL,
             )
 
@@ -50,8 +53,8 @@ class GoogleUtils:
                 input=synthesis_input, voice=voice, audio_config=audio_config
             )
 
-            with open(output_file, "wb") as out:
-                out.write(response.audio_content)
+            async with open(output_file, "wb") as out:
+                await out.write(response.audio_content)
                 logger.debug(
                     f"Audio content written to {output_file}",
                     file=file,

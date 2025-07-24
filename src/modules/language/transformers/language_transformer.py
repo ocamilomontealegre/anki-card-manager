@@ -1,6 +1,6 @@
 from pathlib import Path
 from re import escape, sub
-from typing import Literal, Optional, List
+from typing import Literal
 
 from injector import inject
 
@@ -23,7 +23,7 @@ class LanguageTransformer:
         self._logger = logger
         self._env = EnvVariables.get()
 
-    def _capitalize_text_array(self, text: List[str]) -> str:
+    def _capitalize_text_array(self, text: list[str]) -> str:
         if len(text) == 0:
             return ""
 
@@ -40,9 +40,7 @@ class LanguageTransformer:
 
         return f"{self._env.anki.media}/{full_prefix}{word}.mp3"
 
-    def _check_word_forms(
-        self, base_word: str, word_forms: Optional[str]
-    ) -> str:
+    def _check_word_forms(self, base_word: str, word_forms: str | None) -> str:
         if word_forms and word_forms != ", ":
             return word_forms[:-1] if word_forms[-1] == "," else word_forms
         else:
@@ -52,7 +50,7 @@ class LanguageTransformer:
         self,
         text: str,
         *,
-        word_forms: List[str],
+        word_forms: list[str],
         type: Literal["simple", "compound"],
     ) -> str:
         pattern = r"\b(" + "|".join(escape(w) for w in word_forms) + r")\b"

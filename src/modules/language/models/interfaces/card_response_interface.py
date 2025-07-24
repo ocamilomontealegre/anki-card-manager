@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-from typing import List
 from common.enums import Language
 from ..enums import WordCategory
 
@@ -21,18 +20,18 @@ class CardResponse(BaseModel):
         ...,
         description="The grammatical or semantic category of the word, like noun or verb.",
     )
-    plural: List[str] = Field(
+    plural: list[str] = Field(
         default_factory=list,
         description="A list of plural forms of the word, if applicable, including both feminine and masculine forms. Leave empty if not relevant.",
     )
-    singular: List[str] = Field(
+    singular: list[str] = Field(
         default_factory=list,
         description=(
             "A list of singular forms of the word, if applicable, including both feminine and masculine forms. Leave empty if not relevant."
             "If the word is a verb, add the forms following this pattern 'infinitive', 'present', 'present third person', 'past tense', 'past participle', 'ing form'"
         ),
     )
-    synonyms: List[str] = Field(
+    synonyms: list[str] = Field(
         default_factory=list,
         description="A list of synonyms or words with similar meanings.",
     )
