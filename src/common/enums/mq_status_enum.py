@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class MqTaskStatus(Enum):
+class MqTaskStatus(str, Enum):
     PENDING = "pending"
     STARTED = "started"
     RETRY = "retry"

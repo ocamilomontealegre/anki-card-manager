@@ -60,7 +60,7 @@ start = "scripts.start:start"
 mq = "scripts.start_mq:start_mq"
 lint = "scripts.lint:lint"
 format = "scripts.format:format"
-migrate = "cli:cli"
+migrate = "scripts.cli:cli"
 
 [build-system]
 requires = ["poetry-core"]

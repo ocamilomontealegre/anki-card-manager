@@ -28,10 +28,10 @@ class AnkiService:
         self._word_transformer = word_transformer
 
     def _get_deck_for_lang(self, language: Language) -> str:
-        return language_deck_map.get(language, Language.ENGLISH.value)
+        return language_deck_map.get(language.value, Language.ENGLISH.value)
 
     def _get_model_for_lang(self, language: Language) -> str:
-        return language_model_map.get(language, Language.ENGLISH.value)
+        return language_model_map.get(language.value, Language.ENGLISH.value)
 
     async def create_cards(self, filters: FindAllParams):
         method = self.create_cards.__name__
@@ -63,6 +63,8 @@ class AnkiService:
                     }
                 },
             }
+
+            print("PAYLOAD: ", payload)
 
             try:
                 async with httpx.AsyncClient() as client:

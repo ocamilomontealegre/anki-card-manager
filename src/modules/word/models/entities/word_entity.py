@@ -1,5 +1,5 @@
 from uuid import uuid4
-from sqlalchemy import Column, DateTime, String
+from sqlalchemy import Column, DateTime, String, Text
 from sqlalchemy.sql import func
 from common.database.entities.base_entity import Base
 
@@ -9,9 +9,9 @@ class Word(Base):
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid4()))
     language = Column(String(36), unique=False, nullable=False)
-    word = Column(String(256), unique=False, nullable=False)
+    word = Column(Text, unique=False, nullable=False)
     category = Column(String(56), unique=False, nullable=False)
-    definition = Column(String(1000), unique=False, nullable=False)
+    definition = Column(Text, unique=False, nullable=False)
     sentence = Column(String(256), unique=False, nullable=False)
     phonetics = Column(String(256), unique=False, nullable=False)
     sentence_audio = Column(String(256), unique=False, nullable=False)

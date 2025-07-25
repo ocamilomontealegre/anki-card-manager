@@ -5,7 +5,7 @@ from typing import Literal
 from injector import inject
 
 from common.loggers.models.abstracts.logger_abstract import Logger
-from common.utils import GoogleUtils, ImageUtils
+from common.utils import GoogleUtils
 from common.env.env_config import EnvVariables
 from modules.scraper.services.scraper_service import ScraperService
 from modules.word.models.entities.word_entity import Word
@@ -91,9 +91,9 @@ class LanguageTransformer:
                 card_info.singular + card_info.plural
             )
 
-            images = self._scraper_service.get_image_url(
-                {"query": word, "source": "google"}
-            )
+            # images = self._scraper_service.get_image_url(
+            #     {"query": word, "source": "google"}
+            # )
 
             sentence_path = await GoogleUtils.synthetize_text(
                 text=card_info.sentence,
@@ -135,22 +135,8 @@ class LanguageTransformer:
                 plural=plural,
                 plural_audio=plural_audio_path,
                 synonyms=synonyms,
-                image=await ImageUtils.download_from_url(
-                    {
-                        "url": images[0],
-                        "word": word,
-                        "source": self._env.anki.media,
-                    }
-                )
-                or "",
-                image_2=await ImageUtils.download_from_url(
-                    {
-                        "url": images[1],
-                        "word": word,
-                        "source": self._env.anki.media,
-                    }
-                )
-                or "",
+                image="",
+                image_2="",
             )
             return new_word
         except Exception as e:
