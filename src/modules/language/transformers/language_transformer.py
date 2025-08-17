@@ -53,7 +53,11 @@ class LanguageTransformer:
         word_forms: list[str],
         type: Literal["simple", "compound"],
     ) -> str:
-        pattern = r"\b(" + "|".join(escape(w) for w in word_forms) + r")\b"
+        pattern = (
+            r"(?:^|\W)("
+            + "|".join(escape(w) for w in word_forms)
+            + r")(?:$|\W)"
+        )
 
         if type == "simple":
             return sub(pattern, "{...}", text)
