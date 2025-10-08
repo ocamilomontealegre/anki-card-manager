@@ -4,7 +4,9 @@ version = "0.1.0"
 description = ""
 authors = ["ocamilomontealegre <ocamilomontealegre@gmail.com>"]
 readme = "README.md"
-packages = [{ include = "src" }, { include = "scripts" }]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -44,6 +46,7 @@ colorama = "^0.4.6"
 openai = {extras = ["aiohttp"], version = "^1.93.0"}
 alembic = "^1.16.4"
 aiofiles = "^24.1.0"
+pytest = "^8.4.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"
