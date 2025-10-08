@@ -37,7 +37,7 @@ class WordTransformer:
         # This constructor is intentionally left empty because
         pass
 
-    def _format_audio_path(self, audio_path) -> str:
+    def _format_audio_path(self, audio_path: str) -> str:
         return f"[sound:{path.basename(audio_path)}]" if audio_path else ""
 
     def transform(self, word: Word) -> WordSchema:
