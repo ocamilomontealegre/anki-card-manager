@@ -36,7 +36,7 @@ class AnkiService:
     async def create_cards(self, filters: FindAllParams):
         method = self.create_cards.__name__
 
-        (words, size) = self._word_service.list_paginated(filters=filters)
+        (words, _) = self._word_service.list_paginated(filters=filters)
 
         results = []
         for word in words:
@@ -63,8 +63,6 @@ class AnkiService:
                     }
                 },
             }
-
-            print("PAYLOAD: ", payload)
 
             try:
                 async with httpx.AsyncClient() as client:
