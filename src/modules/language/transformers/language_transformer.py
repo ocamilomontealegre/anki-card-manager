@@ -1,5 +1,5 @@
 from pathlib import Path
-from re import escape, sub
+from re import escape, sub, IGNORECASE
 from typing import Literal
 
 from injector import inject
@@ -54,15 +54,15 @@ class LanguageTransformer:
         type: Literal["simple", "compound"],
     ) -> str:
         pattern = (
-            r"(?:^|\W)("
+            r"(^|\W)("
             + "|".join(escape(w) for w in word_forms)
-            + r")(?:$|\W)"
+            + r")(\W|$)"
         )
 
         if type == "simple":
-            return sub(pattern, "{...}", text)
+            return sub(pattern, lambda m: f"{m.group(1)}{{...}}{m.group(3)}", text, flags=IGNORECASE)
         else:
-            return sub(pattern, lambda m: f"[{m.group(0)}]", text)
+            return sub(pattern, lambda m: f"{m.group(1)}[{m.group(2)}]{m.group(3)}", text, flags=IGNORECASE)
 
     async def to_entity(self, card_info: CardResponse):
         method = self.to_entity.__name__
