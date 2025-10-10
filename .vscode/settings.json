@@ -2,7 +2,8 @@
   "editor.formatOnSave": true,
   "editor.tabSize": 4,
   "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.defaultFormatter": "charliermarsh.ruff",
   },
-  "python-envs.pythonProjects": []
+  "python-envs.pythonProjects": [],
+  "python-envs.defaultEnvManager": "ms-python.python:system"
 }
