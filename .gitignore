@@ -1,6 +1,7 @@
 # Python Cache
 __pycache__/
 *.pyo
+.pytest_cache
 
 # Environment
 .env
