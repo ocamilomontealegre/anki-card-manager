@@ -17,9 +17,7 @@ class RequestValidationExceptionHandler:
 
         exception_details = extract_exception_details(exc)
 
-        response = HTTPResponse(
-            status=400, success=False, message=str(exc.errors)
-        )
+        response = HTTPResponse(status=400, success=False, message=str(exc.errors))
 
         logger.error(
             f"[INCOMING REQUEST] METHOD: {request.method} | URL: {request.url.path} | HEADERS: {request.headers} "

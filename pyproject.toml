@@ -48,6 +48,7 @@ openai = {extras = ["aiohttp"], version = "^1.93.0"}
 alembic = "^1.16.4"
 aiofiles = "^24.1.0"
 pytest = "^8.4.2"
+ruff = "^0.14.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.10.0"

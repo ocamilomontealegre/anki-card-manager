@@ -2,9 +2,9 @@ from subprocess import CalledProcessError, check_call
 
 
 def format() -> None:
-    """Format using black"""
+    """Format using ruff"""
     try:
-        check_call(["black", "src/"])
+        check_call(["ruff", "format", "src/"])
     except CalledProcessError as e:
         error_message = e.output.decode().strip() if e.output else "No output provided."
         print(f"Formatting failed with error code {e.returncode}: {error_message}")

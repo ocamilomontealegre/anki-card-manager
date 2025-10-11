@@ -16,9 +16,7 @@ class UploadService:
 
         self.__logger = logger
 
-    async def _write_file_to_disk(
-        self, file_path: Path, file_data: UploadFile
-    ) -> Path:
+    async def _write_file_to_disk(self, file_path: Path, file_data: UploadFile) -> Path:
         with open(file_path, "wb") as file:
             file.write(await file_data.read())
         self.__logger.debug(

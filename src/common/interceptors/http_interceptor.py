@@ -14,7 +14,6 @@ from common.exception_handlers import (
 
 
 class HTTPInterceptor(BaseHTTPMiddleware):
-
     def __init__(self, app: ASGIApp):
         super().__init__(app)
         self._logger = AppLogger(log_level="INFO")
@@ -48,7 +47,8 @@ class HTTPInterceptor(BaseHTTPMiddleware):
 
             if response.status_code < 400:
                 formated_response = await self._format_response(
-                    response.body_iterator, response.status_code  # type: ignore
+                    response.body_iterator,
+                    response.status_code,  # type: ignore
                 )
 
                 self._logger.info(

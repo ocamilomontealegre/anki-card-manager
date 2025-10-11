@@ -10,7 +10,6 @@ file = "FileUtils"
 class FileUtils:
     @staticmethod
     def create_folder(directory_name: str) -> Path:
-
         directory_path = Path(directory_name)
 
         if not FileUtils.check_folder_existence(directory_path):

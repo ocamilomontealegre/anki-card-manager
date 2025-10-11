@@ -27,9 +27,7 @@ class ImageUtils:
         image = Image.open(BytesIO(image_bytes))
 
         image_format = image.format or "PNG"
-        path = (
-            Path(source) / f"{word}__{uuid4().hex[:8]}.{image_format.lower()}"
-        )
+        path = Path(source) / f"{word}__{uuid4().hex[:8]}.{image_format.lower()}"
 
         resize = image.resize((400, 300))
         resize.save(path, format=image_format)

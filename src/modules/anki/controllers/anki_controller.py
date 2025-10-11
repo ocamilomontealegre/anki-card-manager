@@ -13,7 +13,6 @@ class AnkiController:
         self._register_routes()
 
     def _register_routes(self):
-
         @self._router.post("", response_model=TaskResponse)
         async def process(body: FindAllParams):
             task = process_anki_cards.delay(filters=body.model_dump())  # type: ignore

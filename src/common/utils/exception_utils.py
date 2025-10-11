@@ -1,5 +1,5 @@
-from traceback import TracebackException
 from typing import Union
+from traceback import TracebackException
 
 from fastapi import HTTPException
 

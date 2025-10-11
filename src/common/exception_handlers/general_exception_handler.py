@@ -8,9 +8,7 @@ from common.constants import STATUS_MESSAGES
 
 class GeneralExceptionHandler:
     @staticmethod
-    async def handle_exception(
-        request: Request, exc: Exception
-    ) -> JSONResponse:
+    async def handle_exception(request: Request, exc: Exception) -> JSONResponse:
         file = GeneralExceptionHandler.__name__
         logger = AppLogger()
 

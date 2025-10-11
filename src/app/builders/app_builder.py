@@ -68,15 +68,12 @@ def create_lifespan(deps: LifespanDependencies):
 
 
 class AppBuilder:
-
     def __init__(self):
         self.__injector = Injector([AppModule])
         self.__env = EnvVariables.get()
         self.__db = self.__injector.get(DatabaseStrategy)
         self.__cache = self.__injector.get(CacheStrategy)
-        self.__lifespan = create_lifespan(
-            {"db": self.__db, "cache": self.__cache}
-        )
+        self.__lifespan = create_lifespan({"db": self.__db, "cache": self.__cache})
 
         self.__app = FastAPI(lifespan=self.__lifespan)
         self.__router = AppRouter(self.__injector).get_router()
@@ -98,7 +95,8 @@ class AppBuilder:
             Exception, GeneralExceptionHandler.handle_exception
         )
         self.__app.add_exception_handler(
-            HTTPException, HTTPExceptionHandler.handle_exception  # type: ignore
+            HTTPException,
+            HTTPExceptionHandler.handle_exception,  # type: ignore
         )
         return self
 

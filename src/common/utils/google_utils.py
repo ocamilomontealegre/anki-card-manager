@@ -16,31 +16,23 @@ logger = AppLogger()
 
 class GoogleUtils:
     @staticmethod
-    async def synthetize_text(
-        text: str, language: Language, output_file: Path
-    ) -> str:
+    async def synthetize_text(text: str, language: Language, output_file: Path) -> str:
         file = GoogleUtils.__name__
         method = GoogleUtils.synthetize_text.__name__
 
         try:
             google_env = EnvVariables.get().google
 
-            credentials = (
-                service_account.Credentials.from_service_account_file(
-                    google_env.credentials
-                )
+            credentials = service_account.Credentials.from_service_account_file(
+                google_env.credentials
             )
 
-            client = texttospeech.TextToSpeechAsyncClient(
-                credentials=credentials
-            )
+            client = texttospeech.TextToSpeechAsyncClient(credentials=credentials)
 
             synthesis_input = texttospeech.SynthesisInput(text=text)
 
             voice = texttospeech.VoiceSelectionParams(
-                language_code=language_voice_map[language.value][
-                    "language_code"
-                ],
+                language_code=language_voice_map[language.value]["language_code"],
                 name=language_voice_map[language.value]["voice_model"],
                 ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL,
             )
@@ -62,9 +54,7 @@ class GoogleUtils:
                 )
             return str(output_file)
         except DefaultCredentialsError as e:
-            logger.error(
-                f"Google credentials error: {e}", file=file, method=method
-            )
+            logger.error(f"Google credentials error: {e}", file=file, method=method)
             raise
 
         except GoogleAPIError as e:

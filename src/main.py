@@ -36,7 +36,5 @@ if __name__ == "__main__":
             log_level="debug",
         )
     except KeyboardInterrupt:
-        logger.debug(
-            "Server interrupted. Shutting down gracefully...", file=__file__
-        )
+        logger.debug("Server interrupted. Shutting down gracefully...", file=__file__)
         exit(0)

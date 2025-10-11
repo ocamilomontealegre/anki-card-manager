@@ -118,9 +118,7 @@ class LanguageService:
 
         for index, row in df.iterrows():
             try:
-                card_response = await self._process_row(
-                    cast(Row, row.to_dict())
-                )
+                card_response = await self._process_row(cast(Row, row.to_dict()))
 
                 if not card_response:
                     continue

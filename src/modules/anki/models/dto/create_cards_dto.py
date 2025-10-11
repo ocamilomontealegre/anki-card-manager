@@ -11,9 +11,7 @@ class CreateCardsDto(BaseModel):
         examples=[10],
     )
     offset: Optional[int] = Field(default=None, ge=1, examples=[10])
-    sort: Optional[str] = Field(
-        default="asc", pattern="^(asc|dsc)$", examples=["asc"]
-    )
+    sort: Optional[str] = Field(default="asc", pattern="^(asc|dsc)$", examples=["asc"])
     word: Optional[str] = Field(
         default=None, min_length=2, max_length=100, examples=["hello"]
     )

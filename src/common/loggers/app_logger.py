@@ -63,9 +63,7 @@ class AppLogger(Logger):
             catch=True,
         )
 
-    def _format_context(
-        self, file: str, method: str | None = None
-    ) -> dict[str, str]:
+    def _format_context(self, file: str, method: str | None = None) -> dict[str, str]:
         return {
             "file": str(file),
             "method": str(method) if method else "App",

@@ -8,9 +8,7 @@ from common.constants import STATUS_MESSAGES
 
 class HTTPExceptionHandler:
     @staticmethod
-    async def handle_exception(
-        request: Request, exc: HTTPException
-    ) -> JSONResponse:
+    async def handle_exception(request: Request, exc: HTTPException) -> JSONResponse:
         file = HTTPExceptionHandler.__name__
 
         logger = AppLogger()
@@ -31,6 +29,4 @@ class HTTPExceptionHandler:
             method=HTTPExceptionHandler.handle_exception.__name__,
         )
 
-        return JSONResponse(
-            content=response.model_dump(), status_code=exc.status_code
-        )
+        return JSONResponse(content=response.model_dump(), status_code=exc.status_code)

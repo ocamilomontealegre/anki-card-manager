@@ -13,13 +13,10 @@ class FileRequest(BaseModel):
 class LanguageController:
     @inject
     def __init__(self) -> None:
-        self._router = APIRouter(
-            prefix=AppEndpoints.LANGUAGE.value, tags=["Languages"]
-        )
+        self._router = APIRouter(prefix=AppEndpoints.LANGUAGE.value, tags=["Languages"])
         self._register_routes()
 
     def _register_routes(self) -> None:
-
         @self._router.post("/process", response_model=TaskResponse)
         async def process(request: FileRequest):
             task = process_csv_task.delay(file_path=request.file_path)  # type: ignore

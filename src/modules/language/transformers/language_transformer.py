@@ -13,7 +13,6 @@ from ..models.interfaces.card_response_interface import CardResponse
 
 
 class LanguageTransformer:
-
     @inject
     def __init__(self, scraper_service: ScraperService, logger: Logger):
         self._file = LanguageTransformer.__name__
@@ -53,16 +52,22 @@ class LanguageTransformer:
         word_forms: list[str],
         type: Literal["simple", "compound"],
     ) -> str:
-        pattern = (
-            r"(^|\W)("
-            + "|".join(escape(w) for w in word_forms)
-            + r")(\W|$)"
-        )
+        pattern = r"(^|\W)(" + "|".join(escape(w) for w in word_forms) + r")(\W|$)"
 
         if type == "simple":
-            return sub(pattern, lambda m: f"{m.group(1)}{{...}}{m.group(3)}", text, flags=IGNORECASE)
+            return sub(
+                pattern,
+                lambda m: f"{m.group(1)}{{...}}{m.group(3)}",
+                text,
+                flags=IGNORECASE,
+            )
         else:
-            return sub(pattern, lambda m: f"{m.group(1)}[{m.group(2)}]{m.group(3)}", text, flags=IGNORECASE)
+            return sub(
+                pattern,
+                lambda m: f"{m.group(1)}[{m.group(2)}]{m.group(3)}",
+                text,
+                flags=IGNORECASE,
+            )
 
     async def to_entity(self, card_info: CardResponse):
         method = self.to_entity.__name__
@@ -110,9 +115,7 @@ class LanguageTransformer:
                 plural_audio_path = await GoogleUtils.synthetize_text(
                     text=plural,
                     language=language,
-                    output_file=Path(
-                        self._get_audio_path(word=word, prefix="plural")
-                    ),
+                    output_file=Path(self._get_audio_path(word=word, prefix="plural")),
                 )
 
             singular_audio_path = ""

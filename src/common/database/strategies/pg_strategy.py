@@ -9,7 +9,6 @@ from .database_strategy import DatabaseStrategy
 
 
 class PgStrategy(DatabaseStrategy):
-
     @inject
     def __init__(self, logger: Logger):
         self._file = PgStrategy.__name__
@@ -40,9 +39,7 @@ class PgStrategy(DatabaseStrategy):
             )
             raise
         except Exception as e:
-            self._logger.error(
-                f"Unknown error: {e}", file=self._file, method=method
-            )
+            self._logger.error(f"Unknown error: {e}", file=self._file, method=method)
             raise RuntimeError(
                 "Failed to create a database engine due to an unknown error."
             )
@@ -62,9 +59,7 @@ class PgStrategy(DatabaseStrategy):
             )
             raise
         except Exception as e:
-            self._logger.error(
-                f"Unknown error: {e}", file=self._file, method=method
-            )
+            self._logger.error(f"Unknown error: {e}", file=self._file, method=method)
             raise RuntimeError(
                 "Failed to create a database session due to an unknown error."
             )
@@ -91,6 +86,4 @@ class PgStrategy(DatabaseStrategy):
             )
             raise
         except Exception as e:
-            self._logger.error(
-                f"Unknown error: {e}", file=self._file, method=method
-            )
+            self._logger.error(f"Unknown error: {e}", file=self._file, method=method)

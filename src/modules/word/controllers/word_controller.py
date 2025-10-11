@@ -18,7 +18,6 @@ class WordController:
         self._register_routes()
 
     def _register_routes(self):
-
         @self._router.get("", response_model=ListPaginated)
         async def list_paginated(params: FindAllParams = Depends()):
             (words, size) = self._word_service.list_paginated(params)

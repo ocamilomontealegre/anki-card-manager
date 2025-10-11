@@ -13,7 +13,6 @@ class TaskController:
         self._register_routes()
 
     def _register_routes(self):
-
         @self._router.get("/{id}", response_model=TaskDto)
         async def get_task_by_id(id: str):
             return self._task_service.get_task_by_id(id)

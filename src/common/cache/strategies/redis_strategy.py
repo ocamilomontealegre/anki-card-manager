@@ -9,7 +9,6 @@ from .cache_strategy import CacheStrategy
 
 
 class RedisStrategy(CacheStrategy):
-
     @inject
     def __init__(self, logger: Logger):
         self._file = RedisStrategy.__name__

@@ -72,9 +72,7 @@ class AnkiService:
                         method=method,
                     )
 
-                    response = await client.post(
-                        self._anki_env.connect, json=payload
-                    )
+                    response = await client.post(self._anki_env.connect, json=payload)
                     response.raise_for_status()
                     data = response.json()
 

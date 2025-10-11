@@ -15,9 +15,7 @@ logger = AppLogger()
 
 
 class EnvConfig(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=".env", env_nested_delimiter="_"
-    )
+    model_config = SettingsConfigDict(env_file=".env", env_nested_delimiter="_")
 
     actions: ActionsEnvVariables
     anki: AnkiEnvVariables

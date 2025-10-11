@@ -8,9 +8,7 @@ class ScraperController:
     @inject
     def __init__(self, scraper_service: ScraperService) -> None:
         self._scraper_service = scraper_service
-        self._router = APIRouter(
-            prefix=AppEndpoints.SCRAPER.value, tags=["Scraper"]
-        )
+        self._router = APIRouter(prefix=AppEndpoints.SCRAPER.value, tags=["Scraper"])
         self._register_routes()
 
     def _register_routes(self):

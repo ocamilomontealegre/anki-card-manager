@@ -5,16 +5,10 @@ from common.env.env_config import EnvVariables
 class CeleryMq:
     def __init__(self):
         self._env = EnvVariables.get().redis
-        self._broker = (
-            f"redis://{self._env.host}:{self._env.port}/{self._env.mq}"
-        )
-        self._backend = (
-            f"redis://{self._env.host}:{self._env.port}/{self._env.mq}"
-        )
+        self._broker = f"redis://{self._env.host}:{self._env.port}/{self._env.mq}"
+        self._backend = f"redis://{self._env.host}:{self._env.port}/{self._env.mq}"
 
-        self._app = Celery(
-            main="app", broker=self._broker, backend=self._backend
-        )
+        self._app = Celery(main="app", broker=self._broker, backend=self._backend)
 
         self._config()
 

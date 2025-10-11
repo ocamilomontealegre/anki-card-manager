@@ -27,9 +27,7 @@ class Word(Base):
     updated_at = Column(DateTime, default=func.now())
 
     def __repr__(self):
-        return (
-            f"<Word(id={self.id}, word={self.word}), category={self.category}>"
-        )
+        return f"<Word(id={self.id}, word={self.word}), category={self.category}>"
 
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

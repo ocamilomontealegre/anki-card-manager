@@ -46,18 +46,14 @@ class WordTransformer:
         return WordSchema(
             id=word_dict.id,
             word=word_dict.word,
-            category=WordCategory(
-                word_dict.category.lower()
-            ).value.capitalize(),
+            category=WordCategory(word_dict.category.lower()).value.capitalize(),
             definition=word_dict.definition,
             sentence=word_dict.sentence,
             sentence_audio=self._format_audio_path(word_dict.sentence_audio),
             phonetics=f"/{word_dict.phonetics}/",
             partial_sentence=word_dict.partial_sentence,
             singular=word_dict.singular or "",
-            singular_audio=self._format_audio_path(
-                word_dict.singular_audio or ""
-            ),
+            singular_audio=self._format_audio_path(word_dict.singular_audio or ""),
             plural=word_dict.plural or "",
             plural_audio=self._format_audio_path(word_dict.plural_audio or ""),
             synonyms=word_dict.synonyms or "",
