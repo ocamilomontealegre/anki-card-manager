@@ -64,18 +64,44 @@ def card_info():
         # --- simple replacements ---
         ("The cat sleeps", ["cat"], "simple", "The {...} sleeps"),
         ("Cats are animals", ["cat", "cats"], "simple", "{...} are animals"),
-        ("A dog, a cat, and another cat!", ["cat"], "simple", "A dog, a {...}, and another {...}!"),
+        (
+            "A dog, a cat, and another cat!",
+            ["cat"],
+            "simple",
+            "A dog, a {...}, and another {...}!",
+        ),
         ("No match here", ["cat"], "simple", "No match here"),
-
+        (
+            "Il lavoro su questo progetto è davvero impegnativo",
+            ["impegnativo"],
+            "simple",
+            "Il lavoro su questo progetto è davvero {...}",
+        ),
         # --- compound replacements ---
         ("The cat sleeps", ["cat"], "compound", "The [cat] sleeps"),
         ("Cats are animals", ["cat", "cats"], "compound", "[Cats] are animals"),
-        ("A dog, a cat, and another cat!", ["cat"], "compound", "A dog, a [cat], and another [cat]!"),
-
+        (
+            "A dog, a cat, and another cat!",
+            ["cat"],
+            "compound",
+            "A dog, a [cat], and another [cat]!",
+        ),
         # --- edge cases ---
         ("", ["cat"], "simple", ""),  # empty text
         ("The catalog", ["cat"], "simple", "The catalog"),  # substring shouldn't match
-        ("Cat!", ["cat"], "compound", "[Cat]!"),  # capitalization should still match exactly (case sensitive)
+        (
+            "Cat!",
+            ["cat"],
+            "compound",
+            "[Cat]!",
+        ),  # capitalization should still match exactly (case sensitive)
+        # --- punctuation around words ---
+        ("The cat.", ["cat"], "simple", "The {...}."),
+        ("The (cat) sleeps", ["cat"], "compound", "The ([cat]) sleeps"),
+        ("A cat—really!", ["cat"], "simple", "A {...}—really!"),
+        # --- quotes ---
+        ('"cat" is here', ["cat"], "compound", '"[cat]" is here'),
+        ("'cat'", ["cat"], "simple", "'{...}'"),
     ],
 )
 def test_scape_word(transformer, text, word_forms, type_, expected):
