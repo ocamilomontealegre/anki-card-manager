@@ -77,6 +77,18 @@ def card_info():
             "simple",
             "Il lavoro su questo progetto è davvero {...}",
         ),
+        (
+            "Malgré l'accident, il est rentré chez lui sain et sauf",
+            ["Sain et sauf", ""],
+            "compound",
+            "Malgré l'accident, il est rentré chez lui [sain et sauf]",
+        ),
+        (
+            "Malgré l'accident, il est rentré chez lui sain et sauf",
+            ["sain et sauf"],
+            "simple",
+            "Malgré l'accident, il est rentré chez lui {...}",
+        ),
         # --- compound replacements ---
         ("The cat sleeps", ["cat"], "compound", "The [cat] sleeps"),
         ("Cats are animals", ["cat", "cats"], "compound", "[Cats] are animals"),
