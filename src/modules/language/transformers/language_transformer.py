@@ -1,14 +1,15 @@
 from pathlib import Path
-from re import escape, sub, IGNORECASE
+from re import IGNORECASE, escape, sub
 from typing import Literal
 
 from injector import inject
 
+from common.env.env_config import EnvVariables
 from common.loggers.models.abstracts.logger_abstract import Logger
 from common.utils import GoogleUtils
-from common.env.env_config import EnvVariables
 from modules.scraper.services.scraper_service import ScraperService
 from modules.word.models.entities.word_entity import Word
+
 from ..models.interfaces.card_response_interface import CardResponse
 
 
@@ -52,7 +53,9 @@ class LanguageTransformer:
         word_forms: list[str],
         type: Literal["simple", "compound"],
     ) -> str:
-        pattern = r"(^|\W)(" + "|".join(escape(w) for w in word_forms) + r")(\W|$)"
+        sorted_words = sorted(word_forms, key=len, reverse=True)
+
+        pattern = r"(^|\W)(" + "|".join(escape(w) for w in sorted_words) + r")(\W|$)"
 
         if type == "simple":
             return sub(
@@ -78,6 +81,13 @@ class LanguageTransformer:
             method=method,
         )
 
+        word_forms = [
+            w for w in (card_info.singular + card_info.plural) if w and w.strip()
+        ]
+
+        if not word_forms:
+            word_forms = [card_info.word]
+
         try:
             word = card_info.word
             language = card_info.language
@@ -87,18 +97,16 @@ class LanguageTransformer:
 
             sentence = self._scape_word(
                 card_info.sentence,
-                word_forms=card_info.singular + card_info.plural,
+                word_forms=word_forms,
                 type="compound",
             )
             partial_sentence = self._scape_word(
                 card_info.sentence,
-                word_forms=card_info.singular + card_info.plural,
+                word_forms=word_forms,
                 type="simple",
             )
 
-            word_forms = self._capitalize_text_array(
-                card_info.singular + card_info.plural
-            )
+            word_forms = self._capitalize_text_array(word_forms)
 
             # images = self._scraper_service.get_image_url(
             #     {"query": word, "source": "google"}

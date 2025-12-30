@@ -1,18 +1,19 @@
 from pathlib import Path
 from typing import cast
+
 from injector import inject
-
-from pandas import read_csv
 from openai import OpenAI
+from pandas import read_csv
 
-from common.loggers.models.abstracts.logger_abstract import Logger
-from common.utils import FileUtils
-from common.env.env_config import EnvVariables
 from common.cache.strategies.cache_strategy import CacheStrategy
 from common.enums import Language
+from common.env.env_config import EnvVariables
+from common.loggers.models.abstracts.logger_abstract import Logger
+from common.utils import FileUtils
 from modules.word.services.word_service import WordService
-from ..transformers.language_transformer import LanguageTransformer
+
 from ..models.interfaces import CardResponse, Row
+from ..transformers.language_transformer import LanguageTransformer
 
 
 class LanguageService:
