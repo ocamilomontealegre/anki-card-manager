@@ -24,13 +24,17 @@ class CardResponse(BaseModel):
     )
     plural: list[str] = Field(
         default_factory=list,
-        description="A list of plural forms of the word, if applicable, including both feminine and masculine forms. Leave empty if not relevant.",
+        description=(
+            "A list of plural forms of the word, if applicable, including both feminine and masculine forms. Leave empty if not relevant."
+            "If the word is in german include the all the forms form the nominative, accusative, dative, and genitive cases in that order"
+        ),
     )
     singular: list[str] = Field(
         default_factory=list,
         description=(
             "A list of singular forms of the word, if applicable, including both feminine and masculine forms. Leave empty if not relevant."
-            "If the word is a verb, add the forms following this pattern 'infinitive', 'present', 'present third person', 'past tense', 'past participle', 'ing form'"
+            "If the word is a verb and it's in english, add the forms following this pattern 'infinitive', 'present', 'present third person', 'past tense', 'past participle', 'ing form'"
+            "If the word is in german include the all the forms form the nominative, accusative, dative, and genitive cases in that order"
         ),
     )
     synonyms: list[str] = Field(
