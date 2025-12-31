@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
+
 from common.enums import Language
+
 from ..enums import WordCategory
 
 
@@ -40,6 +42,7 @@ class CardResponse(BaseModel):
         description=(
             "An example sentence using the exact word in context"
             "Do not include any other word forms in the sentence, it has to be the exact one"
+            "If the word is in german always include the article"
         ),
     )
     sentence_phonetics: str = Field(
