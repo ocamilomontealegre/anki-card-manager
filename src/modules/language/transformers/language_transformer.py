@@ -142,7 +142,9 @@ class LanguageTransformer:
                 category=card_info.category.value.capitalize(),
                 definition=card_info.definition.capitalize(),
                 sentence=sentence,
-                phonetics=card_info.sentence_phonetics,
+                phonetics=card_info.sentence_phonetics.replace("[", "").replace(
+                    "]", ""
+                ),
                 sentence_audio=sentence_path,
                 partial_sentence=partial_sentence,
                 singular=singular,

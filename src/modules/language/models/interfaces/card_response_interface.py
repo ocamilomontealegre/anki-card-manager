@@ -26,7 +26,6 @@ class CardResponse(BaseModel):
         default_factory=list,
         description=(
             "A list of plural forms of the word, if applicable, including both feminine and masculine forms. Leave empty if not relevant."
-            "If the word is in german include the all the forms form the nominative, accusative, dative, and genitive cases in that order"
         ),
     )
     singular: list[str] = Field(
@@ -34,7 +33,6 @@ class CardResponse(BaseModel):
         description=(
             "A list of singular forms of the word, if applicable, including both feminine and masculine forms. Leave empty if not relevant."
             "If the word is a verb and it's in english, add the forms following this pattern 'infinitive', 'present', 'present third person', 'past tense', 'past participle', 'ing form'"
-            "If the word is in german include the all the forms form the nominative, accusative, dative, and genitive cases in that order"
         ),
     )
     synonyms: list[str] = Field(
@@ -46,7 +44,7 @@ class CardResponse(BaseModel):
         description=(
             "An example sentence using the exact word in context"
             "Do not include any other word forms in the sentence, it has to be the exact one"
-            "If the word is in german always include the article"
+            "If the word is in german and is a noun always include the article"
         ),
     )
     sentence_phonetics: str = Field(
