@@ -2,52 +2,115 @@ from pydantic import BaseModel, Field
 
 from common.enums import Language
 
-from ..enums import WordCategory
+from ..enums import Usage, WordCategory
+
+
+class Forms(BaseModel):
+    singular_masculine: str
+    singular_feminine: str
+    plural_masculine: str
+    plural_feminine: str
 
 
 class CardResponse(BaseModel):
-    word: str = Field(..., description="The main word to define and explain")
+    word: str = Field(..., description="The main word to be defined and explained")
     language: Language = Field(
         ..., description="The language in which the word is used"
     )
     definition: str = Field(
         ...,
-        description=(
-            "A clear and concise definition of the word suitable for learners. "
-            "Do not include the word itself in the definition."
-            "Do not include any other word forms in the definition"
-        ),
+        description="""
+            Provide a clear, concise definition of the word suitable for learners.
+            Guidelines:
+            - Do not include the word itself.
+            - Do not include any other word forms.
+            - Example: For the word 'run', write 'to move swiftly on foot' instead of 'to run'.
+        """,
     )
     category: WordCategory = Field(
         ...,
         description="The grammatical or semantic category of the word, like noun or verb.",
     )
-    plural: list[str] = Field(
-        default_factory=list,
-        description=(
-            "A list of plural forms of the word, if applicable, including both feminine and masculine forms. Leave empty if not relevant."
-        ),
+    usage: Usage = Field(
+        ..., description="The context or style in which the word is typically used."
     )
-    singular: list[str] = Field(
-        default_factory=list,
-        description=(
-            "A list of singular forms of the word, if applicable, including both feminine and masculine forms. Leave empty if not relevant."
-            "If the word is an english verb, add the forms following this pattern 'infinitive', 'present', 'present third person', 'past tense', 'past participle', 'ing form'"
-        ),
+    etymology: str | None = Field(
+        None,
+        description="""
+            The origin and history of the word.
+            Guidelines:
+            - Explain where the word comes from (language, root words, historical usage).
+            - Keep it concise and learner-friendly.
+            - Avoid including unrelated definitions or examples.
+            Example: 'The word "scourge" comes from Old French "escorgier", meaning to whip.'
+        """,
+    )
+    frequency_rank: int | None = Field(
+        None,
+        description="""
+            A numerical ranking representing how common the word is in general usage.
+            Guidelines:
+            - Lower numbers indicate more frequent/common words (e.g., 1 is the most common).
+            - Higher numbers indicate rarer words.
+            - Optional: leave empty if no reliable frequency data is available.
+            Example: 'The word "the" might have frequency_rank 1, while "scourge" might have 15342.'
+        """,
+    )
+    forms: Forms | None = Field(
+        ...,
+        description="""
+            The grammatical forms of the word, grouped by number and gender.
+            Guidelines:
+            - Include singular and plural forms if applicable.
+            - Include masculine and feminine forms if applicable.
+            Example:
+                singular_masculine: 'ami'
+                singular_feminine: 'amie'
+                plural_masculine: 'amis'
+                plural_feminine: 'amies'
+        """,
+    )
+    conjugations: list[str] | None = Field(
+        None,
+        description="""
+            A list of the word's conjugated forms, typically for verbs.
+            Guidelines:
+            - If it is an English verb, include all relevant forms following this pattern infinitive, present, present third person, past tense, past participle, ing form
+            - If it is not an English verb, include just the infinitive form
+            - Optional: leave empty if the word is not a verb or has no conjugations.
+            Example: ['run', 'runs', 'ran', 'run', 'running']
+        """,
     )
     synonyms: list[str] = Field(
         default_factory=list,
-        description="A list of synonyms or words with similar meanings.",
+        description="""
+            A list of words that have a similar meaning to this word.
+            Guidelines:
+            - Include only words that can be used in a similar context.
+            - Optional: leave empty if no close synonyms exist.
+            Example: For 'happy', synonyms might be ['joyful', 'content', 'cheerful'].
+        """,
     )
     sentence: str = Field(
         ...,
-        description=(
-            "An example sentence using the exact word in context"
-            "Do not include any other word forms in the sentence, it has to be the exact one"
-            "If the word is in german and is a noun always include the article"
-        ),
+        description="""
+            A single example sentence showing how the word is used in context.
+            Guidelines:
+            - Use the word correctly in a simple, learner-friendly sentence.
+            - Do not include alternative forms of the word.
+            - Avoid idioms or overly complex sentences.
+            Example: For 'scourge': 'The disease was a scourge on the village.'
+        """,
     )
     sentence_phonetics: str = Field(
         ...,
-        description="The official IPA (International Phonetic Alphabet) transcription of the sentence",
+        description="""
+            The phonetic transcription of the example sentence in IPA (International Phonetic Alphabet).
+            Guidelines:
+            - Transcribe the sentence exactly as it appears in `sentence`.
+            - Use standard IPA symbols consistently throughout.
+            Example: 
+                Sentence: 'The disease was a scourge on the village.'
+                IPA: 'ðə dɪˈziːz wəz ə skɜːrdʒ ɒn ðə ˈvɪlɪdʒ'
+        """,
     )
