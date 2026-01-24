@@ -16,3 +16,6 @@ build/
 logs/
 uploads/
 protected/
+
+# Bug control
+bugs.md
