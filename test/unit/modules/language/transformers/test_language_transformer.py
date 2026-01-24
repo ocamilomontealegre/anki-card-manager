@@ -53,10 +53,11 @@ def card_info():
     return fake
 
 
-# def test_capitalize_text_array(transformer):
-#     assert transformer._capitalize_text_array([]) == ""
-#     assert transformer._capitalize_text_array(["dog"]) == "Dog"
-#     assert transformer._capitalize_text_array(["dog", "puppy"]) == "Dog, puppy"
+def test_capitalize_text_array(transformer):
+    assert transformer._capitalize_text_array([]) == ""
+    assert transformer._capitalize_text_array(["dog"]) == "Dog"
+    assert transformer._capitalize_text_array(["dog", "puppy"]) == "Dog, puppy"
+
 
 @pytest.mark.parametrize(
     "text,word_forms,type_,expected",
@@ -116,6 +117,6 @@ def card_info():
         ("'cat'", ["cat"], "simple", "'{...}'"),
     ],
 )
-def test_scape_word(transformer, text, word_forms, type_, expected):
-    result = transformer._scape_word(text, word_forms=word_forms, type=type_)
+def test_escape_word(transformer, text, word_forms, type_, expected):
+    result = transformer._escape_word(text, word_forms=word_forms, type=type_)
     assert result == expected
