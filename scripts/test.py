@@ -9,10 +9,11 @@ class TestScript(Script):
             args: list[str] = ["poetry", "run", "pytest", "test"]
             check_call(args)
         except CalledProcessError as e:
-            print(f"Text execution failed: {e}")
+            print(f"Test execution failed: {e}")
             exit(1)
         except Exception as e:
-            print(f"Unknow error: {e}")
+            print(f"Unknown error: {e}")
             exit(1)
+
 
 test_script = TestScript()
