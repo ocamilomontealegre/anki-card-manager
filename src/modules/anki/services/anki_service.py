@@ -6,7 +6,7 @@ from common.env.env_config import EnvVariables
 from common.maps import language_model_map, language_deck_map
 from common.enums import Language
 from modules.word.services.word_service import WordService
-from modules.word.models.inferfaces.find_all_params import FindAllParams
+from modules.word.models.interfaces.find_all_params import FindAllParams
 from modules.word.transformers.word_transformer import WordTransformer
 
 

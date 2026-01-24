@@ -32,7 +32,7 @@ class CardResponse(BaseModel):
         default_factory=list,
         description=(
             "A list of singular forms of the word, if applicable, including both feminine and masculine forms. Leave empty if not relevant."
-            "If the word is a verb and it's in english, add the forms following this pattern 'infinitive', 'present', 'present third person', 'past tense', 'past participle', 'ing form'"
+            "If the word is an english verb, add the forms following this pattern 'infinitive', 'present', 'present third person', 'past tense', 'past participle', 'ing form'"
         ),
     )
     synonyms: list[str] = Field(

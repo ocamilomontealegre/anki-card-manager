@@ -12,7 +12,7 @@ from common.database.strategies.database_strategy import DatabaseStrategy
 from common.loggers.models.abstracts.logger_abstract import Logger
 from common.env.env_config import EnvVariables
 from ..models.entities.word_entity import Word
-from ..models.inferfaces.find_all_params import FindAllParams
+from ..models.interfaces.find_all_params import FindAllParams
 from ..transformers.word_transformer import WordTransformer
 
 

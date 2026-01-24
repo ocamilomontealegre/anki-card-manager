@@ -2,7 +2,7 @@ from injector import inject
 from fastapi import APIRouter
 from common.enums import AppEndpoints, MqTaskStatus
 from common.models import TaskResponse
-from modules.word.models.inferfaces.find_all_params import FindAllParams
+from modules.word.models.interfaces.find_all_params import FindAllParams
 from ..tasks.anki_task import process_anki_cards
 
 

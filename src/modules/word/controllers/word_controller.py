@@ -2,7 +2,7 @@ from injector import inject
 from fastapi import APIRouter, Depends
 from common.enums import AppEndpoints
 from common.models import ListPaginated, DeleteMany
-from ..models.inferfaces.find_all_params import FindAllParams
+from ..models.interfaces.find_all_params import FindAllParams
 from ..services.word_service import WordService
 from ..transformers.word_transformer import WordTransformer
 

@@ -2,7 +2,7 @@ from typing import Any
 from asyncio import run
 from injector import Injector
 from common.mq.celery import celery_app
-from modules.word.models.inferfaces.find_all_params import FindAllParams
+from modules.word.models.interfaces.find_all_params import FindAllParams
 from ..services.anki_service import AnkiService
 
 

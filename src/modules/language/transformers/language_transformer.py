@@ -46,14 +46,18 @@ class LanguageTransformer:
         else:
             return f"{base_word[0].upper()}{base_word[1:]}"
 
-    def _scape_word(
+    def _escape_word(
         self,
         text: str,
         *,
         word_forms: list[str],
         type: Literal["simple", "compound"],
     ) -> str:
-        sorted_words = sorted(word_forms, key=len, reverse=True)
+        # Filter out empty strings to avoid regex issues
+        filtered_words = [w for w in word_forms if w and w.strip()]
+        if not filtered_words:
+            return text
+        sorted_words = sorted(filtered_words, key=len, reverse=True)
 
         pattern = r"(^|\W)(" + "|".join(escape(w) for w in sorted_words) + r")(\W|$)"
 
@@ -95,12 +99,12 @@ class LanguageTransformer:
             singular = self._capitalize_text_array(card_info.singular)
             synonyms = self._capitalize_text_array(card_info.synonyms)
 
-            sentence = self._scape_word(
+            sentence = self._escape_word(
                 card_info.sentence,
                 word_forms=word_forms,
                 type="compound",
             )
-            partial_sentence = self._scape_word(
+            partial_sentence = self._escape_word(
                 card_info.sentence,
                 word_forms=word_forms,
                 type="simple",
