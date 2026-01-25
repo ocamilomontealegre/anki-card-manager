@@ -1,11 +1,17 @@
+import sys
+from pathlib import Path
+
+# Add src directory to Python path for imports
+project_root = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(project_root / "src"))
+
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-
-from src.common.database.entities.base_entity import Base
+from common.database.entities.base_entity import Base
+from modules.word.models.entities.word_entity import Word  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
