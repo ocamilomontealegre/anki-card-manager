@@ -1,21 +1,17 @@
 from pydantic import BaseModel, Field
 
-from common.enums import Language
-
-from ..enums import Usage, WordCategory
-
-
-class Forms(BaseModel):
-    singular_masculine: str
-    singular_feminine: str
-    plural_masculine: str
-    plural_feminine: str
+from common.enums.language_enum import Language
+from common.enums.word_category_enum import WordCategory
+from modules.language.models.enums.usage_enum import Usage
+from modules.language.models.interfaces.card_response_interfaces.card_response_interface import (
+    Forms,
+)
 
 
-class CardResponse(BaseModel):
+class EnglishCardResponse(BaseModel):
     word: str = Field(..., description="The main word to be defined and explained")
     language: Language = Field(
-        ..., description="The language in which the word is used"
+        Language.ENGLISH, description="The language in which the word is used"
     )
     definition: str = Field(
         ...,
@@ -52,7 +48,6 @@ class CardResponse(BaseModel):
             Guidelines:
             - Lower numbers indicate more frequent/common words (e.g., 1 is the most common).
             - Higher numbers indicate rarer words.
-            - Optional: leave empty if no reliable frequency data is available.
             Example: 'The word "the" might have frequency_rank 1, while "scourge" might have 15342.'
         """,
     )
@@ -61,6 +56,7 @@ class CardResponse(BaseModel):
         description="""
             The grammatical forms of the word, grouped by number and gender.
             Guidelines:
+            - Just for nouns
             - Include singular and plural forms if applicable.
             - Include masculine and feminine forms if applicable.
             Example:
@@ -73,12 +69,12 @@ class CardResponse(BaseModel):
     conjugations: list[str] | None = Field(
         None,
         description="""
-            A list of the word's conjugated forms, typically for verbs.
+            A list of the verb conjugated forms in english
             Guidelines:
-            - If it is an English verb, include all relevant forms following this pattern infinitive, present, present third person, past tense, past participle, ing form
-            - If it is not an English verb, include just the infinitive form
+            - Just for english verbs
+            - Follow the pattern infinitive, present, present third person, past tense, past participle, ing form
             - Optional: leave empty if the word is not a verb or has no conjugations.
-            Example: ['run', 'runs', 'ran', 'run', 'running']
+            Example: ['to run', 'runs', 'ran', 'run', 'running']
         """,
     )
     synonyms: list[str] = Field(
@@ -94,7 +90,7 @@ class CardResponse(BaseModel):
     sentence: str = Field(
         ...,
         description="""
-            A single example sentence showing how the word is used in context.
+            A single example sentence showing how the word is used in context in the target language
             Guidelines:
             - Use the word correctly in a simple, learner-friendly sentence.
             - Do not include alternative forms of the word.

@@ -4,13 +4,17 @@ from typing import Literal
 
 from injector import inject
 
+from common.enums.language_enum import Language
+from common.enums.word_category_enum import WordCategory
 from common.env.env_config import EnvVariables
 from common.loggers.models.abstracts.logger_abstract import Logger
 from common.utils import GoogleUtils
 from modules.scraper.services.scraper_service import ScraperService
 from modules.word.models.entities.word_entity import Word
 
-from ..models.interfaces.card_response_interface import CardResponse
+from ..models.interfaces.card_response_interfaces.card_response_interface import (
+    CardResponseBase,
+)
 
 
 class LanguageTransformer:
@@ -41,6 +45,7 @@ class LanguageTransformer:
         return f"{self._env.anki.media}/{full_prefix}{word}.mp3"
 
     def _check_word_forms(self, base_word: str, word_forms: str | None) -> str:
+        self._logger.critical(word_forms or "", file="")
         if word_forms and word_forms != ", ":
             return word_forms[:-1] if word_forms[-1] == "," else word_forms
         else:
@@ -76,7 +81,27 @@ class LanguageTransformer:
                 flags=IGNORECASE,
             )
 
-    async def to_entity(self, card_info: CardResponse):
+    def __get_word_forms(self, card_info: CardResponseBase):
+        if (
+            card_info.category.value == WordCategory.VERB.value
+            and card_info.language.value == Language.ENGLISH.value
+            and card_info.conjugations
+        ):
+            return card_info.conjugations
+
+        if card_info.category.value == WordCategory.VERB.value:
+            return [card_info.word]
+
+        word_forms = [
+            w
+            for w in (
+                list(card_info.forms.model_dump().values() if card_info.forms else [])
+            )
+            if w and w.strip()
+        ]
+        return word_forms
+
+    async def to_entity(self, card_info: CardResponseBase):
         method = self.to_entity.__name__
 
         self._logger.debug(
@@ -85,9 +110,7 @@ class LanguageTransformer:
             method=method,
         )
 
-        word_forms = [
-            w for w in (card_info.singular + card_info.plural) if w and w.strip()
-        ]
+        word_forms = self.__get_word_forms(card_info)
 
         if not word_forms:
             word_forms = [card_info.word]
@@ -95,8 +118,22 @@ class LanguageTransformer:
         try:
             word = card_info.word
             language = card_info.language
-            plural = self._capitalize_text_array(card_info.plural)
-            singular = self._capitalize_text_array(card_info.singular)
+            singular = self._capitalize_text_array(
+                [
+                    card_info.forms.singular_masculine,
+                    card_info.forms.singular_feminine,
+                ]
+                if card_info.forms
+                else []
+            )
+            plural = self._capitalize_text_array(
+                [
+                    card_info.forms.plural_masculine,
+                    card_info.forms.plural_feminine,
+                ]
+                if card_info.forms
+                else []
+            )
             synonyms = self._capitalize_text_array(card_info.synonyms)
 
             sentence = self._escape_word(
@@ -144,6 +181,9 @@ class LanguageTransformer:
                 word=self._check_word_forms(word, word_forms),
                 language=language.value,
                 category=card_info.category.value.capitalize(),
+                usage=card_info.usage.value.capitalize(),
+                etymology=self._capitalize_text_array([card_info.etymology or ""]),
+                frequency_rank=card_info.frequency_rank,
                 definition=card_info.definition.capitalize(),
                 sentence=sentence,
                 phonetics=card_info.sentence_phonetics.replace("[", "").replace(
@@ -155,6 +195,7 @@ class LanguageTransformer:
                 singular_audio=singular_audio_path,
                 plural=plural,
                 plural_audio=plural_audio_path,
+                conjugations=self._capitalize_text_array(card_info.conjugations or []),
                 synonyms=synonyms,
                 image="",
                 image_2="",

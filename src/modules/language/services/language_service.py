@@ -10,9 +10,13 @@ from common.enums import Language
 from common.env.env_config import EnvVariables
 from common.loggers.models.abstracts.logger_abstract import Logger
 from common.utils import FileUtils
+from modules.language.maps.card_interface_map import card_interface_map
 from modules.word.services.word_service import WordService
 
-from ..models.interfaces import CardResponse, Row
+from ..models.interfaces import Row
+from ..models.interfaces.card_response_interfaces.card_response_interface import (
+    CardResponseBase,
+)
 from ..transformers.language_transformer import LanguageTransformer
 
 
@@ -69,7 +73,7 @@ class LanguageService:
 
         return user_prompt
 
-    async def _process_row(self, row: Row) -> CardResponse | None:
+    async def _process_row(self, row: Row) -> CardResponseBase | None:
         method = self._process_row.__name__
 
         word = row["word"]
@@ -101,7 +105,7 @@ class LanguageService:
                     },
                     {"role": "user", "content": self._build_promp(row)},
                 ],
-                response_format=CardResponse,
+                response_format=card_interface_map[str(language)],
             )
             data = completion.choices[0].message.parsed
             await self._cache_strategy.write(key=word, value=word)
