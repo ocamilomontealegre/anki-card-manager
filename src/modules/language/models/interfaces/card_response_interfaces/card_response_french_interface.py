@@ -90,6 +90,14 @@ class FrenchCardResponse(BaseModel):
             Example: For 'scourge': 'The disease was a scourge on the village.'
         """,
     )
+    partial_sentence: str = Field(
+        ...,
+        description="""
+            The same sentence but with some transformations
+            Guidelines:
+            - Replace the target word fo {...}
+        """,
+    )
     sentence_phonetics: str = Field(
         ...,
         description="""
@@ -100,5 +108,11 @@ class FrenchCardResponse(BaseModel):
             Example: 
                 Sentence: 'The disease was a scourge on the village.'
                 IPA: 'ðə dɪˈziːz wəz ə skɜːrdʒ ɒn ðə ˈvɪlɪdʒ'
+        """,
+    )
+    image: str = Field(
+        ...,
+        description="""
+            An image link related to the sentence and the target word
         """,
     )

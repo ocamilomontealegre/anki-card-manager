@@ -1,7 +1,12 @@
+from typing import cast
 from unittest.mock import MagicMock
 
 import pytest
 
+from modules.language.models.interfaces.card_response_interfaces.card_response_interface import (
+    CardResponseBase,
+    Forms,
+)
 from src.modules.language.transformers.language_transformer import LanguageTransformer
 
 
@@ -38,7 +43,7 @@ def transformer(mock_scraper, mock_logger, mock_env):
 
 
 @pytest.fixture
-def card_info():
+def card_info_en():
     """Fake CardResponse-like object."""
     fake = MagicMock()
     fake.word = "cat"
@@ -51,6 +56,27 @@ def card_info():
     fake.plural = ["cats"]
     fake.synonyms = ["kitty"]
     return fake
+
+@pytest.fixture
+def card_info_fr():
+    fake = cast(CardResponseBase, MagicMock(spec=CardResponseBase))
+    fake.word = "confiance"
+    fake.language = MagicMock(value="fr")
+    fake.definition = "C'est un sentiment de sécurité ou de sûreté envers quelqu'un ou quelque chose, basé sur l'assurance en leurs capacités ou intentions."
+    fake.category = MagicMock(value="noun")
+    fake.usage = MagicMock(value="informal")
+    fake.etymology = "Vient du latin 'confidentia', qui signifie 'foi' ou 'assurance'. Ce mot est utilisé en français depuis le Moyen Âge pour exprimer une foi ou une certitude envers autrui."
+    fake.frequency_rank = 2543
+    fake.forms = Forms(
+        singular_masculine="",
+        singular_feminine="",
+        plural_masculine="",
+        plural_feminine="confiances",
+    )
+    fake.conjugations = []
+    fake.synonyms = []
+    fake.sentence = "Elle a confiance en ses compétences pour réussir."
+    fake.sentence_phonetics = "ɛl a kɔ̃fjɑ̃s ɑ̃ sɛ kɔ̃pɛtɑ̃s puʁ ʁesü"
 
 
 def test_capitalize_text_array(transformer):

@@ -1,13 +1,21 @@
-from injector import inject
 from fastapi import APIRouter
+from injector import inject
 from pydantic import BaseModel
+
 from src.common.enums import AppEndpoints, MqTaskStatus
 from src.common.models import TaskResponse
+
 from ..tasks.language_task import process_csv_task
 
 
 class FileRequest(BaseModel):
     file_path: str
+
+
+class CreateRequest(BaseModel):
+    word: str
+    language: str
+    category: str
 
 
 class LanguageController:

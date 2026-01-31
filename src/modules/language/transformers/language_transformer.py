@@ -28,14 +28,19 @@ class LanguageTransformer:
         self._env = EnvVariables.get()
 
     def _capitalize_text_array(self, text: list[str]) -> str:
+        self._logger.debug(f"{text}", file="")
         if len(text) == 0:
             return ""
 
-        first_word = text[0].capitalize()
-        if len(text) == 1:
+        valid_word_forms = [word for word in text if word != ""]
+        if len(valid_word_forms) == 0:
+            return ""
+
+        first_word = valid_word_forms[0].capitalize()
+        if len(valid_word_forms) == 1:
             return first_word
 
-        return ", ".join([first_word] + text[1:])
+        return ", ".join([first_word] + valid_word_forms[1:])
 
     def _get_audio_path(
         self, word: str, prefix: Literal["", "plural", "singular"] = ""
@@ -45,8 +50,7 @@ class LanguageTransformer:
         return f"{self._env.anki.media}/{full_prefix}{word}.mp3"
 
     def _check_word_forms(self, base_word: str, word_forms: str | None) -> str:
-        self._logger.critical(word_forms or "", file="")
-        if word_forms and word_forms != ", ":
+        if word_forms and word_forms != ", " and word_forms != "":
             return word_forms[:-1] if word_forms[-1] == "," else word_forms
         else:
             return f"{base_word[0].upper()}{base_word[1:]}"
@@ -59,7 +63,12 @@ class LanguageTransformer:
         type: Literal["simple", "compound"],
     ) -> str:
         # Filter out empty strings to avoid regex issues
-        filtered_words = [w for w in word_forms if w and w.strip()]
+        cleaned_word_forms = [
+            word[3:] if word.startswith("to ") else word for word in word_forms
+        ]
+
+        filtered_words = [w for w in cleaned_word_forms if w and w.strip()]
+        self._logger.debug(f"{filtered_words}", file="")
         if not filtered_words:
             return text
         sorted_words = sorted(filtered_words, key=len, reverse=True)
@@ -136,17 +145,6 @@ class LanguageTransformer:
             )
             synonyms = self._capitalize_text_array(card_info.synonyms)
 
-            sentence = self._escape_word(
-                card_info.sentence,
-                word_forms=word_forms,
-                type="compound",
-            )
-            partial_sentence = self._escape_word(
-                card_info.sentence,
-                word_forms=word_forms,
-                type="simple",
-            )
-
             word_forms = self._capitalize_text_array(word_forms)
 
             # images = self._scraper_service.get_image_url(
@@ -185,19 +183,19 @@ class LanguageTransformer:
                 etymology=self._capitalize_text_array([card_info.etymology or ""]),
                 frequency_rank=card_info.frequency_rank,
                 definition=card_info.definition.capitalize(),
-                sentence=sentence,
+                sentence=card_info.sentence,
                 phonetics=card_info.sentence_phonetics.replace("[", "").replace(
                     "]", ""
                 ),
                 sentence_audio=sentence_path,
-                partial_sentence=partial_sentence,
+                partial_sentence=card_info.partial_sentence or "random",
                 singular=singular,
                 singular_audio=singular_audio_path,
                 plural=plural,
                 plural_audio=plural_audio_path,
                 conjugations=self._capitalize_text_array(card_info.conjugations or []),
                 synonyms=synonyms,
-                image="",
+                image=card_info.image,
                 image_2="",
             )
             return new_word

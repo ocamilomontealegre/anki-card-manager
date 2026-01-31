@@ -84,10 +84,19 @@ class ItalianCardResponse(BaseModel):
         description="""
             A single example sentence showing how the word is used in context for the Italian Language
             Guidelines:
+            - Highlight the target word between []
             - Use the word correctly in a simple, learner-friendly sentence.
-            - Do not include alternative forms of the word.
+            - Use the exact provided word
             - Avoid idioms or overly complex sentences.
             Example: For 'scourge': 'The disease was a scourge on the village.'
+        """,
+    )
+    partial_sentence: str = Field(
+        ...,
+        description="""
+            The same sentence but with some transformations
+            Guidelines:
+            - Replace the target word for {...}
         """,
     )
     sentence_phonetics: str = Field(
@@ -101,4 +110,7 @@ class ItalianCardResponse(BaseModel):
                 Sentence: 'The disease was a scourge on the village.'
                 IPA: 'ðə dɪˈziːz wəz ə skɜːrdʒ ɒn ðə ˈvɪlɪdʒ'
         """,
+    )
+    image: str = Field(
+        ..., description="An image link related to the sentence and the target word"
     )

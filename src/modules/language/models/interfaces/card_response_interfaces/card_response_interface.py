@@ -28,7 +28,9 @@ class CardResponseBase(BaseModel):
     etymology: str | None
     frequency_rank: int | None
     forms: Forms | None
-    conjugations: list[str]
+    conjugations: list[str] | None
     synonyms: list[str]
     sentence: str
+    partial_sentence: str
     sentence_phonetics: str
+    image: str
