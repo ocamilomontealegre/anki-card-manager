@@ -1,15 +1,16 @@
 from pydantic import ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from src.common.loggers.app_logger import AppLogger
-from src.common.env.app_env_config import AppEnvVariables
+
+from common.env.ai_env_config import AIEnvVariables
+from src.common.env.actions_env_config import ActionsEnvVariables
 from src.common.env.anki_env_config import AnkiEnvVariables
+from src.common.env.app_env_config import AppEnvVariables
+from src.common.env.debuggy_env_config import DebuggyEnvVariables
 from src.common.env.google_env_config import GoogleEnvVariables
-from src.common.env.open_ai_env_config import OpenAIEnvVariables
 from src.common.env.open_api_env_config import OpenAPIEnvVariables
 from src.common.env.pg_env_config import PgEnvVariables
 from src.common.env.redis_env_config import RedisEnvVariables
-from src.common.env.debuggy_env_config import DebuggyEnvVariables
-from src.common.env.actions_env_config import ActionsEnvVariables
+from src.common.loggers.app_logger import AppLogger
 
 logger = AppLogger()
 
@@ -22,7 +23,7 @@ class EnvConfig(BaseSettings):
     app: AppEnvVariables
     debuggy: DebuggyEnvVariables
     google: GoogleEnvVariables
-    openai: OpenAIEnvVariables
+    ai: AIEnvVariables
     openapi: OpenAPIEnvVariables
     pg: PgEnvVariables
     redis: RedisEnvVariables
