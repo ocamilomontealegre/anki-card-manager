@@ -62,13 +62,11 @@ class LanguageTransformer:
         word_forms: list[str],
         type: Literal["simple", "compound"],
     ) -> str:
-        # Filter out empty strings to avoid regex issues
         cleaned_word_forms = [
             word[3:] if word.startswith("to ") else word for word in word_forms
         ]
 
         filtered_words = [w for w in cleaned_word_forms if w and w.strip()]
-        self._logger.debug(f"{filtered_words}", file="")
         if not filtered_words:
             return text
         sorted_words = sorted(filtered_words, key=len, reverse=True)
@@ -195,7 +193,7 @@ class LanguageTransformer:
                 plural_audio=plural_audio_path,
                 conjugations=self._capitalize_text_array(card_info.conjugations or []),
                 synonyms=synonyms,
-                image=card_info.image,
+                image="",
                 image_2="",
             )
             return new_word

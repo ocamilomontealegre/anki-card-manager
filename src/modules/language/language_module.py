@@ -1,4 +1,5 @@
-from injector import Module, Binder, singleton
+from injector import Binder, Module, singleton
+
 from .controllers.language_controller import LanguageController
 from .services.language_service import LanguageService
 from .transformers.language_transformer import LanguageTransformer

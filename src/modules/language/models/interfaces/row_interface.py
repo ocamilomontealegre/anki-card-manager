@@ -1,5 +1,7 @@
 from typing import TypedDict
+
 from typing_extensions import NotRequired
+
 from ..enums import Language, WordCategory
 
 
