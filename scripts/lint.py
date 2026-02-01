@@ -1,9 +1,12 @@
-from subprocess import check_call
+from subprocess import CalledProcessError, check_call
+from sys import exit
 
 
 def lint() -> None:
-    """Run flake8 linter on the src directory"""
+    """Run ruff linter on the src directory"""
     try:
         check_call(["ruff", "check", "src/"])
-    except Exception as e:
-        print(f"Linting failed: {e}")
+        check_call(["pyright", "src/"])
+    except CalledProcessError:
+        print("Linting failed")
+        exit(1)
