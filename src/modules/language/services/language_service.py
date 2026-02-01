@@ -5,7 +5,6 @@ from injector import inject
 from openai import OpenAI
 from pandas import read_csv
 
-from common.cache.strategies.cache_strategy import CacheStrategy
 from common.enums import Language
 from common.env.env_config import EnvVariables
 from common.lib.ai_client.ai_client_adapter import AiClientAdapter
@@ -28,7 +27,6 @@ class LanguageService:
         word_service: WordService,
         ai_client_adapter: AiClientAdapter,
         language_transformer: LanguageTransformer,
-        cache_strategy: CacheStrategy,
         logger: Logger,
     ) -> None:
         self._file = LanguageService.__name__
@@ -40,7 +38,6 @@ class LanguageService:
         self._word_service = word_service
         self.__ai_client_adapter = ai_client_adapter
         self._language_transformer = language_transformer
-        self._cache_strategy = cache_strategy
 
         self._ai_client = OpenAI(api_key=self._env.ai.key)
 
@@ -83,20 +80,11 @@ class LanguageService:
         language = row["language"]
 
         try:
-            if await self._cache_strategy.read(key=word):
-                self._logger.debug(
-                    f"Word data already in the cache: {word}",
-                    file=self._file,
-                    method=method,
-                )
-                return
-
             self._logger.debug(
                 f"Fetching data for word[{word}] with language[{language}]",
                 file=self._file,
                 method=method,
             )
-            await self._cache_strategy.write(key=word, value=word)
             return self.__ai_client_adapter.get_structured_response(
                 prompt=self._build_prompt(row),
                 response_interface=card_interface_map[str(language)],

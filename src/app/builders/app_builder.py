@@ -1,34 +1,31 @@
-from typing import TypedDict
 from contextlib import asynccontextmanager
+from typing import TypedDict
 
-from injector import Injector
 from fastapi import FastAPI, HTTPException
+from injector import Injector
 
 from app.app_module import AppModule
 from app.routers.app_router import AppRouter
 from common.database.strategies.database_strategy import DatabaseStrategy
-from common.cache.strategies.cache_strategy import CacheStrategy
-from common.interceptors import HTTPInterceptor
-from common.loggers.app_logger import AppLogger
+from common.env.env_config import EnvVariables
 from common.exception_handlers import (
     GeneralExceptionHandler,
     HTTPExceptionHandler,
 )
-from common.env.env_config import EnvVariables
+from common.interceptors import HTTPInterceptor
+from common.loggers.app_logger import AppLogger
 
 file = "AppBuilder"
 
 
 class LifespanDependencies(TypedDict):
     db: DatabaseStrategy
-    cache: CacheStrategy
 
 
 def create_lifespan(deps: LifespanDependencies):
     logger = AppLogger()
 
     db = deps["db"]
-    cache = deps["cache"]
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -42,8 +39,6 @@ def create_lifespan(deps: LifespanDependencies):
                 file=file,
                 method=method,
             )
-
-            await cache.connect()
         except Exception as e:
             logger.error(
                 f"Database connection failed: {e}",
@@ -62,8 +57,6 @@ def create_lifespan(deps: LifespanDependencies):
                 method=method,
             )
 
-        await cache.close_connection()
-
     return lifespan
 
 
@@ -72,8 +65,7 @@ class AppBuilder:
         self.__injector = Injector([AppModule])
         self.__env = EnvVariables.get()
         self.__db = self.__injector.get(DatabaseStrategy)
-        self.__cache = self.__injector.get(CacheStrategy)
-        self.__lifespan = create_lifespan({"db": self.__db, "cache": self.__cache})
+        self.__lifespan = create_lifespan({"db": self.__db})
 
         self.__app = FastAPI(lifespan=self.__lifespan)
         self.__router = AppRouter(self.__injector).get_router()
