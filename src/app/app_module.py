@@ -1,16 +1,18 @@
 from injector import Binder, Module, singleton
 
-from health.health_module import HealthModule
 from common.cache.cache_module import CacheModule
 from common.database.database_module import DatabaseModule
-from common.loggers.models.abstracts.logger_abstract import Logger
+from common.lib.ai_client.ai_client_adapter import AiClientAdapter
+from common.lib.ai_client.google_ai_client_adapter import GoogleClientAdapter
 from common.loggers.app_logger import AppLogger
-from modules.upload.upload_module import UploadModule
-from modules.language.language_module import LanguageModule
-from modules.word.word_module import WordModule
-from modules.scraper.scraper_module import ScraperModule
+from common.loggers.models.abstracts.logger_abstract import Logger
+from health.health_module import HealthModule
 from modules.anki.anki_module import AnkiModule
+from modules.language.language_module import LanguageModule
+from modules.scraper.scraper_module import ScraperModule
 from modules.task.task_module import TaskModule
+from modules.upload.upload_module import UploadModule
+from modules.word.word_module import WordModule
 
 
 class AppModule(Module):
@@ -26,3 +28,4 @@ class AppModule(Module):
         binder.install(module=TaskModule)
 
         binder.bind(Logger, to=AppLogger, scope=singleton)
+        binder.bind(AiClientAdapter, to=GoogleClientAdapter, scope=singleton)

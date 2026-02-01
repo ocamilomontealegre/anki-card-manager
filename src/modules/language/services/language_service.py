@@ -8,6 +8,7 @@ from pandas import read_csv
 from common.cache.strategies.cache_strategy import CacheStrategy
 from common.enums import Language
 from common.env.env_config import EnvVariables
+from common.lib.ai_client.ai_client_adapter import AiClientAdapter
 from common.loggers.models.abstracts.logger_abstract import Logger
 from common.utils import FileUtils
 from modules.language.maps.card_interface_map import card_interface_map
@@ -25,6 +26,7 @@ class LanguageService:
     def __init__(
         self,
         word_service: WordService,
+        ai_client_adapter: AiClientAdapter,
         language_transformer: LanguageTransformer,
         cache_strategy: CacheStrategy,
         logger: Logger,
@@ -36,12 +38,13 @@ class LanguageService:
         self._logger = logger
 
         self._word_service = word_service
+        self.__ai_client_adapter = ai_client_adapter
         self._language_transformer = language_transformer
         self._cache_strategy = cache_strategy
 
-        self._open_ai_client = OpenAI(api_key=self._env.openai.key)
+        self._ai_client = OpenAI(api_key=self._env.ai.key)
 
-    def _build_promp(self, row: Row) -> str:
+    def _build_prompt(self, row: Row) -> str:
         word = row["word"]
         language = row["language"]
         category = row.get("category") or "general"
@@ -93,23 +96,11 @@ class LanguageService:
                 file=self._file,
                 method=method,
             )
-            completion = self._open_ai_client.beta.chat.completions.parse(
-                model=self._env.openai.model,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": (
-                            "You are a polyglot linguist with over 10 years of experience in semantics, lexicography, and language education. "
-                            "You specialize in identifying the most common and natural usages of words across different languages, providing accurate and culturally aware definitions and examples."
-                        ),
-                    },
-                    {"role": "user", "content": self._build_promp(row)},
-                ],
-                response_format=card_interface_map[str(language)],
-            )
-            data = completion.choices[0].message.parsed
             await self._cache_strategy.write(key=word, value=word)
-            return data
+            return self.__ai_client_adapter.get_structured_response(
+                prompt=self._build_prompt(row),
+                response_interface=card_interface_map[str(language)],
+            )
         except Exception as e:
             self._logger.error(
                 f"Error processing row: {row}, Error: {e}",
