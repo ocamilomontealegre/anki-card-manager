@@ -28,7 +28,6 @@ class LanguageTransformer:
         self._env = EnvVariables.get()
 
     def _capitalize_text_array(self, text: list[str]) -> str:
-        self._logger.debug(f"{text}", file="")
         if len(text) == 0:
             return ""
 
@@ -43,7 +42,7 @@ class LanguageTransformer:
         return ", ".join([first_word] + valid_word_forms[1:])
 
     def _get_audio_path(
-        self, word: str, prefix: Literal["", "plural", "singular"] = ""
+        self, word: str, prefix: Literal["", "plural", "singular", "conjugations"] = ""
     ) -> str:
         full_prefix = f"{prefix}_" if prefix else ""
 
@@ -141,7 +140,9 @@ class LanguageTransformer:
                 if card_info.forms
                 else []
             )
-            synonyms = self._capitalize_text_array(card_info.synonyms)
+
+            conjugations = self._capitalize_text_array(card_info.conjugations or [])
+            self._logger.debug(f"{conjugations}", file="LANGUAGE_TRANSFORMER")
 
             word_forms = self._capitalize_text_array(word_forms)
 
@@ -150,7 +151,7 @@ class LanguageTransformer:
             # )
 
             sentence_path = await GoogleUtils.synthetize_text(
-                text=card_info.sentence,
+                text=card_info.sentence.replace("[", "").replace("]", ""),
                 language=language,
                 output_file=Path(self._get_audio_path(word=word)),
             )
@@ -173,28 +174,36 @@ class LanguageTransformer:
                     ),
                 )
 
+            conjugations_audio_path = ""
+            if len(conjugations) > 0:
+                conjugations_audio_path = await GoogleUtils.synthetize_text(
+                    text=conjugations,
+                    language=language,
+                    output_file=Path(
+                        self._get_audio_path(word=word, prefix="conjugations")
+                    ),
+                )
+
             new_word = Word(
                 word=self._check_word_forms(word, word_forms),
                 language=language.value,
-                category=card_info.category.value.capitalize(),
-                usage=card_info.usage.value.capitalize(),
-                etymology=self._capitalize_text_array([card_info.etymology or ""]),
+                category=card_info.category.value,
+                usage=card_info.usage.value,
                 frequency_rank=card_info.frequency_rank,
-                definition=card_info.definition.capitalize(),
+                definition=card_info.definition.capitalize().rstrip(),
                 sentence=card_info.sentence,
-                phonetics=card_info.sentence_phonetics.replace("[", "").replace(
-                    "]", ""
-                ),
+                phonetics=card_info.sentence_phonetics.replace("[", "")
+                .replace("]", "")
+                .rstrip(),
                 sentence_audio=sentence_path,
-                partial_sentence=card_info.partial_sentence or "random",
+                partial_sentence=card_info.partial_sentence.rstrip(),
                 singular=singular,
                 singular_audio=singular_audio_path,
                 plural=plural,
                 plural_audio=plural_audio_path,
                 conjugations=self._capitalize_text_array(card_info.conjugations or []),
-                synonyms=synonyms,
+                conjugations_audio=conjugations_audio_path,
                 image="",
-                image_2="",
             )
             return new_word
         except Exception as e:

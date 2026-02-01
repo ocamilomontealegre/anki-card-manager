@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from sqlalchemy import Column, DateTime, Integer, String, Text
+from sqlalchemy import Column, DateTime, String, Text
 from sqlalchemy.sql import func
 
 from common.database.entities.base_entity import Base
@@ -14,8 +14,7 @@ class Word(Base):
     word = Column(Text, unique=False, nullable=False)
     category = Column(String(56), unique=False, nullable=False)
     usage = Column(String(56), unique=False, nullable=False)
-    etymology = Column(Text, unique=False, nullable=True)
-    frequency_rank = Column(Integer, unique=False, nullable=True)
+    frequency_rank = Column(String(56), unique=False, nullable=True)
     definition = Column(Text, unique=False, nullable=False)
     sentence = Column(String(256), unique=False, nullable=False)
     phonetics = Column(String(256), unique=False, nullable=False)
@@ -26,9 +25,8 @@ class Word(Base):
     plural = Column(String(256), unique=False, nullable=True)
     plural_audio = Column(String(256), unique=False, nullable=True)
     conjugations = Column(Text, unique=False, nullable=True)
-    synonyms = Column(String(256), unique=False, nullable=True)
+    conjugations_audio = Column(String(256), unique=False, nullable=True)
     image = Column(String(256), unique=False, nullable=True)
-    image_2 = Column(String(256), unique=False, nullable=True)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now())
 

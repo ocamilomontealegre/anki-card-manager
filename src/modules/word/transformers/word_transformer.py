@@ -1,32 +1,35 @@
-from os import path
-from typing import Optional
 from datetime import datetime
+from os import path
 
-from pydantic import BaseModel
 from injector import inject
+from pydantic import BaseModel
 
-from common.enums import WordCategory
+from common.enums import Language, Usage, WordCategory
+
 from ..models.entities.word_entity import Word
 
 
 class WordSchema(BaseModel):
     id: str
     word: str
+    language: str
     category: str
+    usage: str
+    frequency_rank: int | str
     definition: str
     sentence: str
     phonetics: str
     sentence_audio: str
     partial_sentence: str
-    singular: Optional[str] = None
-    singular_audio: Optional[str] = None
-    plural: Optional[str] = None
-    plural_audio: Optional[str] = None
-    synonyms: Optional[str] = None
+    singular: str | None = None
+    singular_audio: str | None = None
+    plural: str | None = None
+    plural_audio: str | None = None
+    conjugations: str | None = None
+    conjugations_audio: str | None = None
     image: str
-    image_2: Optional[str] = None
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
     model_config = {"from_attributes": True}
 
@@ -46,7 +49,10 @@ class WordTransformer:
         return WordSchema(
             id=word_dict.id,
             word=word_dict.word,
+            language=Language(word_dict.language).value.capitalize(),
             category=WordCategory(word_dict.category.lower()).value.capitalize(),
+            usage=Usage(word_dict.usage).value,
+            frequency_rank=str(word_dict.frequency_rank),
             definition=word_dict.definition,
             sentence=word_dict.sentence,
             sentence_audio=self._format_audio_path(word_dict.sentence_audio),
@@ -56,7 +62,9 @@ class WordTransformer:
             singular_audio=self._format_audio_path(word_dict.singular_audio or ""),
             plural=word_dict.plural or "",
             plural_audio=self._format_audio_path(word_dict.plural_audio or ""),
-            synonyms=word_dict.synonyms or "",
+            conjugations=word_dict.conjugations,
+            conjugations_audio=self._format_audio_path(
+                word_dict.conjugations_audio or ""
+            ),
             image=path.basename(word_dict.image),
-            image_2=path.basename(word_dict.image_2 or ""),
         )

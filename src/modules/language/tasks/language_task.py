@@ -1,6 +1,9 @@
 from asyncio import run
+
 from injector import Injector
+
 from common.mq.celery import celery_app
+
 from ..services.language_service import LanguageService
 
 
