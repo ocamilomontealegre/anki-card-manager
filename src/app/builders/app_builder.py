@@ -6,6 +6,7 @@ from injector import Injector
 
 from app.app_module import AppModule
 from app.routers.app_router import AppRouter
+from common.cache.strategies.cache_strategy import CacheStrategy
 from common.database.strategies.database_strategy import DatabaseStrategy
 from common.env.env_config import EnvVariables
 from common.exception_handlers import (
@@ -20,12 +21,14 @@ file = "AppBuilder"
 
 class LifespanDependencies(TypedDict):
     db: DatabaseStrategy
+    cache: CacheStrategy
 
 
 def create_lifespan(deps: LifespanDependencies):
     logger = AppLogger()
 
     db = deps["db"]
+    cache = deps["cache"]
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -39,6 +42,8 @@ def create_lifespan(deps: LifespanDependencies):
                 file=file,
                 method=method,
             )
+
+            await cache.connect()
         except Exception as e:
             logger.error(
                 f"Database connection failed: {e}",
@@ -57,6 +62,8 @@ def create_lifespan(deps: LifespanDependencies):
                 method=method,
             )
 
+        await cache.close_connection()
+
     return lifespan
 
 
@@ -65,7 +72,8 @@ class AppBuilder:
         self.__injector = Injector([AppModule])
         self.__env = EnvVariables.get()
         self.__db = self.__injector.get(DatabaseStrategy)
-        self.__lifespan = create_lifespan({"db": self.__db})
+        self.__cache = self.__injector.get(CacheStrategy)
+        self.__lifespan = create_lifespan({"db": self.__db, "cache": self.__cache})
 
         self.__app = FastAPI(lifespan=self.__lifespan)
         self.__router = AppRouter(self.__injector).get_router()

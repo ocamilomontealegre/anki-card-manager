@@ -2,7 +2,8 @@ from typing import TypedDict
 
 from typing_extensions import NotRequired
 
-from ..enums import Language, WordCategory
+from common.enums.language_enum import Language
+from common.enums.word_category_enum import WordCategory
 
 
 class Row(TypedDict):

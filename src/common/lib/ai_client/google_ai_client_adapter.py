@@ -4,7 +4,7 @@ from google import genai
 from pydantic import BaseModel
 
 from common.env.env_config import EnvVariables
-from common.lib.ai_client_adapter import AiClientAdapter
+from common.lib.ai_client.ai_client_adapter import AiClientAdapter
 
 T = TypeVar("T", bound=BaseModel)
 

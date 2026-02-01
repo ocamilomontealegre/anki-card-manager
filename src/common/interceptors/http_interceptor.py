@@ -1,16 +1,18 @@
+from collections.abc import AsyncIterable, Awaitable, Callable
 from json import loads
-from typing import Callable, Awaitable, AsyncIterable
-from starlette.types import ASGIApp
+
+from fastapi import HTTPException, Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse, Response
-from fastapi import Request, HTTPException
-from common.loggers.app_logger import AppLogger
-from common.models import HTTPResponse
-from common.utils import get_status_message
+from starlette.types import ASGIApp
+
 from common.exception_handlers import (
     GeneralExceptionHandler,
     HTTPExceptionHandler,
 )
+from common.loggers.app_logger import AppLogger
+from common.models import HTTPResponse
+from common.utils import get_status_message
 
 
 class HTTPInterceptor(BaseHTTPMiddleware):
@@ -47,7 +49,7 @@ class HTTPInterceptor(BaseHTTPMiddleware):
 
             if response.status_code < 400:
                 formated_response = await self._format_response(
-                    response.body_iterator,
+                    response.body_iterator,  # type: ignore
                     response.status_code,  # type: ignore
                 )
 

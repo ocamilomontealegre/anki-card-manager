@@ -3,7 +3,7 @@ from injector import Binder, Module, singleton
 from common.cache.cache_module import CacheModule
 from common.database.database_module import DatabaseModule
 from common.lib.ai_client.ai_client_adapter import AiClientAdapter
-from common.lib.ai_client.google_ai_client_adapter import GoogleClientAdapter
+from common.lib.ai_client.open_ai_client_adapter import OpenAiClientAdapter
 from common.loggers.app_logger import AppLogger
 from common.loggers.models.abstracts.logger_abstract import Logger
 from health.health_module import HealthModule
@@ -28,4 +28,4 @@ class AppModule(Module):
         binder.install(module=TaskModule)
 
         binder.bind(Logger, to=AppLogger, scope=singleton)
-        binder.bind(AiClientAdapter, to=GoogleClientAdapter, scope=singleton)
+        binder.bind(AiClientAdapter, to=OpenAiClientAdapter, scope=singleton)
