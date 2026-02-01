@@ -1,14 +1,15 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from common.enums.language_enum import Language
-from common.enums.word_category_enum import WordCategory
 from modules.language.models.enums.usage_enum import Usage
+from modules.language.models.enums.word_category_enum import WordCategory
 from modules.language.models.interfaces.card_response_interfaces.card_response_interface import (
+    CardResponseBase,
     Forms,
 )
 
 
-class ItalianCardResponse(BaseModel):
+class ItalianCardResponse(CardResponseBase):
     word: str = Field(..., description="The main word to be defined and explained")
     language: Language = Field(
         ..., description="The language in which the word is used"
@@ -110,7 +111,4 @@ class ItalianCardResponse(BaseModel):
                 Sentence: 'The disease was a scourge on the village.'
                 IPA: 'ðə dɪˈziːz wəz ə skɜːrdʒ ɒn ðə ˈvɪlɪdʒ'
         """,
-    )
-    image: str = Field(
-        ..., description="An image link related to the sentence and the target word"
     )

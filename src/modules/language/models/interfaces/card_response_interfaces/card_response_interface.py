@@ -6,18 +6,31 @@ from ...enums import Usage, WordCategory
 
 
 class Forms(BaseModel):
-    singular_masculine: str = Field(..., description="""
+    singular_masculine: str = Field(
+        ...,
+        description="""
         Singular masculine form of word, leave empty if none
-    """)
-    singular_feminine: str = Field(..., description="""
+    """,
+    )
+    singular_feminine: str = Field(
+        ...,
+        description="""
         Singular masculine form of word, leave empty if none
-    """)
-    plural_masculine: str = Field(..., description="""
+    """,
+    )
+    plural_masculine: str = Field(
+        ...,
+        description="""
         Singular masculine form of word, leave empty if none
-    """)
-    plural_feminine: str = Field(..., description="""
+    """,
+    )
+    plural_feminine: str = Field(
+        ...,
+        description="""
         Singular masculine form of word, leave empty if none
-    """)
+    """,
+    )
+
 
 class CardResponseBase(BaseModel):
     word: str
@@ -33,4 +46,3 @@ class CardResponseBase(BaseModel):
     sentence: str
     partial_sentence: str
     sentence_phonetics: str
-    image: str

@@ -1,4 +1,6 @@
-from typing import Any
+from modules.language.models.interfaces.card_response_interfaces.card_response_interface import (
+    CardResponseBase,
+)
 
 from ..models.enums import Language
 from ..models.interfaces import (
@@ -7,8 +9,10 @@ from ..models.interfaces import (
     ItalianCardResponse,
 )
 
-card_interface_map: dict[str, Any] = {
+card_interface_map: dict[str, type[CardResponseBase]] = {
     Language.ENGLISH.value: EnglishCardResponse,
     Language.FRENCH.value: FrenchCardResponse,
     Language.ITALIAN.value: ItalianCardResponse,
+    Language.GERMAN.value: EnglishCardResponse,
+    Language.PORTUGUESE.value: EnglishCardResponse,
 }

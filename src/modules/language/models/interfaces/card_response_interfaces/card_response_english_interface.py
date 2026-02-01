@@ -1,14 +1,15 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from common.enums.language_enum import Language
-from common.enums.word_category_enum import WordCategory
 from modules.language.models.enums.usage_enum import Usage
+from modules.language.models.enums.word_category_enum import WordCategory
 from modules.language.models.interfaces.card_response_interfaces.card_response_interface import (
+    CardResponseBase,
     Forms,
 )
 
 
-class EnglishCardResponse(BaseModel):
+class EnglishCardResponse(CardResponseBase):
     word: str = Field(..., description="The main word to be defined and explained")
     language: Language = Field(
         Language.ENGLISH, description="The language in which the word is used"
@@ -90,10 +91,11 @@ class EnglishCardResponse(BaseModel):
     sentence: str = Field(
         ...,
         description="""
-            A single example sentence showing how the word is used in context in the target language
+            A single example sentence showing how the word is used in context for the Italian Language
             Guidelines:
+            - Highlight the target word between []
             - Use the word correctly in a simple, learner-friendly sentence.
-            - Do not include alternative forms of the word.
+            - Use the exact provided word
             - Avoid idioms or overly complex sentences.
             Example: For 'scourge': 'The disease was a scourge on the village.'
         """,
@@ -116,11 +118,5 @@ class EnglishCardResponse(BaseModel):
             Example: 
                 Sentence: 'The disease was a scourge on the village.'
                 IPA: 'ðə dɪˈziːz wəz ə skɜːrdʒ ɒn ðə ˈvɪlɪdʒ'
-        """,
-    )
-    image: str = Field(
-        ...,
-        description="""
-            An image link related to the sentence and the target word
         """,
     )
