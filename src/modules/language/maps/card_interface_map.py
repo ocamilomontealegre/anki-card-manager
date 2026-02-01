@@ -1,8 +1,8 @@
+from common.enums.language_enum import Language
 from modules.language.models.interfaces.card_response_interfaces.card_response_interface import (
     CardResponseBase,
 )
 
-from ..models.enums import Language
 from ..models.interfaces import (
     EnglishCardResponse,
     FrenchCardResponse,
