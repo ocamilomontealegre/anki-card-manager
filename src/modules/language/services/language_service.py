@@ -61,16 +61,6 @@ class LanguageService:
                 "Use this to guide your definition and example. "
             )
 
-        user_prompt += (
-            "Provide:\n"
-            "- A clear, learner-friendly definition, it should not contain the word I'm searching for\n"
-            "- Plural and singular forms (if relevant)\n"
-            "- A list of common synonyms\n"
-            "- A natural example sentence using the word\n"
-            "- The IPA transcription of that sentence\n"
-            "Add subtle usage or cultural notes if they help clarify the meaning or usage."
-        )
-
         return user_prompt
 
     async def _process_row(self, row: Row) -> CardResponseBase | None:

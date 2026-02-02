@@ -194,6 +194,7 @@ class LanguageTransformer:
                 sentence=card_info.sentence,
                 phonetics=card_info.sentence_phonetics.replace("[", "")
                 .replace("]", "")
+                .replace("/", "")
                 .rstrip(),
                 sentence_audio=sentence_path,
                 partial_sentence=card_info.partial_sentence.rstrip(),
