@@ -1,15 +1,16 @@
 from pathlib import Path
+
 from aiofiles import open
-from google.cloud import texttospeech
-from google.oauth2 import service_account
 from google.api_core.exceptions import GoogleAPIError
 from google.auth.exceptions import DefaultCredentialsError
+from google.cloud import texttospeech
+from google.oauth2 import service_account
 
-from src.common.loggers.app_logger import AppLogger
 from src.common.enums import Language
+from src.common.loggers.app_logger import AppLogger
+
 from ..env.env_config import EnvVariables
 from ..maps import language_voice_map
-
 
 logger = AppLogger()
 

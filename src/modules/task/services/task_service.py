@@ -1,5 +1,7 @@
 from celery.result import AsyncResult
+
 from common.mq.celery import celery_app
+
 from ..models.dto.task_dto import TaskDto
 
 

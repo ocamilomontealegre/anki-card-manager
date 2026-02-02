@@ -1,8 +1,10 @@
-from injector import inject
 from fastapi import APIRouter
+from injector import inject
+
 from common.enums import AppEndpoints
-from ..services.task_service import TaskService
+
 from ..models.dto.task_dto import TaskDto
+from ..services.task_service import TaskService
 
 
 class TaskController:
