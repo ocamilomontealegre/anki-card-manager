@@ -50,8 +50,8 @@ class CardResponseBase(BaseModel):
     usage: Usage = Field(
         ..., description="The context or style in which the word is typically used."
     )
-    frequency_rank: str | None = Field(
-        None,
+    frequency_rank: str = Field(
+        ...,
         description="""
             A numerical ranking representing how common the word is in general usage.
             Guidelines:
@@ -89,8 +89,5 @@ class CardResponseBase(BaseModel):
             Guidelines:
             - Transcribe the sentence exactly as it appears in `sentence`.
             - Use standard IPA symbols consistently throughout.
-            Example: 
-                Sentence: 'The disease was a scourge on the village.'
-                IPA: 'ðə dɪˈziːz wəz ə skɜːrdʒ ɒn ðə ˈvɪlɪdʒ'
         """,
     )
