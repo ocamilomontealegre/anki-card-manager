@@ -7,20 +7,30 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
     env_file:
-      - .env
+      - ../.env
     volumes:
-      - ../:/app
+      - ../src:/app/src
     working_dir: /app
-    command: poetry run start
+    depends_on:
+      - redis
   
   worker:
     build:
       context: ..
       dockerfile: Dockerfile
-    command: poetry run mq
+    command: celery -A common.mq.celery worker --loglevel=info
     volumes:
-      - ../:/app
+      - ../src:/app/src
     working_dir: /app
     env_file:
-      - .env
+      - ../.env
+    depends_on:
+      - redis
+
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
