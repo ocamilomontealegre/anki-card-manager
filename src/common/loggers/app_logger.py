@@ -5,6 +5,7 @@ from typing import Literal
 from loguru import logger
 
 from src.common.decorators.singleton_decorator import singleton
+
 from .models.abstracts.logger_abstract import Logger
 from .models.enums.ansi_colors_enum import ANSIColors
 
@@ -63,9 +64,11 @@ class AppLogger(Logger):
             catch=True,
         )
 
-    def _format_context(self, file: str, method: str | None = None) -> dict[str, str]:
+    def _format_context(
+        self, file: str | None = None, method: str | None = None
+    ) -> dict[str, str]:
         return {
-            "file": str(file),
+            "file": str(file) if file else "Unknown",
             "method": str(method) if method else "App",
         }
 
