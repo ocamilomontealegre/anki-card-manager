@@ -14,7 +14,13 @@ class GoogleClientAdapter(AiClientAdapter):
         self.__env = EnvVariables().get()
         self.__ai_client = genai.Client(api_key=self.__env.ai.key)
 
-    def get_structured_response(self, *, prompt: str, response_interface: type[T]) -> T:
+    def get_structured_response(
+        self, *, messages: list[dict[str, str]], response_interface: type[T]
+    ) -> T:
+        prompt = "\n".join(
+            f"{message['role'].upper()}: {message['content']}" for message in messages
+        )
+
         response = self.__ai_client.models.generate_content(
             model=self.__env.ai.model,
             contents=prompt,

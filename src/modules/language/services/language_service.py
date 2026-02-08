@@ -41,7 +41,7 @@ class LanguageService:
 
         self._ai_client = OpenAI(api_key=self._env.ai.key)
 
-    def _build_prompt(self, row: Row) -> str:
+    def _build_prompt_messages(self, row: Row) -> list[dict[str, str]]:
         word = row["word"]
         language = row["language"]
         category = row.get("category") or "general"
@@ -61,7 +61,16 @@ class LanguageService:
                 "Use this to guide your definition and example. "
             )
 
-        return user_prompt
+        return [
+            {
+                "role": "system",
+                "content": (
+                    "You are a polyglot linguist with over 10 years of experience in semantics, lexicography, and language education. "
+                    "You specialize in identifying the most common and natural usages of words across different languages, providing accurate and culturally aware definitions and examples."
+                ),
+            },
+            {"role": "user", "content": user_prompt},
+        ]
 
     async def _process_row(self, row: Row) -> CardResponseBase | None:
         method = self._process_row.__name__
@@ -76,7 +85,7 @@ class LanguageService:
                 method=method,
             )
             return self.__ai_client_adapter.get_structured_response(
-                prompt=self._build_prompt(row),
+                messages=self._build_prompt_messages(row),
                 response_interface=card_interface_map[str(language)],
             )
         except Exception as e:
