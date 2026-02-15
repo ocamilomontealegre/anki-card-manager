@@ -1,4 +1,5 @@
 from injector import Binder, Module, singleton
+
 from .controllers.upload_controller import UploadController
 from .services.upload_service import UploadService
 
