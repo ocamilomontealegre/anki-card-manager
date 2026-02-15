@@ -5,27 +5,29 @@ from google.api_core.exceptions import GoogleAPIError
 from google.auth.exceptions import DefaultCredentialsError
 from google.cloud import texttospeech
 from google.oauth2 import service_account
+from injector import inject
 
-from src.common.enums import Language
-from src.common.loggers.app_logger import AppLogger
-
-from ..env.env_config import EnvVariables
-from ..maps import language_voice_map
-
-logger = AppLogger()
+from common.enums.language_enum import Language
+from common.env.env_config import EnvVariables
+from common.lib.tts.tts_adapter import TtsAdapter
+from common.loggers.models.abstracts.logger_abstract import Logger
+from common.maps import language_voice_map
 
 
-class GoogleUtils:
-    @staticmethod
-    async def synthetize_text(text: str, language: Language, output_file: Path) -> str:
-        file = GoogleUtils.__name__
-        method = GoogleUtils.synthetize_text.__name__
+class GoogleTtsAdapter(TtsAdapter):
+    @inject
+    def __init__(self, logger: Logger):
+        self._file = GoogleTtsAdapter.__name__
+
+        self._logger = logger
+        self._env = EnvVariables().get().google
+
+    async def synthetize_text(self, *, text: str, language: Language, output_file: Path) -> str:
+        method = GoogleTtsAdapter.synthetize_text.__name__
 
         try:
-            google_env = EnvVariables.get().google
-
             credentials = service_account.Credentials.from_service_account_file(
-                google_env.credentials
+                self._env.credentials
             )
 
             client = texttospeech.TextToSpeechAsyncClient(credentials=credentials)
@@ -48,24 +50,24 @@ class GoogleUtils:
 
             async with open(output_file, "wb") as out:
                 await out.write(response.audio_content)
-                logger.debug(
+                self._logger.debug(
                     f"Audio content written to {output_file}",
-                    file=file,
+                    file=self._file,
                     method=method,
                 )
             return str(output_file)
         except DefaultCredentialsError as e:
-            logger.error(f"Google credentials error: {e}", file=file, method=method)
+            self._logger.error(f"Google credentials error: {e}", file=self._file, method=method)
             raise
 
         except GoogleAPIError as e:
-            logger.error(f"Google API error: {e}", file=file, method=method)
+            self._logger.error(f"Google API error: {e}", file=self._file, method=method)
             raise
 
         except Exception as e:
-            logger.error(
+            self._logger.error(
                 f"Unexpected error during text synthesis: {e}",
-                file=file,
+                file=self._file,
                 method=method,
             )
             raise
