@@ -76,7 +76,7 @@ class AppBuilder:
         self.__lifespan = create_lifespan({"db": self.__db, "cache": self.__cache})
 
         self.__app = FastAPI(lifespan=self.__lifespan)
-        self.__router = AppRouter(self.__injector).get_router()
+        self.__router = AppRouter(self.__injector).router
 
     def set_open_api(self) -> "AppBuilder":
         env_variables = self.__env.openapi
