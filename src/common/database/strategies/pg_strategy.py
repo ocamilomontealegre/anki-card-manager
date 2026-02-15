@@ -1,9 +1,10 @@
 from injector import inject
-from sqlalchemy import create_engine, Engine, exc
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy import Engine, create_engine, exc
+from sqlalchemy.orm import Session, sessionmaker
 
-from common.loggers.models.abstracts.logger_abstract import Logger
 from common.env.env_config import EnvVariables
+from common.loggers.models.abstracts.logger_abstract import Logger
+
 from ..entities.base_entity import Base
 from .database_strategy import DatabaseStrategy
 
@@ -48,8 +49,7 @@ class PgStrategy(DatabaseStrategy):
         method = self.create_session.__name__
 
         try:
-            engine = self.create_engine()
-            session = sessionmaker(bind=engine)
+            session = sessionmaker(bind=self._engine)
             return session()
         except exc.DatabaseError as e:
             self._logger.error(
