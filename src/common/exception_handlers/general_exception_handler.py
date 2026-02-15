@@ -1,9 +1,10 @@
 from fastapi import Request
 from fastapi.responses import JSONResponse
-from common.loggers.app_logger import AppLogger
-from common.utils import ExceptionUtils
-from common.models import HTTPResponse
+
 from common.constants import STATUS_MESSAGES
+from common.loggers.app_logger import AppLogger
+from common.models import HTTPResponse
+from common.utils import ExceptionUtils
 
 
 class GeneralExceptionHandler:
@@ -21,7 +22,7 @@ class GeneralExceptionHandler:
         )
 
         logger.error(
-            f"[INCOMING REQUEST] METHOD: {request.method} | URL: {request.url.path} | HEADERS: {request.headers} "
+            f"[INCOMING REQUEST] METHOD: {request.method} | URL: {request.url.path} "
             f"[OUTGOING RESPONSE] STATUS: {response.status} | RESPONSE_BODY: {response} | EXCEPTION: {exception_details}",
             file=file,
             method=GeneralExceptionHandler.handle_exception.__name__,
