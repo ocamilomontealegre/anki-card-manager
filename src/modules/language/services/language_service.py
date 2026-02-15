@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import cast
 
 from injector import inject
@@ -9,7 +8,6 @@ from common.env.env_config import EnvVariables
 from common.lib.ai_client.ai_client_adapter import AiClientAdapter
 from common.lib.http_client.http_client_adapter import HttpClientAdapter
 from common.loggers.models.abstracts.logger_abstract import Logger
-from common.utils import FileUtils
 from modules.language.maps.card_interface_map import card_interface_map
 from modules.language.models.interfaces.word_context_response_interface import (
     WordContextResponse,
@@ -82,7 +80,7 @@ class LanguageService:
         method = self._process_row.__name__
 
         word = row["word"]
-        language = row["language"]
+        language = Language(row["language"])
 
         try:
             self._logger.debug(
@@ -125,8 +123,8 @@ class LanguageService:
                 )
                 continue
 
-        if self._env.actions.delete:
-            FileUtils.remove_file(file_path=Path(file_name))
+        # if self._env.actions.delete:
+        #     FileUtils.remove_file(file_path=Path(file_name))
 
     async def create_word_entry(self, word: Row):
         try:
