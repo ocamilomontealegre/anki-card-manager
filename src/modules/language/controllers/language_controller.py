@@ -1,14 +1,13 @@
 from injector import inject
 from pydantic import BaseModel
 
+from common.enums import MqTaskStatus
 from common.enums.language_enum import Language
 from common.enums.word_category_enum import WordCategory
+from common.models import TaskResponse
 from modules.language.models.interfaces.row_interface import Row
 from modules.language.services.language_service import LanguageService
-from src.common.enums import MqTaskStatus
-from src.common.models import TaskResponse
-
-from ..tasks.language_task import process_csv_task
+from modules.language.tasks.language_task import process_csv_task
 
 
 class ProcessRequest(BaseModel):
