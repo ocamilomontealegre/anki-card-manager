@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import cast
 
 from injector import inject
@@ -8,11 +9,13 @@ from common.env.env_config import EnvVariables
 from common.lib.ai_client.ai_client_adapter import AiClientAdapter
 from common.lib.http_client.http_client_adapter import HttpClientAdapter
 from common.loggers.models.abstracts.logger_abstract import Logger
+from common.utils.file_utils import FileUtils
 from modules.language.maps.card_interface_map import card_interface_map
 from modules.language.models.interfaces.word_context_response_interface import (
     WordContextResponse,
 )
 from modules.language.repositories.language_repository import LanguageRepository
+from modules.word.models.entities.word_entity import Word
 from modules.word.services.word_service import WordService
 
 from ..models.interfaces import Row
@@ -103,6 +106,8 @@ class LanguageService:
     async def process_csv(self, file_name: str) -> None:
         df = read_csv(file_name, delimiter=",")
 
+        entities: list[Word] = []
+
         for index, row in df.iterrows():
             try:
                 card_response = await self._process_row(cast(Row, row.to_dict()))
@@ -113,8 +118,7 @@ class LanguageService:
                 transformed_word = await self._language_transformer.to_entity(
                     card_info=card_response
                 )
-                self._word_service.create(word=transformed_word)
-
+                entities.append(transformed_word)
             except Exception as e:
                 self._logger.error(
                     f"Skipping row[{index}] due to error: {e}",
@@ -123,14 +127,16 @@ class LanguageService:
                 )
                 continue
 
-        # if self._env.actions.delete:
-        #     FileUtils.remove_file(file_path=Path(file_name))
+        self._word_service.create_many(entities)
+
+        if self._env.actions.delete:
+            FileUtils.remove_file(file_path=Path(file_name))
 
     async def create_word_entry(self, word: Row):
         try:
             card_response = await self._process_row(word)
             if not card_response:
-                raise ValueError("random")
+                raise ValueError("Card could not be created")
 
             transformed_word = await self._language_transformer.to_entity(
                 card_info=card_response
