@@ -7,9 +7,9 @@ from injector import inject
 from common.enums.language_enum import Language
 from common.enums.word_category_enum import WordCategory
 from common.env.env_config import EnvVariables
+from common.lib.ipa_service.ipa_service_adapter import IpaServiceAdapter
+from common.lib.tts.tts_adapter import TtsAdapter
 from common.loggers.models.abstracts.logger_abstract import Logger
-from common.utils import GoogleUtils
-from modules.scraper.services.scraper_service import ScraperService
 from modules.word.models.entities.word_entity import Word
 
 from ..models.interfaces.card_response_interfaces.card_response_interface import (
@@ -19,10 +19,16 @@ from ..models.interfaces.card_response_interfaces.card_response_interface import
 
 class LanguageTransformer:
     @inject
-    def __init__(self, scraper_service: ScraperService, logger: Logger):
+    def __init__(
+        self,
+        ipa_service_adapter: IpaServiceAdapter,
+        tts_adapter: TtsAdapter,
+        logger: Logger,
+    ):
         self._file = LanguageTransformer.__name__
 
-        self._scraper_service = scraper_service
+        self._ipa_service = ipa_service_adapter
+        self._tts = tts_adapter
 
         self._logger = logger
         self._env = EnvVariables.get()
@@ -142,15 +148,10 @@ class LanguageTransformer:
             )
 
             conjugations = self._capitalize_text_array(card_info.conjugations or [])
-            self._logger.debug(f"{conjugations}", file="LANGUAGE_TRANSFORMER")
 
             word_forms = self._capitalize_text_array(word_forms)
 
-            # images = self._scraper_service.get_image_url(
-            #     {"query": word, "source": "google"}
-            # )
-
-            sentence_path = await GoogleUtils.synthetize_text(
+            sentence_audio_path = await self._tts.synthetize_text(
                 text=card_info.sentence.replace("[", "").replace("]", ""),
                 language=language,
                 output_file=Path(self._get_audio_path(word=word)),
@@ -158,7 +159,7 @@ class LanguageTransformer:
 
             plural_audio_path = ""
             if len(plural) > 0:
-                plural_audio_path = await GoogleUtils.synthetize_text(
+                plural_audio_path = await self._tts.synthetize_text(
                     text=plural,
                     language=language,
                     output_file=Path(self._get_audio_path(word=word, prefix="plural")),
@@ -166,7 +167,7 @@ class LanguageTransformer:
 
             singular_audio_path = ""
             if len(singular) > 0:
-                singular_audio_path = await GoogleUtils.synthetize_text(
+                singular_audio_path = await self._tts.synthetize_text(
                     text=singular,
                     language=language,
                     output_file=Path(
@@ -176,7 +177,7 @@ class LanguageTransformer:
 
             conjugations_audio_path = ""
             if len(conjugations) > 0:
-                conjugations_audio_path = await GoogleUtils.synthetize_text(
+                conjugations_audio_path = await self._tts.synthetize_text(
                     text=conjugations,
                     language=language,
                     output_file=Path(
@@ -192,11 +193,12 @@ class LanguageTransformer:
                 frequency_rank=card_info.frequency_rank,
                 definition=card_info.definition.capitalize().rstrip(),
                 sentence=card_info.sentence,
-                phonetics=card_info.sentence_phonetics.replace("[", "")
-                .replace("]", "")
-                .replace("/", "")
-                .rstrip(),
-                sentence_audio=sentence_path,
+                phonetics=self._ipa_service.transform_text_to_ipa(
+                    text=card_info.sentence, language=card_info.language
+                )
+                .replace("[", "")
+                .replace("]", ""),
+                sentence_audio=sentence_audio_path,
                 partial_sentence=card_info.partial_sentence.rstrip(),
                 singular=singular,
                 singular_audio=singular_audio_path,

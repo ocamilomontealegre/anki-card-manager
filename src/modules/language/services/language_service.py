@@ -2,15 +2,19 @@ from pathlib import Path
 from typing import cast
 
 from injector import inject
-from openai import OpenAI
 from pandas import read_csv
 
 from common.enums import Language
 from common.env.env_config import EnvVariables
 from common.lib.ai_client.ai_client_adapter import AiClientAdapter
+from common.lib.http_client.http_client_adapter import HttpClientAdapter
 from common.loggers.models.abstracts.logger_abstract import Logger
 from common.utils import FileUtils
 from modules.language.maps.card_interface_map import card_interface_map
+from modules.language.models.interfaces.word_context_response_interface import (
+    WordContextResponse,
+)
+from modules.language.repositories.language_repository import LanguageRepository
 from modules.word.services.word_service import WordService
 
 from ..models.interfaces import Row
@@ -25,7 +29,9 @@ class LanguageService:
     def __init__(
         self,
         word_service: WordService,
-        ai_client_adapter: AiClientAdapter,
+        ai_client: AiClientAdapter,
+        http_client: HttpClientAdapter,
+        language_repository: LanguageRepository,
         language_transformer: LanguageTransformer,
         logger: Logger,
     ) -> None:
@@ -36,10 +42,10 @@ class LanguageService:
         self._logger = logger
 
         self._word_service = word_service
-        self.__ai_client_adapter = ai_client_adapter
+        self._ai_client_adapter = ai_client
+        self._http_client = http_client
+        self._language_repository = language_repository
         self._language_transformer = language_transformer
-
-        self._ai_client = OpenAI(api_key=self._env.ai.key)
 
     def _build_prompt_messages(self, row: Row) -> list[dict[str, str]]:
         word = row["word"]
@@ -84,9 +90,9 @@ class LanguageService:
                 file=self._file,
                 method=method,
             )
-            return self.__ai_client_adapter.get_structured_response(
+            return self._ai_client_adapter.get_structured_response(
                 messages=self._build_prompt_messages(row),
-                response_interface=card_interface_map[str(language)],
+                response_interface=card_interface_map[language.value],
             )
         except Exception as e:
             self._logger.error(
@@ -121,3 +127,31 @@ class LanguageService:
 
         if self._env.actions.delete:
             FileUtils.remove_file(file_path=Path(file_name))
+
+    async def create_word_entry(self, word: Row):
+        try:
+            card_response = await self._process_row(word)
+            if not card_response:
+                raise ValueError("random")
+
+            transformed_word = await self._language_transformer.to_entity(
+                card_info=card_response
+            )
+            self._word_service.create(word=transformed_word)
+
+            return transformed_word
+
+        except Exception as e:
+            self._logger.error(
+                f"Something went wrong {e}",
+                file=self._file,
+                method=self.create_word_entry.__name__,
+            )
+            raise e
+
+    async def get_word_context(
+        self, *, word: str, language: Language
+    ) -> WordContextResponse:
+        return await self._language_repository.get_word_context(
+            word=word, language=language
+        )
