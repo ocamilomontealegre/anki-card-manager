@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class WordCategory(Enum):
+class WordCategory(str, Enum):
     NOUN = "noun"
     VERB = "verb"
     ADJECTIVE = "adjective"
