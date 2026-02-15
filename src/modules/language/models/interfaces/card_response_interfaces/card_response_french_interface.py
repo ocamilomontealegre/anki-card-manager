@@ -16,7 +16,7 @@ class FrenchCardResponse(CardResponseBase):
         description="""
             The grammatical forms of the word, grouped by number and gender.
             Guidelines:
-            
+
             - Include singular and plural forms if applicable.
             - Include masculine and feminine forms if applicable.
             Example:

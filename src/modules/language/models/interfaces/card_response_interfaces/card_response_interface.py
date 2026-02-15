@@ -82,12 +82,3 @@ class CardResponseBase(BaseModel):
             - Replace the target word fo {...}
         """,
     )
-    sentence_phonetics: str = Field(
-        ...,
-        description="""
-            The phonetic transcription of the example sentence in IPA (International Phonetic Alphabet).
-            Guidelines:
-            - Transcribe the sentence exactly as it appears in `sentence`.
-            - Use standard IPA symbols consistently throughout.
-        """,
-    )
