@@ -15,7 +15,6 @@ from modules.language.models.interfaces.word_context_response_interface import (
     WordContextResponse,
 )
 from modules.language.repositories.language_repository import LanguageRepository
-from modules.word.models.entities.word_entity import Word
 from modules.word.services.word_service import WordService
 
 from ..models.interfaces import Row
@@ -106,8 +105,6 @@ class LanguageService:
     async def process_csv(self, file_name: str) -> None:
         df = read_csv(file_name, delimiter=",")
 
-        entities: list[Word] = []
-
         for index, row in df.iterrows():
             try:
                 card_response = await self._process_row(cast(Row, row.to_dict()))
@@ -118,7 +115,7 @@ class LanguageService:
                 transformed_word = await self._language_transformer.to_entity(
                     card_info=card_response
                 )
-                entities.append(transformed_word)
+                self._word_service.create(transformed_word)
             except Exception as e:
                 self._logger.error(
                     f"Skipping row[{index}] due to error: {e}",
@@ -126,8 +123,6 @@ class LanguageService:
                     method=self.process_csv.__name__,
                 )
                 continue
-
-        self._word_service.create_many(entities)
 
         if self._env.actions.delete:
             FileUtils.remove_file(file_path=Path(file_name))
