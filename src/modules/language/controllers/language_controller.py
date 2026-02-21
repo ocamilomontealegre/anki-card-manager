@@ -24,6 +24,8 @@ class CreateWord(BaseModel):
     language: Language
     category: WordCategory | None = None
     context: str | None = None
+    thense: str | None = None
+    person: str | None = None
 
 
 class LanguageController:
@@ -40,6 +42,8 @@ class LanguageController:
         word: Row = {
             "word": request.word,
             "language": request.language,
+            "thense": request.thense,
+            "person": request.person,
         }
 
         if request.category is not None:
