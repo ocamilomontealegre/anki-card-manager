@@ -1,16 +1,16 @@
-from typing import List, Tuple
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 from uuid import uuid4
 
-from pandas import DataFrame
 from injector import inject
+from pandas import DataFrame
 from sqlalchemy.orm import Session
 
-from common.models import DeleteMany
 from common.database.strategies.database_strategy import DatabaseStrategy
-from common.loggers.models.abstracts.logger_abstract import Logger
 from common.env.env_config import EnvVariables
+from common.loggers.models.abstracts.logger_abstract import Logger
+from common.models import DeleteMany
+
 from ..models.entities.word_entity import Word
 from ..models.interfaces.find_all_params import FindAllParams
 from ..transformers.word_transformer import WordTransformer
@@ -65,7 +65,7 @@ class WordService:
         )
         return word
 
-    def create_many(self, words: List[Word]):
+    def create_many(self, words: list[Word]):
         self._session.add_all(words)
         self._session.commit()
         self._logger.info(
@@ -74,7 +74,7 @@ class WordService:
             method=self.create_many.__name__,
         )
 
-    def list_paginated(self, filters: FindAllParams) -> Tuple[List[Word], int]:
+    def list_paginated(self, filters: FindAllParams) -> tuple[list[Word], int]:
         off_set = filters.offset or 0
         limit = filters.limit or 100
 
