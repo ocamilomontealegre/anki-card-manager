@@ -11,6 +11,9 @@ from common.lib.http_client.http_client_adapter import HttpClientAdapter
 from common.loggers.models.abstracts.logger_abstract import Logger
 from common.utils.file_utils import FileUtils
 from modules.language.maps.card_interface_map import card_interface_map
+from modules.language.models.interfaces.card_response_interfaces.card_verb_response_interface import (
+    CardVerbResponse,
+)
 from modules.language.models.interfaces.word_context_response_interface import (
     WordContextResponse,
 )
@@ -83,6 +86,8 @@ class LanguageService:
 
         word = row["word"]
         language = Language(row["language"])
+        thense = row["thense"] if row["thense"] else None
+        person = row["person"] if row["person"] else None
 
         try:
             self._logger.debug(
@@ -90,10 +95,18 @@ class LanguageService:
                 file=self._file,
                 method=method,
             )
+
+            if not thense and not person:
+                return self._ai_client_adapter.get_structured_response(
+                    messages=self._build_prompt_messages(row),
+                    response_interface=card_interface_map[language.value],
+                )
+
             return self._ai_client_adapter.get_structured_response(
                 messages=self._build_prompt_messages(row),
-                response_interface=card_interface_map[language.value],
+                response_interface=CardVerbResponse,
             )
+
         except Exception as e:
             self._logger.error(
                 f"Error processing row: {row}, Error: {e}",

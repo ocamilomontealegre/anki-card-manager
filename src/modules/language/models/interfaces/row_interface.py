@@ -11,3 +11,5 @@ class Row(TypedDict):
     language: Language
     category: NotRequired[WordCategory]
     context: NotRequired[str]
+    thense: str | None
+    person: str | None

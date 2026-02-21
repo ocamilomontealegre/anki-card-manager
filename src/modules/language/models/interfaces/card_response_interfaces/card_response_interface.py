@@ -65,7 +65,7 @@ class CardResponseBase(BaseModel):
     sentence: str = Field(
         ...,
         description="""
-            A single example sentence showing how the word is used in context for the Italian Language
+            A single example sentence showing how the word is used in context for the target Language
             Guidelines:
             - Highlight the target word between []
             - Use the word correctly in a simple, learner-friendly sentence.
