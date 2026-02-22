@@ -4,7 +4,7 @@ from injector import inject
 from common.enums import AppEndpoints
 from common.models import ListPaginated
 
-from ..models.interfaces.find_all_params import FindAllParams
+from ..models.interfaces.list_params import ListParams
 from ..services.word_service import WordService
 from ..transformers.word_transformer import WordTransformer
 
@@ -18,8 +18,8 @@ class WordController:
         self._word_transformer = word_transformer
         self._router = APIRouter(prefix=AppEndpoints.WORD.value, tags=["Word"])
 
-    async def list_paginated(self, params: FindAllParams = Depends()):
-        (words, size) = self._word_service.list_paginated(params)
+    async def list_paginated(self, params: ListParams = Depends()):
+        (words, size) = self._word_service.list(params)
         transformed_words = [self._word_transformer.transform(word) for word in words]
         return ListPaginated(
             items=transformed_words,
@@ -28,5 +28,5 @@ class WordController:
             size=params.limit or 1,
         )
 
-    async def get_as_csv(self, params: FindAllParams = Depends()):
+    async def get_as_csv(self, params: ListParams = Depends()):
         return self._word_service.get_as_csv(params)

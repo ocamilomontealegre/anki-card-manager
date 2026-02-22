@@ -1,7 +1,7 @@
 from word.models.entities.word_entity import Word
 
 from common.database.strategies.database_strategy import DatabaseStrategy
-from modules.word.models.interfaces.find_all_params import ListParams
+from modules.word.models.interfaces.list_params import ListParams
 
 
 class WordRepository:

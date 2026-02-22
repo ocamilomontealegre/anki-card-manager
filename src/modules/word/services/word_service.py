@@ -10,7 +10,7 @@ from common.loggers.models.abstracts.logger_abstract import Logger
 from modules.word.repositories.word_repository import WordRepository
 
 from ..models.entities.word_entity import Word
-from ..models.interfaces.find_all_params import ListParams
+from ..models.interfaces.list_params import ListParams
 from ..transformers.word_transformer import WordTransformer
 
 
