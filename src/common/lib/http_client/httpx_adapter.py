@@ -22,6 +22,7 @@ class HttpxAdapter(HttpClientAdapter):
                 params=http_options.query_params,
                 headers=http_options.headers,
                 timeout=http_options.timeout,
+                json=http_options.body,
             )
 
             response.raise_for_status()
