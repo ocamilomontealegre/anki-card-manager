@@ -1,13 +1,14 @@
-import httpx
 from injector import inject
 from requests import RequestException
 
 from common.enums import Language
 from common.env.env_config import EnvVariables
+from common.lib.http_client.http_client_adapter import HttpOptions
+from common.lib.http_client.httpx_adapter import HttpxAdapter
 from common.loggers.models.abstracts.logger_abstract import Logger
 from common.maps import language_deck_map, language_model_map
-from modules.word.models.interfaces.find_all_params import FindAllParams
-from modules.word.services.word_service import WordService
+from modules.word.models.interfaces.list_params import ListParams
+from modules.word.repositories.word_repository import WordRepository
 from modules.word.transformers.word_transformer import WordTransformer
 
 
@@ -15,18 +16,20 @@ class AnkiService:
     @inject
     def __init__(
         self,
-        word_service: WordService,
+        word_repository: WordRepository,
         word_transformer: WordTransformer,
+        http_client: HttpxAdapter,
         logger: Logger,
     ) -> None:
         self._file = AnkiService.__name__
 
-        self._anki_env = EnvVariables.get().anki
+        self._word_repository = word_repository
+        self._word_transformer = word_transformer
 
+        self._http_client = http_client
         self._logger = logger
 
-        self._word_service = word_service
-        self._word_transformer = word_transformer
+        self._anki_env = EnvVariables.get().anki
 
     def _get_deck_for_lang(self, language: Language) -> str:
         return language_deck_map.get(language.value, Language.ENGLISH.value)
@@ -34,10 +37,10 @@ class AnkiService:
     def _get_model_for_lang(self, language: Language) -> str:
         return language_model_map.get(language.value, Language.ENGLISH.value)
 
-    async def create_cards(self, filters: FindAllParams):
+    async def create_cards(self, params: ListParams):
         method = self.create_cards.__name__
 
-        (words, _) = self._word_service.list_paginated(filters=filters)
+        words = self._word_repository.list(params=params)
 
         results = []
         for word in words:
@@ -66,25 +69,25 @@ class AnkiService:
             }
 
             try:
-                async with httpx.AsyncClient() as client:
-                    self._logger.debug(
-                        f"Adding card for word: {word}",
-                        file=self._file,
-                        method=method,
-                    )
+                self._logger.debug(
+                    f"Adding card for word: {word}",
+                    file=self._file,
+                    method=method,
+                )
 
-                    response = await client.post(self._anki_env.connect, json=payload)
-                    response.raise_for_status()
-                    data = response.json()
+                response = await self._http_client.request(
+                    self._anki_env.connect,
+                    http_options=HttpOptions(method="POST", body=payload),
+                )
 
-                if "error" in data and data["error"]:
+                if "error" in response and response["error"]:
                     self._logger.error(
-                        f"Error adding card for word: {word} -> {data['error']}",
+                        f"Error adding card for word: {word} -> {response['error']}",
                         file=self._file,
                         method=method,
                     )
                 else:
-                    results.append(data.get("result"))
+                    results.append(response.get("result"))
             except RequestException as e:
                 self._logger.error(
                     f"Failed to connect to AnkiConnect: {e}",
