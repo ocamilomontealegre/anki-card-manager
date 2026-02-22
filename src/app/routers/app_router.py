@@ -7,7 +7,7 @@ from modules.language.routers.language_router import LanguageRouter
 from modules.scraper.controllers.scraper_controller import ScraperController
 from modules.task.routers.task_router import TaskRouter
 from modules.upload.controllers.upload_controller import UploadController
-from modules.word.controllers.word_controller import WordController
+from modules.word.routers.word_router import WordRouter
 
 
 class AppRouter:
@@ -24,14 +24,14 @@ class AppRouter:
         health_controller = self._injector.get(HealthController)
         upload_controller = self._injector.get(UploadController)
         language_router = self._injector.get(LanguageRouter)
-        word_controller = self._injector.get(WordController)
+        word_router = self._injector.get(WordRouter)
         scraper_controller = self._injector.get(ScraperController)
         anki_controller = self._injector.get(AnkiController)
         task_router = self._injector.get(TaskRouter)
 
         self._router.include_router(health_controller.get_router())
         self._router.include_router(upload_controller.get_router())
-        self._router.include_router(word_controller.get_router())
+        self._router.include_router(word_router.router)
         self._router.include_router(scraper_controller.get_router())
         self._router.include_router(anki_controller.get_router())
         self._router.include_router(language_router.router)
