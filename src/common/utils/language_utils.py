@@ -1,6 +1,8 @@
 from typing import TypedDict
+
 from googletrans import Translator
-from src.common.enums import Language
+
+from common.enums import Language
 
 
 class Translate(TypedDict):

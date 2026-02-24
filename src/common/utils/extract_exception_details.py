@@ -1,7 +1,8 @@
 from traceback import TracebackException
-from fastapi import HTTPException
-from src.common.models import ExceptionTrace
 
+from fastapi import HTTPException
+
+from common.models import ExceptionTrace
 
 union_exception = HTTPException | Exception
 

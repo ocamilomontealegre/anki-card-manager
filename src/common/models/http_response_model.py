@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 from pydantic import BaseModel, Field
 
-from src.common.types import DataType
+from common.types import DataType
 
 
 class HTTPResponse(BaseModel):

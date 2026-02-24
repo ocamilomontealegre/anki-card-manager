@@ -1,9 +1,9 @@
-from typing import Union
 from traceback import TracebackException
+from typing import Union
 
 from fastapi import HTTPException
 
-from src.common.models import ExceptionTrace
+from common.models import ExceptionTrace
 
 union_exception = Union[HTTPException, Exception]
 

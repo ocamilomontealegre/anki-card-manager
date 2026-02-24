@@ -4,7 +4,7 @@ from typing import Literal
 
 from loguru import logger
 
-from src.common.decorators.singleton_decorator import singleton
+from common.decorators.singleton_decorator import singleton
 
 from .models.abstracts.logger_abstract import Logger
 from .models.enums.ansi_colors_enum import ANSIColors

@@ -1,4 +1,4 @@
-from src.common.enums import Language
+from common.enums import Language
 
 language_deck_map: dict[str, str] = {
     Language.ENGLISH.value: "Languages::English::Book 08 - Sand",

@@ -1,4 +1,4 @@
-from src.common.constants import STATUS_MESSAGES
+from common.constants import STATUS_MESSAGES
 
 
 def get_status_message(status_code: int) -> str:

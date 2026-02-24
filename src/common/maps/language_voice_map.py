@@ -1,4 +1,4 @@
-from src.common.enums import Language
+from common.enums import Language
 
 language_voice_map: dict[str, dict[str, str]] = {
     Language.ENGLISH.value: {

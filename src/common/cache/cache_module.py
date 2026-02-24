@@ -1,4 +1,5 @@
-from injector import Module, Binder, singleton
+from injector import Binder, Module, singleton
+
 from .strategies.cache_strategy import CacheStrategy
 from .strategies.redis_strategy import RedisStrategy
 
