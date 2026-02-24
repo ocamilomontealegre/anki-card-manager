@@ -1,10 +1,12 @@
-from word.models.entities.word_entity import Word
+from injector import inject
 
 from common.database.strategies.database_strategy import DatabaseStrategy
+from modules.word.models.entities.word_entity import Word
 from modules.word.models.interfaces.list_params import ListParams
 
 
 class WordRepository:
+    @inject
     def __init__(self, db_strategy: DatabaseStrategy):
         self._session = db_strategy.create_session()
 

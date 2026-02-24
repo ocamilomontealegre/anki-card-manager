@@ -7,6 +7,7 @@ from common.lib.ipa_service.phonemizer_adapter import PhonemizerAdapter
 from common.lib.tts.google_tts_adapter import GoogleTtsAdapter
 from common.lib.tts.tts_adapter import TtsAdapter
 from modules.language.repositories.language_repository import LanguageRepository
+from modules.language.routers.language_router import LanguageRouter
 
 from .controllers.language_controller import LanguageController
 from .services.language_service import LanguageService
@@ -15,6 +16,7 @@ from .transformers.language_transformer import LanguageTransformer
 
 class LanguageModule(Module):
     def configure(self, binder: Binder):
+        binder.bind(LanguageRouter, to=LanguageRouter, scope=singleton)
         binder.bind(LanguageController, to=LanguageController, scope=singleton)
         binder.bind(LanguageService, to=LanguageService, scope=singleton)
         binder.bind(LanguageTransformer, to=LanguageTransformer, scope=singleton)

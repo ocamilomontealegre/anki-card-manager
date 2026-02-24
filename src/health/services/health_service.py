@@ -1,5 +1,5 @@
-from health.models.abstracts.health_service_abstract import HealthService
 from health.constants import HEALTH_MESSAGE
+from health.models.abstracts.health_service_abstract import HealthService
 
 
 class HealthServiceImpl(HealthService):

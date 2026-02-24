@@ -1,9 +1,11 @@
 from fastapi import APIRouter
+from injector import inject
 
 from health.controllers.health_controller import HealthController
 
 
 class HealthRouter:
+    @inject
     def __init__(self, health_controller: HealthController):
         self._health_controller = health_controller
 
