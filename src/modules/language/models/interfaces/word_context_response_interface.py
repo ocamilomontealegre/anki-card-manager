@@ -13,4 +13,3 @@ class WordContextResponse(BaseModel):
         ...,
     )
     context: list[Context]
-

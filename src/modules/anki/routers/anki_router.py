@@ -9,11 +9,10 @@ class AnkiRouter:
         self._router = APIRouter(prefix=AppEndpoints.ANKI.value, tags=["Anki"])
         self._anki_controller = anki_controller
 
-
     @property
     def router(self) -> APIRouter:
         return self._router
-    
+
     def _register_routes(self) -> None:
         self._router.add_api_route(
             "/",

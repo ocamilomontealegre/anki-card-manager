@@ -12,7 +12,7 @@ class CardVerbResponse(CardResponseBase):
         description="""
             A string covering the thense, the person, and the base verb        
             Example: For: 'mangio': Present - First Person - Parlare
-        """
+        """,
     )
     sentence: str = Field(
         ...,
@@ -33,4 +33,3 @@ class CardVerbResponse(CardResponseBase):
             - Replace the target word for {...}
         """,
     )
-

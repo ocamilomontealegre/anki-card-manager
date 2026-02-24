@@ -44,5 +44,3 @@ class WordRepository:
         self._session.refresh(word)
 
         return word
-    
-

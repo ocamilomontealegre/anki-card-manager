@@ -22,7 +22,9 @@ class GoogleTtsAdapter(TtsAdapter):
         self._logger = logger
         self._env = EnvVariables.get().google
 
-    async def synthetize_text(self, *, text: str, language: Language, output_file: Path) -> str:
+    async def synthetize_text(
+        self, *, text: str, language: Language, output_file: Path
+    ) -> str:
         method = GoogleTtsAdapter.synthetize_text.__name__
 
         try:
@@ -57,7 +59,9 @@ class GoogleTtsAdapter(TtsAdapter):
                 )
             return str(output_file)
         except DefaultCredentialsError as e:
-            self._logger.error(f"Google credentials error: {e}", file=self._file, method=method)
+            self._logger.error(
+                f"Google credentials error: {e}", file=self._file, method=method
+            )
             raise
 
         except GoogleAPIError as e:

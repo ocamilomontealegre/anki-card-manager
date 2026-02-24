@@ -6,6 +6,7 @@ T = TypeVar("T")
 
 HttpMethod = Literal["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]
 
+
 @dataclass
 class HttpOptions:
     method: HttpMethod
@@ -18,6 +19,10 @@ class HttpOptions:
 class HttpClientAdapter(ABC):
     @abstractmethod
     async def request(
-        self, url: str, *, http_options: HttpOptions, response_model: type[T] | None = None
+        self,
+        url: str,
+        *,
+        http_options: HttpOptions,
+        response_model: type[T] | None = None,
     ) -> T:
         pass

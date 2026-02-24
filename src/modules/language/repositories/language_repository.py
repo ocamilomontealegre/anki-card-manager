@@ -97,7 +97,7 @@ class LanguageRepository:
                 response = await self._get_context_from_api(word=word)
                 if response:
                     return response
-                
+
             return await self._get_context_from_ai_client(word=word, language=language)
         except Exception as e:
             raise RuntimeError(f"Failed to get context for word {word}") from e

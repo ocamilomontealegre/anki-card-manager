@@ -1,4 +1,3 @@
-
 from phonemizer import phonemize
 
 from common.enums.language_enum import Language

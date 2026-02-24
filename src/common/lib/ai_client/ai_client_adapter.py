@@ -6,7 +6,6 @@ from pydantic import BaseModel
 T = TypeVar("T", bound=BaseModel)
 
 
-
 class AiClientAdapter(ABC):
     @abstractmethod
     def get_structured_response(
