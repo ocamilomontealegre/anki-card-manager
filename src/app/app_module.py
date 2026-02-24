@@ -9,7 +9,6 @@ from common.loggers.models.abstracts.logger_abstract import Logger
 from health.health_module import HealthModule
 from modules.anki.anki_module import AnkiModule
 from modules.language.language_module import LanguageModule
-from modules.scraper.scraper_module import ScraperModule
 from modules.task.task_module import TaskModule
 from modules.upload.upload_module import UploadModule
 from modules.word.word_module import WordModule
@@ -23,7 +22,6 @@ class AppModule(Module):
         binder.install(module=UploadModule)
         binder.install(module=LanguageModule)
         binder.install(module=WordModule)
-        binder.install(module=ScraperModule)
         binder.install(module=AnkiModule)
         binder.install(module=TaskModule)
 
