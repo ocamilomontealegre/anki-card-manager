@@ -1,7 +1,6 @@
-from typing import DefaultDict
 from collections import defaultdict
 
-STATUS_MESSAGES: DefaultDict[int, str] = defaultdict(
+STATUS_MESSAGES: defaultdict[int, str] = defaultdict(
     lambda: "Unknown status code",
     {
         200: "Request completed successfully",

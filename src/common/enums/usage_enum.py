@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class Usage(Enum):
+class Usage(str, Enum):
     """
     Indicates the context or style in which a word is typically used.
 
