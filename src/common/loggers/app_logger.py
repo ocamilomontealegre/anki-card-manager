@@ -16,7 +16,7 @@ def add_file_context(log_func):
         frame = currentframe()
         if frame is not None and frame.f_back is not None:
             frame = frame.f_back
-            file = frame.f_code.co_filename
+            file = frame.f_code.co_filename.split("/")[-1]
             method = frame.f_code.co_name
         else:
             file = "Unknown"
