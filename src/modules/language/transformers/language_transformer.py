@@ -25,8 +25,6 @@ class LanguageTransformer:
         tts_adapter: TtsAdapter,
         logger: Logger,
     ):
-        self._file = LanguageTransformer.__name__
-
         self._ipa_service = ipa_service_adapter
         self._tts = tts_adapter
 
@@ -114,12 +112,8 @@ class LanguageTransformer:
         return word_forms
 
     async def to_entity(self, card_info: CardResponseBase):
-        method = self.to_entity.__name__
-
         self._logger.debug(
             f"Transforming word[{card_info.word}]",
-            file=self._file,
-            method=method,
         )
 
         word_forms = self.__get_word_forms(card_info)
@@ -212,7 +206,5 @@ class LanguageTransformer:
         except Exception as e:
             self._logger.error(
                 f"Error transforming card: {e}",
-                file=self._file,
-                method=method,
             )
             raise

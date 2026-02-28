@@ -38,8 +38,6 @@ class LanguageService:
         language_transformer: LanguageTransformer,
         logger: Logger,
     ) -> None:
-        self._file = LanguageService.__name__
-
         self._env = EnvVariables.get()
 
         self._logger = logger
@@ -82,8 +80,6 @@ class LanguageService:
         ]
 
     async def _process_row(self, row: Row) -> CardResponseBase | None:
-        method = self._process_row.__name__
-
         word = row["word"]
         language = Language(row["language"])
         thense = row["thense"] if row["thense"] else None
@@ -91,9 +87,7 @@ class LanguageService:
 
         try:
             self._logger.debug(
-                f"Fetching data for word[{word}] with language[{language}]",
-                file=self._file,
-                method=method,
+                f"Fetching data for word[{word}] with language[{language}]"
             )
 
             if not thense and not person:
@@ -110,8 +104,6 @@ class LanguageService:
         except Exception as e:
             self._logger.error(
                 f"Error processing row: {row}, Error: {e}",
-                file=self._file,
-                method=method,
             )
             raise
 
@@ -132,8 +124,6 @@ class LanguageService:
             except Exception as e:
                 self._logger.error(
                     f"Skipping row[{index}] due to error: {e}",
-                    file=self._file,
-                    method=self.process_csv.__name__,
                 )
                 continue
 
@@ -156,8 +146,6 @@ class LanguageService:
         except Exception as e:
             self._logger.error(
                 f"Something went wrong {e}",
-                file=self._file,
-                method=self.create_word_entry.__name__,
             )
             raise e
 

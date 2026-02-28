@@ -22,8 +22,6 @@ class WordService:
         word_transformer: WordTransformer,
         logger: Logger,
     ) -> None:
-        self._file = WordService.__name__
-
         self._word_repository = word_repository
         self._word_transformer = word_transformer
 
@@ -34,8 +32,6 @@ class WordService:
         created_word = self._word_repository.create(word)
         self._logger.info(
             f"{Word.__name__}[{word.word}] created successfully.",
-            file=self._file,
-            method=self.create.__name__,
         )
         return created_word
 
@@ -44,8 +40,6 @@ class WordService:
 
         self._logger.info(
             f"{Word.__name__}[{len(words)}] found",
-            file=self._file,
-            method=self.list.__name__,
         )
 
         return (words, len(words))
@@ -63,7 +57,5 @@ class WordService:
         df.to_csv(output_path, index=False, header=False)
         self._logger.info(
             f"{Word.__name__}[{len(words)}] found",
-            file=self._file,
-            method=self.get_as_csv.__name__,
         )
         return {"status": "OK"}

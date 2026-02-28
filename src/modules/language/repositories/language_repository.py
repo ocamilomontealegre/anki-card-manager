@@ -31,8 +31,6 @@ class LanguageRepository:
     def __init__(
         self, ai_client: AiClientAdapter, http_client: HttpClientAdapter, logger: Logger
     ):
-        self._file = LanguageRepository.__name__
-
         self._ai_client = ai_client
         self._http_client = http_client
         self._logger = logger

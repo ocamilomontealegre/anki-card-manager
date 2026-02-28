@@ -21,8 +21,6 @@ class AnkiService:
         http_client: HttpxAdapter,
         logger: Logger,
     ) -> None:
-        self._file = AnkiService.__name__
-
         self._word_repository = word_repository
         self._word_transformer = word_transformer
 
@@ -38,8 +36,6 @@ class AnkiService:
         return language_model_map.get(language.value, Language.ENGLISH.value)
 
     async def create_cards(self, params: ListParams):
-        method = self.create_cards.__name__
-
         words = self._word_repository.list(params=params)
 
         results = []
@@ -71,8 +67,6 @@ class AnkiService:
             try:
                 self._logger.debug(
                     f"Adding card for word: {word}",
-                    file=self._file,
-                    method=method,
                 )
 
                 response = await self._http_client.request(
@@ -83,16 +77,12 @@ class AnkiService:
                 if "error" in response and response["error"]:
                     self._logger.error(
                         f"Error adding card for word: {word} -> {response['error']}",
-                        file=self._file,
-                        method=method,
                     )
                 else:
                     results.append(response.get("result"))
             except RequestException as e:
                 self._logger.error(
                     f"Failed to connect to AnkiConnect: {e}",
-                    file=self._file,
-                    method=method,
                 )
                 continue
 

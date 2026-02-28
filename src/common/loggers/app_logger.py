@@ -1,4 +1,5 @@
 import sys
+from inspect import currentframe
 from os import getpid
 from typing import Literal
 
@@ -8,6 +9,21 @@ from common.decorators.singleton_decorator import singleton
 
 from .models.abstracts.logger_abstract import Logger
 from .models.enums.ansi_colors_enum import ANSIColors
+
+
+def add_file_context(log_func):
+    def wrapper(self, message: str, *args, **kwargs):
+        frame = currentframe()
+        if frame is not None and frame.f_back is not None:
+            frame = frame.f_back
+            file = frame.f_code.co_filename
+            method = frame.f_code.co_name
+        else:
+            file = "Unknown"
+            method = "Unknown"
+        return log_func(self, message, file=file, method=method, *args, **kwargs)
+
+    return wrapper
 
 
 @singleton
@@ -72,51 +88,56 @@ class AppLogger(Logger):
             "method": str(method) if method else "App",
         }
 
+    @add_file_context
     def debug(
         self,
         message: str,
         *,
-        file: str,
+        file: str | None = None,
         method: str | None = None,
     ) -> None:
         extra = self._format_context(file, method)
         self._logger.bind(**extra).debug(message)
 
+    @add_file_context
     def info(
         self,
         message: str,
         *,
-        file: str,
+        file: str | None = None,
         method: str | None = None,
     ) -> None:
         extra = self._format_context(file, method)
         self._logger.bind(**extra).info(message)
 
+    @add_file_context
     def warning(
         self,
         message: str,
         *,
-        file: str,
+        file: str | None = None,
         method: str | None = None,
     ) -> None:
         extra = self._format_context(file, method)
         self._logger.bind(**extra).warning(message)
 
+    @add_file_context
     def error(
         self,
         message: str,
         *,
-        file: str,
+        file: str | None = None,
         method: str | None = None,
     ) -> None:
         extra = self._format_context(file, method)
         self._logger.bind(**extra).error(message)
 
+    @add_file_context
     def critical(
         self,
         message: str,
         *,
-        file: str,
+        file: str | None = None,
         method: str | None = None,
     ) -> None:
         extra = self._format_context(file, method)

@@ -17,16 +17,12 @@ from common.maps import language_voice_map
 class GoogleTtsAdapter(TtsAdapter):
     @inject
     def __init__(self, logger: Logger):
-        self._file = GoogleTtsAdapter.__name__
-
         self._logger = logger
         self._env = EnvVariables.get().google
 
     async def synthetize_text(
         self, *, text: str, language: Language, output_file: Path
     ) -> str:
-        method = GoogleTtsAdapter.synthetize_text.__name__
-
         try:
             credentials = service_account.Credentials.from_service_account_file(
                 self._env.credentials
@@ -54,24 +50,18 @@ class GoogleTtsAdapter(TtsAdapter):
                 await out.write(response.audio_content)
                 self._logger.debug(
                     f"Audio content written to {output_file}",
-                    file=self._file,
-                    method=method,
                 )
             return str(output_file)
         except DefaultCredentialsError as e:
-            self._logger.error(
-                f"Google credentials error: {e}", file=self._file, method=method
-            )
+            self._logger.error(f"Google credentials error: {e}")
             raise
 
         except GoogleAPIError as e:
-            self._logger.error(f"Google API error: {e}", file=self._file, method=method)
+            self._logger.error(f"Google API error: {e}")
             raise
 
         except Exception as e:
             self._logger.error(
                 f"Unexpected error during text synthesis: {e}",
-                file=self._file,
-                method=method,
             )
             raise

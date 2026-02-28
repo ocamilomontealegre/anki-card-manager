@@ -56,8 +56,6 @@ class HTTPInterceptor(BaseHTTPMiddleware):
                 self._logger.info(
                     f"[INCOMING REQUEST] METHOD: {request.method} | URL: {request.url.path} | "
                     f"[OUTGOING RESPONSE] STATUS: {response.status_code} | RESPONSE_BODY: {formated_response.data}",
-                    file=HTTPInterceptor.__name__,
-                    method=self.dispatch.__name__,
                 )
 
                 return JSONResponse(

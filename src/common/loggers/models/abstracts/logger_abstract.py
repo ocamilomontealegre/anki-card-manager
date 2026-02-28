@@ -3,21 +3,31 @@ from abc import ABC, abstractmethod
 
 class Logger(ABC):
     @abstractmethod
-    def debug(self, message: str, *, file: str, method: str | None = None) -> None:
+    def debug(
+        self, message: str, *, file: str | None = None, method: str | None = None
+    ) -> None:
         pass
 
     @abstractmethod
-    def info(self, message: str, *, file: str, method: str | None = None) -> None:
+    def info(
+        self, message: str, *, file: str | None = None, method: str | None = None
+    ) -> None:
         pass
 
     @abstractmethod
-    def warning(self, message: str, *, file: str, method: str | None = None) -> None:
+    def warning(
+        self, message: str, *, file: str | None = None, method: str | None = None
+    ) -> None:
         pass
 
     @abstractmethod
-    def error(self, message: str, *, file: str, method: str | None = None) -> None:
+    def error(
+        self, message: str, *, file: str | None = None, method: str | None = None
+    ) -> None:
         pass
 
     @abstractmethod
-    def critical(self, message: str, *, file: str, method: str | None = None) -> None:
+    def critical(
+        self, message: str, *, file: str | None = None, method: str | None = None
+    ) -> None:
         pass

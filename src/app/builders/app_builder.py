@@ -16,8 +16,6 @@ from common.exception_handlers import (
 from common.interceptors import HTTPInterceptor
 from common.loggers.app_logger import AppLogger
 
-file = "AppBuilder"
-
 
 class LifespanDependencies(TypedDict):
     db: DatabaseStrategy
@@ -32,34 +30,28 @@ def create_lifespan(deps: LifespanDependencies):
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-        method = lifespan.__name__
-
         try:
             db.create_session()
             db.create_tables()
             logger.info(
                 "Database connected successfully",
-                file=file,
-                method=method,
             )
 
             await cache.connect()
         except Exception as e:
             logger.error(
                 f"Database connection failed: {e}",
-                file=file,
-                method=method,
             )
             raise
         yield
         try:
             db.disconnect()
-            logger.info("Database connection closed", file=file, method=method)
+            logger.info(
+                "Database connection closed",
+            )
         except Exception as e:
             logger.error(
                 f"Error during database disconnection: {e}",
-                file=file,
-                method=method,
             )
 
         await cache.close_connection()
