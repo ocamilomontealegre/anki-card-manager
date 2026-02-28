@@ -142,10 +142,9 @@ class LanguageService:
             self._word_service.create(word=transformed_word)
 
             return transformed_word
-
         except Exception as e:
             self._logger.error(
-                f"Something went wrong {e}",
+                f"Error creating entry for {word['word']}: {e}",
             )
             raise e
 
