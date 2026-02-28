@@ -1,11 +1,10 @@
 from traceback import TracebackException
-from typing import Union
 
 from fastapi import HTTPException
 
 from common.models import ExceptionTrace
 
-union_exception = Union[HTTPException, Exception]
+union_exception = HTTPException | Exception
 
 
 class ExceptionUtils:
