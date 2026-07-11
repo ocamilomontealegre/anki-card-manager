@@ -13,6 +13,9 @@ from .models.enums.ansi_colors_enum import ANSIColors
 
 def add_file_context(log_func):
     def wrapper(self, message: str, *args, **kwargs):
+        file = kwargs.pop("file", None)
+        method = kwargs.pop("method", None)
+
         frame = currentframe()
         if frame is not None and frame.f_back is not None:
             frame = frame.f_back
@@ -40,6 +43,7 @@ class AppLogger(Logger):
     def _format_log(self, record, type: Literal["console", "file"]):
         extra = record["extra"]
         pid = extra.get("pid")
+
         file = extra.get("file", "App")
         method = extra.get("method", "App")
         time = record["time"].strftime("%b-%d-%y %H:%M:%S")

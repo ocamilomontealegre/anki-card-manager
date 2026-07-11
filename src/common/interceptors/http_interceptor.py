@@ -50,7 +50,7 @@ class HTTPInterceptor(BaseHTTPMiddleware):
             if response.status_code < 400:
                 formated_response = await self._format_response(
                     response.body_iterator,  # type: ignore
-                    response.status_code,  # type: ignore
+                    response.status_code,
                 )
 
                 self._logger.info(
