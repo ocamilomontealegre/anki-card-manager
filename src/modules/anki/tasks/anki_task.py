@@ -9,10 +9,12 @@ from ..services.anki_service import AnkiService
 
 
 @celery_app.task(name="process_anki_cards")
-def process_anki_cards(params: ListParams) -> None:
+def process_anki_cards(params: dict) -> None:
     from app.app_module import AppModule
+
+    validated_params = ListParams(**params)
 
     container = Injector([AppModule()])
     anki_service = container.get(AnkiService)
 
-    run(anki_service.create_cards(params=params))
+    run(anki_service.create_cards(params=validated_params))

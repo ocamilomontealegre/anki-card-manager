@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from injector import inject
 
 from common.enums.app_endpoints_enum import AppEndpoints
+from common.models.task_response_model import TaskResponse
 from modules.anki.controllers.anki_controller import AnkiController
 
 
@@ -10,6 +11,7 @@ class AnkiRouter:
     def __init__(self, anki_controller: AnkiController):
         self._router = APIRouter(prefix=AppEndpoints.ANKI.value, tags=["Anki"])
         self._anki_controller = anki_controller
+        self._register_routes()
 
     @property
     def router(self) -> APIRouter:
@@ -17,7 +19,8 @@ class AnkiRouter:
 
     def _register_routes(self) -> None:
         self._router.add_api_route(
-            "/",
+            "",
             self._anki_controller.process,
             methods=["POST"],
+            response_model=TaskResponse,
         )

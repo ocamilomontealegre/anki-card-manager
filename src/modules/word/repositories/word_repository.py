@@ -32,8 +32,8 @@ class WordRepository:
         return query
 
     def list(self, params: ListParams) -> list[Word]:
-        off_set = params.offset or 0
-        limit = params.limit or 100
+        off_set = params.offset if params.offset else 0
+        limit = params.limit if params.limit else 100
 
         query = self._get_filter_query(params)
         words = query.offset(off_set).limit(limit).all()
