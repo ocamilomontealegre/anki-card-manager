@@ -80,10 +80,10 @@ class LanguageService:
         ]
 
     async def _process_row(self, row: Row) -> CardResponseBase | None:
-        word = row["word"]
-        language = Language(row["language"])
-        thense = row["thense"] if row["thense"] else None
-        person = row["person"] if row["person"] else None
+        word = row.get("word")
+        language = Language(row.get("language"))
+        thense = row.get("thense")
+        person = row.get("person")
 
         try:
             self._logger.debug(
