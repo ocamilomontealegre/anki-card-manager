@@ -5,7 +5,6 @@ from common.env.actions_env_config import ActionsEnvVariables
 from common.env.ai_env_config import AIEnvVariables
 from common.env.anki_env_config import AnkiEnvVariables
 from common.env.app_env_config import AppEnvVariables
-from common.env.debuggy_env_config import DebuggyEnvVariables
 from common.env.google_env_config import GoogleEnvVariables
 from common.env.open_api_env_config import OpenAPIEnvVariables
 from common.env.pg_env_config import PgEnvVariables
@@ -21,7 +20,6 @@ class EnvConfig(BaseSettings):
     actions: ActionsEnvVariables
     anki: AnkiEnvVariables
     app: AppEnvVariables
-    debuggy: DebuggyEnvVariables
     google: GoogleEnvVariables
     ai: AIEnvVariables
     openapi: OpenAPIEnvVariables

@@ -1,21 +1,28 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "FastAPI Debug (Uvicorn)",
-      "type": "debugpy",
-      "request": "attach",
-      "connect": {
-        "host": "localhost",
-        "port": 5678
-      },
-      "pathMappings": [
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
         {
-          "localRoot": "${workspaceFolder}/src",
-          "remoteRoot": "/app"
+            "name": "Python Debugger: FastAPI",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "cwd": "${workspaceFolder}/src",
+            "args": [
+                "main:app",
+                "--reload"
+            ],
+            "jinja": true
+        },
+        {
+            "name": "Python Debugger: MQ Worker",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/celery.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
         }
-      ],
-      "justMyCode": true
-    }
-  ]
+    ]
 }
