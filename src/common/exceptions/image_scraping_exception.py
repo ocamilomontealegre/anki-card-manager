@@ -1,2 +1,0 @@
-class ImageScrapingException(Exception):
-    pass
