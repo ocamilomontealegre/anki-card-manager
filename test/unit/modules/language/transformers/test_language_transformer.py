@@ -30,16 +30,21 @@ def mock_logger():
 
 
 @pytest.fixture
-def mock_scraper():
-    """Mock scraper service."""
+def mock_ipa():
+    """Mock ipa service."""
     mock = MagicMock()
     return mock
 
+@pytest.fixture
+def mock_tts():
+    """Mock tts service."""
+    mock = MagicMock()
+    return mock
 
 @pytest.fixture
-def transformer(mock_scraper, mock_logger, mock_env):
+def transformer(mock_ipa, mock_tts, mock_logger):
     """Create the transformer instance."""
-    return LanguageTransformer(scraper_service=mock_scraper, logger=mock_logger)
+    return LanguageTransformer(mock_ipa, mock_tts, mock_logger)
 
 
 @pytest.fixture
