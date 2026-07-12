@@ -32,7 +32,7 @@ class LanguageRouter:
         )
 
         self._router.add_api_route(
-            "/",
+            "",
             self._language_controller.create_word_entry,
             methods=["POST"],
         )

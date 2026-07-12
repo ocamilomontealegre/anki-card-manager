@@ -19,7 +19,7 @@ class WordRouter:
 
     def _register_routes(self) -> None:
         self._router.add_api_route(
-            "/",
+            "",
             self._language_controller.list_paginated,
             methods=["GET"],
         )

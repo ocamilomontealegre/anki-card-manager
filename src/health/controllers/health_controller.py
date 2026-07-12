@@ -10,4 +10,5 @@ class HealthController:
         self._health_service = health_service
 
     async def check(self):
+        print("OK")
         return HealthMessageDto(message=self._health_service.check())
